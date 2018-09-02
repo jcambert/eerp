@@ -1,0 +1,10 @@
+﻿version: '3.4'
+
+services:
+  article.api:
+    image: eerp/article.api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "80:80"
