@@ -1,6 +1,18 @@
 version: '3.4'
 
 services:
+  rabbitmq:
+    image: 'bitnami/rabbitmq:latest'
+    labels:
+      kompose.service.type: nodeport
+    ports:
+      - '4369:4369'
+      - '5672:5672'
+      - '25672:25672'
+      - '15672:15672'
+    volumes:
+      - 'rabbitmq_data:/bitnami'
+      
   article.api:
     image: eerp/article.api
     environment :
@@ -11,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: src/services/Article/Article.Api/Dockerfile
+    depends_on:
+      - rabbitmq
   websupervisor:
     image: eerp/websupervisor
     environment:
@@ -21,3 +35,6 @@ services:
     build:
       context: .
       dockerfile: src/web/WebSupervisor/Dockerfile
+volumes:
+  rabbitmq_data:
+    driver: local
