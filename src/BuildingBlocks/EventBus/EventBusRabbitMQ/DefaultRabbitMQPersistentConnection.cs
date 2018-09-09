@@ -7,7 +7,7 @@ using RabbitMQ.Client.Exceptions;
 using System;
 using System.IO;
 using System.Net.Sockets;
-
+using System.Reactive.Linq;
 
 namespace EventBusRabbitMQ
 {
@@ -21,11 +21,17 @@ namespace EventBusRabbitMQ
 
         object sync_root = new object();
 
+        private IDisposable whenConnectionShutdown;
+        private IDisposable whenConnectionBlocked;
+        private IDisposable whenCallbackException;
+
         public DefaultRabbitMQPersistentConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQPersistentConnection> logger, int retryCount = 5)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _retryCount = retryCount;
+
+
         }
 
         public bool IsConnected
@@ -54,6 +60,9 @@ namespace EventBusRabbitMQ
 
             try
             {
+                whenCallbackException.Dispose();
+                whenConnectionBlocked.Dispose();
+                whenConnectionShutdown.Dispose();
                 _connection.Dispose();
             }
             catch (IOException ex)
@@ -84,9 +93,34 @@ namespace EventBusRabbitMQ
 
                 if (IsConnected)
                 {
-                    _connection.ConnectionShutdown += OnConnectionShutdown;
-                    _connection.CallbackException += OnCallbackException;
-                    _connection.ConnectionBlocked += OnConnectionBlocked;
+                    whenConnectionShutdown = this.WhenConnectionShutdown.Subscribe(e =>
+                    {
+                        if (_disposed) return;
+
+                        _logger.LogWarning("A RabbitMQ connection is on shutdown. Trying to re-connect...");
+
+                        TryConnect();
+                    });
+                    whenCallbackException = this.WhenCallbackException.Subscribe(e =>
+                    {
+                        if (_disposed) return;
+
+                        _logger.LogWarning("A RabbitMQ connection throw exception. Trying to re-connect...");
+
+                        TryConnect();
+                    });
+                    whenConnectionBlocked = this.WhenConnectionBlocked.Subscribe(e =>
+                    {
+                        if (_disposed) return;
+
+                        _logger.LogWarning("A RabbitMQ connection is blocked. Trying to re-connect...");
+
+                        TryConnect();
+                    });
+
+                    //_connection.ConnectionShutdown += OnConnectionShutdown;
+                    // _connection.CallbackException += OnCallbackException;
+                    // _connection.ConnectionBlocked += OnConnectionBlocked;
 
                     _logger.LogInformation($"RabbitMQ persistent connection acquired a connection {_connection.Endpoint.HostName} and is subscribed to failure events");
 
@@ -126,6 +160,42 @@ namespace EventBusRabbitMQ
             _logger.LogWarning("A RabbitMQ connection is on shutdown. Trying to re-connect...");
 
             TryConnect();
+        }
+
+        public IObservable<ShutdownEventArgs> WhenConnectionShutdown
+        {
+            get
+            {
+                return Observable
+                    .FromEventPattern<ShutdownEventArgs>(
+                        h => _connection.ConnectionShutdown += h,
+                        h => _connection.ConnectionShutdown -= h)
+                        .Select(e => e.EventArgs);
+            }
+        }
+
+        public IObservable<ConnectionBlockedEventArgs> WhenConnectionBlocked
+        {
+            get
+            {
+                return Observable
+                    .FromEventPattern<ConnectionBlockedEventArgs>(
+                        h => _connection.ConnectionBlocked += h,
+                        h => _connection.ConnectionBlocked -= h)
+                        .Select(e => e.EventArgs);
+            }
+        }
+
+        public IObservable<CallbackExceptionEventArgs> WhenCallbackException
+        {
+            get
+            {
+                return Observable
+                    .FromEventPattern<CallbackExceptionEventArgs>(
+                        h => _connection.CallbackException += h,
+                        h => _connection.CallbackException -= h)
+                        .Select(e => e.EventArgs);
+            }
         }
     }
 }
