@@ -12,6 +12,7 @@ namespace EventBusRabbitMQ
         public static IBus CreateBus(string connectionString)
         {
             Kernel.RegisterDefaultServices();
+            //Kernel.Bind<IConnectionFactory>().To<DefaultRabbitMQPersistentConnection>().WithConstructorArgument("connectionString",connectionString)
             return Kernel.Get<IBus>();
         }
 

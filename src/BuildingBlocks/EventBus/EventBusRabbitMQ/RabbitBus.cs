@@ -12,6 +12,7 @@ namespace EventBusRabbitMQ
         private readonly ISendReceive _sendreceive;
         private readonly IScheduler _scheduler;
         private readonly IAdvancedBus _advanced;
+        private readonly IRabbitMQPersistentConnection _connection;
 
         [Inject]
         public RabbitBus(
@@ -19,7 +20,8 @@ namespace EventBusRabbitMQ
             IPubSub pubSub,
             IRpc rpc,
             ISendReceive sendReceive,
-            IScheduler scheduler)
+            IScheduler scheduler,
+            IRabbitMQPersistentConnection connection)
         {
 
         }
@@ -32,6 +34,8 @@ namespace EventBusRabbitMQ
         public IScheduler Scheduler => _scheduler;
 
         public IAdvancedBus Advanced => _advanced;
+
+        public IRabbitMQPersistentConnection Connection => _connection;
 
         public void Dispose()
         {

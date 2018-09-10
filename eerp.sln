@@ -32,22 +32,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Temp", "Temp", "{699ADCB9-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testef", "testef", "{AD27AB9C-2957-417E-AD65-F1A619075CE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCoreTest", "src\Temp\testef\EFCoreTest\EFCoreTest.csproj", "{2658FB8C-CDA8-4A15-B9F8-282640529B76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreTest", "src\Temp\testef\EFCoreTest\EFCoreTest.csproj", "{2658FB8C-CDA8-4A15-B9F8-282640529B76}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testbus", "testbus", "{C75E4E35-B78F-4D77-9CA0-FF3F80D9DAE6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusTest", "src\Temp\testbus\BusTest\BusTest.csproj", "{849AE601-F836-4E4A-9AB5-604D5A94166A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusTest", "src\Temp\testbus\BusTest\BusTest.csproj", "{849AE601-F836-4E4A-9AB5-604D5A94166A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventBus", "EventBus", "{D658F9F4-1558-4469-919E-3BD16E031DB9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBusRabbitMQ", "src\BuildingBlocks\EventBus\EventBusRabbitMQ\EventBusRabbitMQ.csproj", "{B93C23E8-97A3-453E-86DA-56EC20152C71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventBusRabbitMQ", "src\BuildingBlocks\EventBus\EventBusRabbitMQ\EventBusRabbitMQ.csproj", "{B93C23E8-97A3-453E-86DA-56EC20152C71}"
 	ProjectSection(ProjectDependencies) = postProject
 		{240ECA1B-7108-4D7C-AA76-BA7205111DC4} = {240ECA1B-7108-4D7C-AA76-BA7205111DC4}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventsBus", "src\BuildingBlocks\EventBus\EventsBus\EventsBus.csproj", "{240ECA1B-7108-4D7C-AA76-BA7205111DC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventsBus", "src\BuildingBlocks\EventBus\EventsBus\EventsBus.csproj", "{240ECA1B-7108-4D7C-AA76-BA7205111DC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestEasyBus", "src\Temp\TestEasyBus\TestEasyBus.csproj", "{0C8B1FF3-5937-4960-8C89-7F67266B3C62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusTestConsole", "src\Temp\testbus\BusTestConsole\BusTestConsole.csproj", "{D286DF7F-CAF6-49F4-B8FC-307E674B56E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,10 +87,10 @@ Global
 		{240ECA1B-7108-4D7C-AA76-BA7205111DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{240ECA1B-7108-4D7C-AA76-BA7205111DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{240ECA1B-7108-4D7C-AA76-BA7205111DC4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C8B1FF3-5937-4960-8C89-7F67266B3C62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C8B1FF3-5937-4960-8C89-7F67266B3C62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C8B1FF3-5937-4960-8C89-7F67266B3C62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C8B1FF3-5937-4960-8C89-7F67266B3C62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D286DF7F-CAF6-49F4-B8FC-307E674B56E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D286DF7F-CAF6-49F4-B8FC-307E674B56E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D286DF7F-CAF6-49F4-B8FC-307E674B56E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D286DF7F-CAF6-49F4-B8FC-307E674B56E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,7 +113,7 @@ Global
 		{D658F9F4-1558-4469-919E-3BD16E031DB9} = {FD69B32A-14D1-4206-9286-F1135BECB5D3}
 		{B93C23E8-97A3-453E-86DA-56EC20152C71} = {D658F9F4-1558-4469-919E-3BD16E031DB9}
 		{240ECA1B-7108-4D7C-AA76-BA7205111DC4} = {D658F9F4-1558-4469-919E-3BD16E031DB9}
-		{0C8B1FF3-5937-4960-8C89-7F67266B3C62} = {699ADCB9-C9D2-4B6F-B68E-A5248BD63FBF}
+		{D286DF7F-CAF6-49F4-B8FC-307E674B56E0} = {C75E4E35-B78F-4D77-9CA0-FF3F80D9DAE6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {91170C71-1FDD-4C77-8230-8726B6DFEDD5}

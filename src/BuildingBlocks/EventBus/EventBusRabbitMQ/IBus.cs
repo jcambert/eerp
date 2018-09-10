@@ -33,5 +33,10 @@ namespace EventBusRabbitMQ
         /// Return the advanced EasyNetQ advanced API.
         /// </summary>
         IAdvancedBus Advanced { get; }
+
+        /// <summary>
+        /// Return underlayed connection
+        /// </summary>
+        IRabbitMQPersistentConnection Connection { get; }
     }
 }
