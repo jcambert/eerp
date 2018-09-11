@@ -1,4 +1,5 @@
-﻿using Ninject;
+﻿using EventBusRabbitMQ.ConnectionString;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +11,7 @@ namespace EventBusRabbitMQ
         internal static void RegisterDefaultServices(this IKernel container)
         {
             container.Bind<IRabbitMQPersistentConnection>().To<DefaultRabbitMQPersistentConnection>();
-            container.Bind<IConnectionFactory>().To<ConnectionFactoryWrapper>();
+            container.Bind<IConnectionStringParser>().To<ConnectionStringParser>();
             container.Bind<IPubSub>().To<DefaultPubSub>();
             container.Bind<IRpc>().To<DefaultRpc>();
             container.Bind<ISendReceive>().To<DefaultSendReceive>();

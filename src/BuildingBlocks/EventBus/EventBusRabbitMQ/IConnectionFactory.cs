@@ -16,49 +16,49 @@ namespace EventBusRabbitMQ
         private readonly RabbitMQ.Client.IConnectionFactory _connectionFactory;
 
         [Inject]
-        public ConnectionFactoryWrapper(IKernel container, ConnectionConfiguration connectionConfiguration)
+        public ConnectionFactoryWrapper(string connectionString)
         {
 
-           
-            Configuration = connectionConfiguration;
-            _container = container;
-           
-                var connectionFactory = new ConnectionFactory
-                {
-                    UseBackgroundThreadsForIO = connectionConfiguration.UseBackgroundThreads,
-                    AutomaticRecoveryEnabled = false,
-                    TopologyRecoveryEnabled = false
-                };
 
-                if (connectionConfiguration.AMQPConnectionString != null)
-                {
-                    connectionFactory.Uri = connectionConfiguration.AMQPConnectionString;
-                }
+            Configuration = new ConnectionConfiguration();
 
-                connectionFactory.HostName = Configuration.Name;
 
-                if (connectionFactory.VirtualHost == "/")
-                    connectionFactory.VirtualHost = Configuration.VirtualHost;
+            var connectionFactory = new ConnectionFactory
+            {
+                UseBackgroundThreadsForIO = Configuration.UseBackgroundThreads,
+                AutomaticRecoveryEnabled = false,
+                TopologyRecoveryEnabled = false
+            };
 
-                if (connectionFactory.UserName == "guest")
-                    connectionFactory.UserName = Configuration.UserName;
+            if (Configuration.AMQPConnectionString != null)
+            {
+                connectionFactory.Uri = Configuration.AMQPConnectionString;
+            }
 
-                if (connectionFactory.Password == "guest")
-                    connectionFactory.Password = Configuration.Password;
+            connectionFactory.HostName = Configuration.Name;
 
-                if (connectionFactory.Port == -1)
-                    connectionFactory.Port = Configuration.Port;
+            if (Configuration.VirtualHost == "/")
+                connectionFactory.VirtualHost = Configuration.VirtualHost;
 
-                if (Configuration.Ssl.Enabled)
-                    connectionFactory.Ssl = Configuration.Ssl;
+            if (Configuration.UserName == "guest")
+                connectionFactory.UserName = Configuration.UserName;
 
-                //Prefer SSL configurations per each host but fall back to ConnectionConfiguration's SSL configuration for backwards compatibility
-                else if (Configuration.Ssl.Enabled)
-                    connectionFactory.Ssl = Configuration.Ssl;
+            if (Configuration.Password == "guest")
+                connectionFactory.Password = Configuration.Password;
 
-                connectionFactory.RequestedHeartbeat = Configuration.RequestedHeartbeat;
-                connectionFactory.ClientProperties = Configuration.ClientProperties;
-                connectionFactory.AuthMechanisms = Configuration.AuthMechanisms;
+            if (Configuration.Port == -1)
+                connectionFactory.Port = Configuration.Port;
+
+            if (Configuration.Ssl.Enabled)
+                connectionFactory.Ssl = Configuration.Ssl;
+
+            //Prefer SSL configurations per each host but fall back to ConnectionConfiguration's SSL configuration for backwards compatibility
+            else if (Configuration.Ssl.Enabled)
+                connectionFactory.Ssl = Configuration.Ssl;
+
+            connectionFactory.RequestedHeartbeat = Configuration.RequestedHeartbeat;
+            connectionFactory.ClientProperties = Configuration.ClientProperties;
+            connectionFactory.AuthMechanisms = Configuration.AuthMechanisms;
             _connectionFactory = connectionFactory;
         }
 
@@ -70,6 +70,9 @@ namespace EventBusRabbitMQ
 
 
         public HostConfiguration Host => throw new System.NotImplementedException();
+
+        [Inject]
+        public IKernel Container { get; set; }
     }
 
     public class ConnectionFactoryInfo

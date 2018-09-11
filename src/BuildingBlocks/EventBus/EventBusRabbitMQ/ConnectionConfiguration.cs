@@ -1,10 +1,9 @@
 ﻿
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using RabbitMQ.Client;
 
 namespace EventBusRabbitMQ
 {
@@ -12,7 +11,7 @@ namespace EventBusRabbitMQ
     {
         private const int DefaultPort = 5672;
         private const int DefaultAmqpsPort = 5671;
-        public ushort Port { get; set; }
+        public int Port { get; set; }
         public string VirtualHost { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
@@ -24,7 +23,7 @@ namespace EventBusRabbitMQ
         public Uri AMQPConnectionString { get; set; }
         public IDictionary<string, object> ClientProperties { get; }
 
-        public HostConfiguration Hosts { get; set; }
+        public string Host { get; set; }
         public SslOption Ssl { get; }
         /// <summary>
         /// Operation timeout seconds. (default is 10)
@@ -60,7 +59,8 @@ namespace EventBusRabbitMQ
             PrefetchCount = 50;
             AuthMechanisms = new AuthMechanismFactory[] { new PlainMechanismFactory() };
 
-            Hosts = new HostConfiguration();
+            //Hosts = new HostConfiguration();
+            Host = "";
 
             Ssl = new SslOption();
             ClientProperties = new Dictionary<string, object>();
@@ -125,14 +125,6 @@ namespace EventBusRabbitMQ
 
         public void Validate()
         {
-            
-           
-                if (Hosts.Port == 0)
-                {
-                    Hosts.Port = Port;
-                }
-            
-
             SetDefaultClientProperties(ClientProperties);
         }
     }
@@ -145,7 +137,7 @@ namespace EventBusRabbitMQ
         }
 
         public string Host { get; set; }
-        public ushort Port { get; set; }
+        public int Port { get; set; }
         public SslOption Ssl { get; }
     }
 }

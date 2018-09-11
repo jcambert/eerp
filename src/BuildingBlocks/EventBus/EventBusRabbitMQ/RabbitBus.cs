@@ -1,7 +1,4 @@
 ﻿using Ninject;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EventBusRabbitMQ
 {
@@ -23,6 +20,12 @@ namespace EventBusRabbitMQ
             IScheduler scheduler,
             IRabbitMQPersistentConnection connection)
         {
+            _advanced = advanced;
+            _pubsub = pubSub;
+            _rpc = rpc;
+            _sendreceive = sendReceive;
+            _scheduler = scheduler;
+            _connection = connection;
 
         }
         public IPubSub PubSub => _pubsub;

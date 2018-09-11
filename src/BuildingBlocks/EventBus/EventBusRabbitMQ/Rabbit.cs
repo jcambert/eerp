@@ -7,12 +7,20 @@ namespace EventBusRabbitMQ
 {
     public static class Rabbit
     {
-        static IKernel Kernel => new StandardKernel();
+        
+
+        static Rabbit()
+        {
+            Kernel = new StandardKernel();
+            Kernel.RegisterDefaultServices();
+        }
+
+        public static IKernel Kernel { get; }
 
         public static IBus CreateBus(string connectionString)
         {
-            Kernel.RegisterDefaultServices();
-            //Kernel.Bind<IConnectionFactory>().To<DefaultRabbitMQPersistentConnection>().WithConstructorArgument("connectionString",connectionString)
+            
+            Kernel.Bind<IConnectionFactory>().To<ConnectionFactoryWrapper>().WithConstructorArgument("connectionString",connectionString);
             return Kernel.Get<IBus>();
         }
 
