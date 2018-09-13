@@ -1,8 +1,6 @@
 ﻿using EventBusRabbitMQ.ConnectionString;
+using Microsoft.Extensions.Logging;
 using Ninject;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EventBusRabbitMQ
 {
@@ -18,6 +16,13 @@ namespace EventBusRabbitMQ
             container.Bind<IScheduler>().To<ExternalScheduler>();
             container.Bind<IAdvancedBus>().To<RabbitAdvancedBus>();
             container.Bind<IBus>().To<RabbitBus>();
+            container.Bind<ILogger>().ToMethod((kernel) =>
+            {
+                ILoggerFactory loggerFactory = new LoggerFactory().AddConsole().AddDebug();
+                ILogger logger = loggerFactory.CreateLogger("EventBusRabbitMQ");
+                return logger;
+
+            });
         }
     }
 }

@@ -27,6 +27,7 @@ namespace EventBusRabbitMQ
             _scheduler = scheduler;
             _connection = connection;
 
+
         }
         public IPubSub PubSub => _pubsub;
 

@@ -1,4 +1,5 @@
-﻿using Ninject;
+﻿using EventBusRabbitMQ.ConnectionString;
+using Ninject;
 using RabbitMQ.Client;
 namespace EventBusRabbitMQ
 {
@@ -7,20 +8,22 @@ namespace EventBusRabbitMQ
         IConnection CreateConnection();
         ConnectionConfiguration Configuration { get; }
         HostConfiguration Host { get; }
+        string ConnectionString { get; }
 
     }
     public class ConnectionFactoryWrapper : IConnectionFactory
     {
+        public string ConnectionString { get; }
         public virtual ConnectionConfiguration Configuration { get; }
-        private readonly IKernel _container;
+        
         private readonly RabbitMQ.Client.IConnectionFactory _connectionFactory;
 
         [Inject]
-        public ConnectionFactoryWrapper(string connectionString)
+        public ConnectionFactoryWrapper(string connectionString,IConnectionStringParser Parser)
         {
+            ConnectionString = connectionString;
 
-
-            Configuration = new ConnectionConfiguration();
+            Configuration  = Parser.Parse(ConnectionString); //new ConnectionConfiguration();
 
 
             var connectionFactory = new ConnectionFactory
@@ -35,26 +38,26 @@ namespace EventBusRabbitMQ
                 connectionFactory.Uri = Configuration.AMQPConnectionString;
             }
 
-            connectionFactory.HostName = Configuration.Name;
+            connectionFactory.HostName = Configuration.Host;
 
-            if (Configuration.VirtualHost == "/")
+           // if (Configuration.VirtualHost == "/")
                 connectionFactory.VirtualHost = Configuration.VirtualHost;
 
-            if (Configuration.UserName == "guest")
+            //if (Configuration.UserName == "guest")
                 connectionFactory.UserName = Configuration.UserName;
 
-            if (Configuration.Password == "guest")
+           // if (Configuration.Password == "guest")
                 connectionFactory.Password = Configuration.Password;
 
-            if (Configuration.Port == -1)
+           // if (Configuration.Port == -1)
                 connectionFactory.Port = Configuration.Port;
 
             if (Configuration.Ssl.Enabled)
                 connectionFactory.Ssl = Configuration.Ssl;
 
             //Prefer SSL configurations per each host but fall back to ConnectionConfiguration's SSL configuration for backwards compatibility
-            else if (Configuration.Ssl.Enabled)
-                connectionFactory.Ssl = Configuration.Ssl;
+            //else if (Configuration.Ssl.Enabled)
+              //  connectionFactory.Ssl = Configuration.Ssl;
 
             connectionFactory.RequestedHeartbeat = Configuration.RequestedHeartbeat;
             connectionFactory.ClientProperties = Configuration.ClientProperties;
@@ -71,8 +74,9 @@ namespace EventBusRabbitMQ
 
         public HostConfiguration Host => throw new System.NotImplementedException();
 
+
         [Inject]
-        public IKernel Container { get; set; }
+        public IConnectionStringParser Parser { get; set; }
     }
 
     public class ConnectionFactoryInfo

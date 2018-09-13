@@ -19,9 +19,9 @@ namespace EventBusRabbitMQ
 
         public static IBus CreateBus(string connectionString)
         {
-            
             Kernel.Bind<IConnectionFactory>().To<ConnectionFactoryWrapper>().WithConstructorArgument("connectionString",connectionString);
-            return Kernel.Get<IBus>();
+            var bus = Kernel.Get<IBus>();
+            return bus;
         }
 
         

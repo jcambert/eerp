@@ -2,6 +2,7 @@
 using Polly.Timeout;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Reactive.Linq;
 using System.Threading;
@@ -21,6 +22,15 @@ namespace EventBusRabbitMQ
             var timeoutPolicy = Policy.TimeoutAsync(TimeSpan.FromSeconds(5), TimeoutStrategy.Optimistic);
             IModel model = null;
 
+            var authPolicy= Policy.Handle<AuthenticationFailureException>().Fallback(() =>
+            {
+
+            },
+            ex =>
+            {
+               // Logger.LogError(ex.Message);
+            });
+            var wrap=Policy.WrapAsync(timeoutPolicy, authPolicy);
             var onAcks = Observable.FromEventPattern<BasicAckEventArgs>(
                 e => model.BasicAcks += e,
                 e => model.BasicAcks -= e).Select(e => e.EventArgs);
@@ -30,7 +40,7 @@ namespace EventBusRabbitMQ
             var tokenSource2 = new CancellationTokenSource();
             CancellationToken ct = tokenSource2.Token;
 
-            await timeoutPolicy.ExecuteAsync(async () =>
+            await wrap.ExecuteAsync(async () =>
             {
                 byte[] messageBodyBytes = System.Text.Encoding.UTF8.GetBytes("Bonjour tout le monde!");
                 await Task.Factory.StartNew(() =>

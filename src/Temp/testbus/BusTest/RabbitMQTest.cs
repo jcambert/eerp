@@ -27,6 +27,26 @@ namespace BusTest
         {
             var bus = Rabbit.CreateBus(ConnectionString);
             Assert.IsNotNull(bus);
+            Assert.IsNotNull(bus.Connection);
+
+            bus.Connection.TryConnect();
+
+            bus.Connection.TryClose();
+
+            Assert.IsTrue(bus.Connection.isOpen);
+
+            bus.Connection.TryClose(true);
+
+            Assert.IsFalse(bus.Connection.isOpen);
+
+        }
+
+        [TestMethod]
+        public void TestSendPublishMessage()
+        {
+            var bus = Rabbit.CreateBus(ConnectionString);
+
+            bus.publish("Bonjour tout le monde");
         }
     }
 }
