@@ -31,7 +31,8 @@ namespace Ping.Api.Controllers
             var client = _clientFactory.CreateClient("ping");
             var uri ="/mobile/pxml/xml_licence_c.php".BuildUri(new NameValueCollection() {
                 {"serie" , "LAWRSAVOEJZXALD" },
-                {"tm","20180919171858309" },
+                //{"tm","20180919171858309" },
+                {"tm",Now() },
                 {"tmc", "bde40f00237c4fff59839f4650e95685c8bcbe5a" },
                 {"id", "AW001" },
                 {"club", numero }
@@ -46,6 +47,9 @@ namespace Ping.Api.Controllers
             var json = JsonConvert.SerializeXmlNode(doc);
             return json;
         }
+
+        static string Now() => DateTime.Now.ToString("yyyyMMddhhmmFFF");
+        
     }
 
     public static class UriExtension
