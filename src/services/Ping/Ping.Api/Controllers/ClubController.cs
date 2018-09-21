@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Ping.Api.services;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
@@ -9,59 +12,62 @@ namespace Ping.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClubController : ControllerBase
+    public class ClubController : SpidControllerBase
     {
-        private readonly IHttpClientFactory _clientFactory;
-        public ClubController(IHttpClientFactory clientFactory)
+        
+        public ClubController(ISpidRequest request, ISpidConfiguration configuration):base(request,configuration)
         {
 
-            _clientFactory = clientFactory;
 
         }
 
         [HttpGet("numero/{numero}")]
         public async Task<ActionResult<string>> GetByNumero(string numero)
         {
-            return await searchBy("numero", numero);
-            /*
-            var client = _clientFactory.CreateClient("ping");
-
-            var formVars = new Dictionary<string, string>();
-            formVars.Add("numero", id);
-            formVars.Add("rmode", "XML");
-            var content = new FormUrlEncodedContent(formVars);
-            var response = await client.PostAsync("/rechercheclub/recup_club.php", content);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadAsStreamAsync();
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load(result);
-            var json = JsonConvert.SerializeXmlNode(doc);
-            return json;*/
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                {"numero", numero }
+            });
 
         }
         [HttpGet("{nom}")]
         [HttpGet("nom/{nom}")]
         public async Task<ActionResult<string>> GetByNom(string nom)
         {
-            return await searchBy("nom", nom);
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubFFTT, new NameValueCollection() {
+                {"nom", nom }
+            });
         }
-        private async Task<string> searchBy(string key, string value)
+
+        [HttpGet("dept/{dept}")]
+        public async Task<ActionResult<string>> GetByDepartement(string dept)
         {
-            var client = _clientFactory.CreateClient("ping");
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.Departement, new NameValueCollection() {
+                {"dep", dept }
+            });
+        }
+        
+        [HttpGet("cp/{cp}")]
+        public async Task<ActionResult<string>> GetByCodePostal(string cp)
+        {
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                {"code", cp }
+            });
+        }
+        
+        [HttpGet("ville/{ville}")]
+        public async Task<ActionResult<string>> GetByVille(string ville)
+        {
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                {"ville", ville}
+            });
+        }
 
-            var formVars = new Dictionary<string, string>();
-            formVars.Add(key, value);
-            formVars.Add("rmode", "XML");
-            var content = new FormUrlEncodedContent(formVars);
-            var response = await client.PostAsync("/rechercheclub/recup_club.php", content);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadAsStreamAsync();
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load(result);
-            var json = JsonConvert.SerializeXmlNode(doc);
-            return json;
+        [HttpGet("detail/{numero}")]
+        public async Task<ActionResult<string>> GetDetailByNumero(string numero)
+        {
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubDetail, new NameValueCollection() {
+                {"club", numero}
+            });
         }
     }
 }
