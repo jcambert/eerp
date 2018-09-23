@@ -69,5 +69,22 @@ namespace Ping.Api.Controllers
                 {"club", numero}
             });
         }
+
+        [HttpGet("equipe/{numero}/{type}")]
+        public async Task<ActionResult<string>> GetEquipe(string numero,string @type)
+        {
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubEquipe, new NameValueCollection() {
+                {"numclu", numero},
+                {"type",@type }
+            });
+        }
+
+        [HttpGet("classement/{division}")]
+        public async Task<ActionResult<string>> GetByClassementDivision(string division)
+        {
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClassementDivision, new NameValueCollection() {
+                {"res_division", division}
+            });
+        }
     }
 }

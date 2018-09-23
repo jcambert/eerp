@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Ping.Api.logging;
 using Ping.Api.services;
 using Polly;
 using Polly.CircuitBreaker;
@@ -29,33 +30,40 @@ namespace Ping.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
-            
+
+            services.AddSingleton<ISpidConfiguration, SpidConfiguration>();
+            services.AddSingleton<ISpidLicence, SpidLicence>();
+            services.AddSingleton<ISpidRequest, SpidRequest>();
+            services.AddTransient<HttpMessageLogger>();
 
             services
                 .AddHttpClient(Configuration["spid:name"],c=> {
                     c.BaseAddress = new Uri(Configuration["spid:fftt_endpoint"]);
                     c.DefaultRequestHeaders.Add("Accept", "text/xml");
+                    
                 })
+                .AddHttpMessageHandler<HttpMessageLogger>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-            services.AddSingleton<ISpidConfiguration, SpidConfiguration>();
-            services.AddSingleton<ISpidLicence,SpidLicence>();
-            services.AddSingleton<ISpidRequest, SpidRequest>();
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+           
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            loggerFactory.AddConsole(Configuration);
             app.UseMvc();
+            
         }
 
         static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()

@@ -20,10 +20,11 @@ namespace Ping.Api.services
         private string _tm;
         private string _key;
         private string _tmc;
+        private readonly ISpidConfiguration _configuration;
 
-        public SpidLicence()
+        public SpidLicence(ISpidConfiguration configuration)
         {
-
+            _configuration = configuration;
         }
 
         public string Tm
@@ -31,7 +32,7 @@ namespace Ping.Api.services
             get
             {
                 _tm= DateTime.Now.ToString("yyyyMMddhhMMssfff");
-                _key = _tm.Key();
+                _key = _tm.Key(_configuration["spid:password"]);
                 _tmc = _key.Hash(_tm);
                 return _tm;
             }
@@ -42,11 +43,11 @@ namespace Ping.Api.services
 
     internal static class SpidLicenceExtensions
     {
-        public static string Key(this string tm)
+        public static string Key(this string tm,string password)
         {
             using (var md5 = MD5.Create())
             {
-                var result = md5.ComputeHash(Encoding.UTF8.GetBytes("LaFeR2STp6"));
+                var result = md5.ComputeHash(Encoding.UTF8.GetBytes(password));
                 var md5hex = BitConverter.ToString(result);
                 md5hex = md5hex.Replace("-", "").ToLower();
                 return md5hex;

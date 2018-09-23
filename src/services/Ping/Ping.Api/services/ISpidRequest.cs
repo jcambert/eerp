@@ -20,11 +20,11 @@ namespace Ping.Api.services
         /// <param name="api"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        Task<ActionResult<string>> Execute(string name, string api, NameValueCollection parameters);
+        Task<string> Execute(string name, string api, NameValueCollection parameters);
 
-        Task<ActionResult<string>> ExecuteApi(string name, string endpoint, NameValueCollection parameters);
+        Task<string> ExecuteApi(string name, string endpoint, NameValueCollection parameters);
 
-        Task<ActionResult<string>> ExecuteFFTT(string name, string endpoint, Dictionary<string, string> parameters);
+        Task<string> ExecuteFFTT(string name, string endpoint, Dictionary<string, string> parameters);
     }
 
     public class SpidRequest : ISpidRequest
@@ -56,9 +56,20 @@ namespace Ping.Api.services
             apis[Configuration.ClubDetail] = "spid:api:club_detail";
             apis[Configuration.ClubFFTT] = "spid:fftt:recup_club";
             apis[Configuration.Organisme] = "spid:api:organisme";
+            apis[Configuration.Epreuve] = "spid:api:epreuve";
+            apis[Configuration.DivisionEpreuve] = "spid:api:divisionepreuve";
+            apis[Configuration.RencontreResultat] = "spid:api:rencontreresultat";
+            apis[Configuration.RencontreResultatDetail] = "spid:api:rencontreresultatdetail";
+            apis[Configuration.ClubEquipe] = "spid:api:clubequipe";
+            apis[Configuration.ClassementDivision] = "spid:api:divisionclassement";
+            apis[Configuration.ListeJoueur] = "spid:api:listejoueur";
+            apis[Configuration.Joueur] = "spid:api:joueur";
+            apis[Configuration.JoueurSpid] = "spid:api:joueurspid";
+            apis[Configuration.JoueurPartieSpid] = "spid:api:joueurpartiespid";
+            apis[Configuration.HistoriqueClassement] = "spid:api:histoclassement";
         }
 
-        public async Task<ActionResult<string>> Execute(string name,string api, NameValueCollection parameters)
+        public async Task<string> Execute(string name,string api, NameValueCollection parameters)
         {
             if (apis[api].StartsWith("spid:api"))
                 return await ExecuteApi(name, Configuration[apis[api]], parameters as NameValueCollection);
@@ -74,7 +85,7 @@ namespace Ping.Api.services
             return "";
         }
 
-        public async Task<ActionResult<string>> ExecuteApi(string name, string endpoint, NameValueCollection parameters)
+        public async Task<string> ExecuteApi(string name, string endpoint, NameValueCollection parameters)
         {
             
             var client = _clientFactory.CreateClient(name);
@@ -90,11 +101,16 @@ namespace Ping.Api.services
 
             XmlDocument doc = new XmlDocument();
             doc.Load(result);
-            var json = JsonConvert.SerializeXmlNode(doc);
+            var root = doc.DocumentElement;
+            var node_ = root.SelectSingleNode("/liste");
+            /*var node = doc.GetElementsByTagName("liste");
+            doc.LoadXml(node_.InnerXml);
+            node_ = doc.DocumentElement;*/
+            var json = JsonConvert.SerializeXmlNode(node_);
             return json;
         }
 
-        public async Task<ActionResult<string>> ExecuteFFTT(string name,string endpoint, Dictionary<string,string> parameters)
+        public async Task<string> ExecuteFFTT(string name,string endpoint, Dictionary<string,string> parameters)
         {
             var client = _clientFactory.CreateClient(name);
 
@@ -107,6 +123,8 @@ namespace Ping.Api.services
             XmlDocument doc = new XmlDocument();
             doc.Load(result);
             var json = JsonConvert.SerializeXmlNode(doc);
+            
+           
             return json;
         }
 

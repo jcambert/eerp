@@ -22,6 +22,18 @@ namespace Ping.Api.services
         string Departement { get; }
         string ClubFFTT { get; }
         string Organisme { get; }
+        string Epreuve { get;  }
+        string DivisionEpreuve { get; }
+        string RencontreResultat { get; }
+        string RencontreResultatDetail { get; }
+        string ClubEquipe { get; }
+        string ClassementDivision { get; }
+        string ListeJoueur { get; }
+        string Joueur { get; }
+        string JoueurSpid { get; }
+        string JoueurPartieSpid { get; }
+        string HistoriqueClassement { get; }
+
     }
 
     public class SpidConfiguration : ISpidConfiguration
@@ -54,5 +66,27 @@ namespace Ping.Api.services
         public string Departement => "Departement";
 
         public string Organisme=> "Organisme";
+
+        public string Epreuve => "Epreuve";
+
+        public string DivisionEpreuve => "DivisionEpreuve";
+
+        public string RencontreResultat => "RencontreResultat";
+
+        public string RencontreResultatDetail => "RencontreResultatDetail";
+
+        public string ClubEquipe => "ClubEquipe";
+
+        public string ClassementDivision => "ClassementDivision";
+
+        public string ListeJoueur => "ListeJoueur";
+
+        public string Joueur => "Joueur";
+
+        public string JoueurSpid => "JoueurSpid";
+
+        public string JoueurPartieSpid => "JoueurPartieSpid";
+
+        public string HistoriqueClassement => "HistoriqueClassement";
     }
 }

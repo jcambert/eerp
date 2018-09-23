@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+    "libraries": [
+        {
+            "provider": "cdnjs",
+            "library": "vue@2.5.17",
+            "destination": "wwwroot/lib/vue/"
+        },
+        {
+            "provider": "cdnjs",
+            "library": "vuex@3.0.1",
+            "destination": "wwwroot/lib/vuex/"
+        },
+        {
+            "provider": "cdnjs",
+            "library": "vue-form@0.3.1",
+            "destination": "wwwroot/lib/vue-form/"
+        },
+        {
+            "provider": "cdnjs",
+            "library": "vue-router@3.0.1",
+            "destination": "wwwroot/lib/vue-router/"
+        },
+        {
+            "provider": "cdnjs",
+            "library": "vue-toasted@1.1.24",
+            "destination": "wwwroot/lib/vue-toasted/"
+        },
+        {
+            "provider": "cdnjs",
+            "library": "vuetify@1.2.4",
+            "destination": "wwwroot/lib/vuetify/"
+        }
+    ]
+}
