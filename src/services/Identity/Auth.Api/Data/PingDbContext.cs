@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Auth.Api.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Api.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class PingDbContext : IdentityDbContext<PingUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public PingDbContext(DbContextOptions<PingDbContext> options)
             : base(options)
         {
         }

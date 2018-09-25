@@ -1014,22 +1014,22 @@ th {
 .glyphicon-text-background:before {
   content: "\e243";
 }
-.glyphicon-object-align-top:before {
+.glyphicon-string-align-top:before {
   content: "\e244";
 }
-.glyphicon-object-align-bottom:before {
+.glyphicon-string-align-bottom:before {
   content: "\e245";
 }
-.glyphicon-object-align-horizontal:before {
+.glyphicon-string-align-horizontal:before {
   content: "\e246";
 }
-.glyphicon-object-align-left:before {
+.glyphicon-string-align-left:before {
   content: "\e247";
 }
-.glyphicon-object-align-vertical:before {
+.glyphicon-string-align-vertical:before {
   content: "\e248";
 }
-.glyphicon-object-align-right:before {
+.glyphicon-string-align-right:before {
   content: "\e249";
 }
 .glyphicon-triangle-right:before {
@@ -5207,10 +5207,10 @@ a.thumbnail.active {
 .media-body {
   width: 10000px;
 }
-.media-object {
+.media-string {
   display: block;
 }
-.media-object.img-thumbnail {
+.media-string.img-thumbnail {
   max-width: none;
 }
 .media-right,
@@ -5800,7 +5800,7 @@ button.list-group-item-danger.active:focus {
 .embed-responsive .embed-responsive-item,
 .embed-responsive iframe,
 .embed-responsive embed,
-.embed-responsive object,
+.embed-responsive string,
 .embed-responsive video {
   position: absolute;
   top: 0;

@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Auth.Api.Data;
+using Auth.Api.Models;
+using Auth.Api.Services;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Auth.Api.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Polly;
+using Polly.Extensions.Http;
+using System;
+using System.Net.Http;
+using AutoMapper;
 namespace Auth.Api
 {
     public class Startup
@@ -27,6 +28,12 @@ namespace Auth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<SpidUserManager>();
+            services.AddScoped<SpidSignInManager>();
+            services.AddScoped<UserManager<PingUser>, SpidUserManager>();
+            services.AddScoped<SignInManager<PingUser>, SpidSignInManager>();
+            services.AddTransient<SpidRequest<PingDbContext>>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -34,11 +41,32 @@ namespace Auth.Api
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<PingDbContext>(options =>
+                //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                options.UseSqlite(connectionString)
+                );
+
+            services.AddScoped<IUserStore<PingUser>, SpidStore>();
+
+            services.AddDefaultIdentity<PingUser>()
+                .AddUserStore<SpidStore>()
+                .AddEntityFrameworkStores<PingDbContext>()
+                .AddUserManager<SpidUserManager>();
+
+            services
+                .AddHttpClient(Configuration["ping:name"], c => {
+
+                    c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
+                    c.DefaultRequestHeaders.Add("Accept", "text/xml");
+
+                })
+                //.AddHttpMessageHandler<HttpMessageLogger>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                .AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+            services.AddAutoMapper();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -57,6 +85,16 @@ namespace Auth.Api
                 app.UseHsts();
             }
 
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
+                if (env.IsDevelopment())
+                {
+                    context.Database.EnsureDeleted();
+                    context.Database.EnsureCreated();
+                }
+            }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -69,6 +107,21 @@ namespace Auth.Api
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+        }
+
+        static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+                .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
         }
     }
 }

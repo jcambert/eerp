@@ -12,8 +12,8 @@ namespace ePing.Api
     {
         public DomainProfile()
         {
-            CreateMap<ClubDto, Club>();
-            CreateMap<JoueurDto, Joueur>();
+            CreateMap<ClubDto, Club>().ReverseMap();
+            CreateMap<JoueurDto, Joueur>().ReverseMap();
         }
     }
 }

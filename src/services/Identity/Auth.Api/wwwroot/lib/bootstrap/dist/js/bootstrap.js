@@ -252,7 +252,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.button')
-      var options = typeof option == 'object' && option
+      var options = typeof option == 'string' && option
 
       if (!data) $this.data('bs.button', (data = new Button(this, options)))
 
@@ -476,7 +476,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.carousel')
-      var options = $.extend({}, Carousel.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var options = $.extend({}, Carousel.DEFAULTS, $this.data(), typeof option == 'string' && option)
       var action  = typeof option == 'string' ? option : options.slide
 
       if (!data) $this.data('bs.carousel', (data = new Carousel(this, options)))
@@ -708,7 +708,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.collapse')
-      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'string' && option)
 
       if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
       if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
@@ -1209,7 +1209,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.modal')
-      var options = $.extend({}, Modal.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var options = $.extend({}, Modal.DEFAULTS, $this.data(), typeof option == 'string' && option)
 
       if (!data) $this.data('bs.modal', (data = new Modal(this, options)))
       if (typeof option == 'string') data[option](_relatedTarget)
@@ -1311,7 +1311,7 @@ if (typeof jQuery === 'undefined') {
     this.inState   = { click: false, hover: false, focus: false }
 
     if (this.$element[0] instanceof document.constructor && !this.options.selector) {
-      throw new Error('`selector` option must be specified when initializing ' + this.type + ' on the window.document object!')
+      throw new Error('`selector` option must be specified when initializing ' + this.type + ' on the window.document string!')
     }
 
     var triggers = this.options.trigger.split(' ')
@@ -1751,7 +1751,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.tooltip')
-      var options = typeof option == 'object' && option
+      var options = typeof option == 'string' && option
 
       if (!data && /destroy|hide/.test(option)) return
       if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
@@ -1823,7 +1823,7 @@ if (typeof jQuery === 'undefined') {
     var content = this.getContent()
 
     $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
-    $tip.find('.popover-content').children().detach().end()[ // we use append for html objects to maintain js events
+    $tip.find('.popover-content').children().detach().end()[ // we use append for html strings to maintain js events
       this.options.html ? (typeof content == 'string' ? 'html' : 'append') : 'text'
     ](content)
 
@@ -1860,7 +1860,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.popover')
-      var options = typeof option == 'object' && option
+      var options = typeof option == 'string' && option
 
       if (!data && /destroy|hide/.test(option)) return
       if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
@@ -2023,7 +2023,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.scrollspy')
-      var options = typeof option == 'object' && option
+      var options = typeof option == 'string' && option
 
       if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
       if (typeof option == 'string') data[option]()
@@ -2295,7 +2295,7 @@ if (typeof jQuery === 'undefined') {
     var offsetBottom = offset.bottom
     var scrollHeight = Math.max($(document).height(), $(document.body).height())
 
-    if (typeof offset != 'object')         offsetBottom = offsetTop = offset
+    if (typeof offset != 'string')         offsetBottom = offsetTop = offset
     if (typeof offsetTop == 'function')    offsetTop    = offset.top(this.$element)
     if (typeof offsetBottom == 'function') offsetBottom = offset.bottom(this.$element)
 
@@ -2335,7 +2335,7 @@ if (typeof jQuery === 'undefined') {
     return this.each(function () {
       var $this   = $(this)
       var data    = $this.data('bs.affix')
-      var options = typeof option == 'object' && option
+      var options = typeof option == 'string' && option
 
       if (!data) $this.data('bs.affix', (data = new Affix(this, options)))
       if (typeof option == 'string') data[option]()
