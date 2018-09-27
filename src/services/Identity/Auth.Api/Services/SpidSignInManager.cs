@@ -21,14 +21,14 @@ namespace Auth.Api.Services
 
         public new SpidUserManager UserManager => base.UserManager as SpidUserManager;
 
-        internal async Task<SignInResult> LicenceSignInAsync(string licence, bool rememberMe)
+        internal async Task<SpidSignInResult> LicenceSignInAsync(string licence, bool rememberMe)
         {
             
             var result = await UserManager.FindByLicenceAsync(licence);
 
             if (result != null)
-                return SignInResult.Success;
-            return SignInResult.Failed;
+                return new SpidSignInResult() { SignInResult = SignInResult.Success, User = result };
+            return new SpidSignInResult() { SignInResult = SignInResult.Failed };
         }
     }
 }

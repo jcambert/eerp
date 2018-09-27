@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Ping.Api.services;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ping.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class JoueurController : SpidControllerBase
@@ -50,6 +52,7 @@ namespace Ping.Api.Controllers
         }
 
         [HttpGet("spid/{license}")]
+        [AllowAnonymous]
         public async Task<ActionResult<string>> GetByLicenseSpid(string license)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurSpid, new NameValueCollection() {

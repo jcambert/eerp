@@ -1,0 +1,43 @@
+﻿@{
+    Layout = "_LoginLayout";
+}
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<v-app id="inspire">
+    <v-content>
+        <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+                <v-flex xs12 sm8 md4>
+                    <v-card class="elevation-12">
+                        <v-toolbar dark color="primary">
+                            <v-toolbar-title>Identifiez-vous</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                            <v-tooltip bottom>
+                                <v-btn icon
+                                       large
+                                       :href="source"
+                                       target="_blank"
+                                       slot="activator">
+                                    <v-icon large>code</v-icon>
+                                </v-btn>
+                                <span>Source</span>
+                            </v-tooltip>
+                        </v-toolbar>
+                        <v-card-text>
+                            <v-form ref="loginForm" id="loginForm" method="post" action="/Account/Login" v-model="valid">
+                                <v-text-field clearable required prepend-icon="person"  v-model="licence" label="N° de Licence ou du club" type="text" :rules="licenceRule"></v-text-field>
+
+                            </v-form>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primary" :disabled="!valid" v-on:click.prevent="login" >ENTRER</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </v-container>
+    </v-content>
+</v-app>

@@ -29,7 +29,7 @@ namespace Auth.Api
                 .ForMember(dest => dest.Categorie, opt => opt.MapFrom(src => src.Categorie))
 
                 ;
-            
+            CreateMap<LoginResultViewModel, LoginResult>().ReverseMap();
         }
     }
 }

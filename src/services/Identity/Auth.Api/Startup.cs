@@ -14,6 +14,12 @@ using Polly.Extensions.Http;
 using System;
 using System.Net.Http;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 namespace Auth.Api
 {
     public class Startup
@@ -28,10 +34,13 @@ namespace Auth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AppSettings>(Configuration);
+
             services.AddScoped<SpidUserManager>();
             services.AddScoped<SpidSignInManager>();
             services.AddScoped<UserManager<PingUser>, SpidUserManager>();
             services.AddScoped<SignInManager<PingUser>, SpidSignInManager>();
+            services.AddTransient<HttpClientRequest>();
             services.AddTransient<SpidRequest<PingDbContext>>();
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -49,10 +58,47 @@ namespace Auth.Api
 
             services.AddScoped<IUserStore<PingUser>, SpidStore>();
 
+
+           /* services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "epingcookie";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.LoginPath = "/Account/Login";
+                // ReturnUrlParameter requires 
+                //using Microsoft.AspNetCore.Authentication.Cookies;
+                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                options.SlidingExpiration = true;
+            });*/
+            services.AddIdentityServer()
+
             services.AddDefaultIdentity<PingUser>()
                 .AddUserStore<SpidStore>()
                 .AddEntityFrameworkStores<PingDbContext>()
-                .AddUserManager<SpidUserManager>();
+                .AddUserManager<SpidUserManager>()
+                .AddDefaultTokenProviders();
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+            services
+                .AddAuthentication(options=> {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = Configuration["auth:barear:JwtIssuer"],
+                        ValidAudience = Configuration["auth:barear:JwtIssuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["auth:barear:JwtKey"])),
+                        ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                    };
+                })
+            ;
 
             services
                 .AddHttpClient(Configuration["ping:name"], c => {
@@ -65,7 +111,19 @@ namespace Auth.Api
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
+            services
+                .AddHttpClient(Configuration["auth: name"], c => {
 
+                    c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
+                    c.DefaultRequestHeaders.Add("Accept", "text/xml");
+
+                })
+                //.AddHttpMessageHandler<HttpMessageLogger>()
+                .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                .AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+        
             services.AddAutoMapper();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
