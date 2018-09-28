@@ -60,7 +60,7 @@ namespace Auth.Api.Controllers
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return BadRequest();
+                    return Unauthorized();
                 }
 
         }
@@ -68,12 +68,12 @@ namespace Auth.Api.Controllers
         private async Task<string> GenerateJwtToken(PingUser user)
         {
             var t = Task.Run(() => {
-                var claims = new List<Claim>
+               /* var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email??"tmp@tmp.fr"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
-            };
+            };*/
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["auth:barear:JwtKey"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -82,7 +82,7 @@ namespace Auth.Api.Controllers
                 var token = new JwtSecurityToken(
                     _configuration["auth:barear:JwtIssuer"],
                     _configuration["auth:barear:JwtIssuer"],
-                    claims,
+                    claims:new List<Claim>(),
                     expires: expires,
                     signingCredentials: creds
                 );

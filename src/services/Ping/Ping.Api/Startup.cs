@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +35,7 @@ namespace Ping.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+           // System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             services.AddSingleton<ISpidConfiguration, SpidConfiguration>();
             services.AddSingleton<ISpidLicence, SpidLicence>();
@@ -75,6 +78,10 @@ namespace Ping.Api
             loggerFactory.AddConsole(Configuration);
             app.UseCors("CorsPolicy");
 
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
             ConfigureAuth(app);
 
             app.UseMvc();
@@ -102,18 +109,28 @@ namespace Ping.Api
             // prevent from mapping "sub" claim to nameidentifier.
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+            services.AddAuthorization(auth =>
+            {
+
+                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
+                    
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme‌​)
+                    .RequireAuthenticatedUser().Build());
+            })
+            ;
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(options =>
+            .AddJwtBearer("Bearer","Bearer",options =>
             {
 
                 options.Authority = Configuration.GetValue<string>("IdentityUrl");
-                options.Audience = "ePing";
-                options.ClaimsIssuer = "ePing";
+                options.Audience = Configuration.GetValue<string>("IdentityUrl");
+                options.ClaimsIssuer = Configuration.GetValue<string>("IdentityUrl");
                 options.RequireHttpsMetadata = false;
+               
             });
         }
 

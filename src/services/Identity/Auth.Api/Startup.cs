@@ -19,6 +19,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Auth.Api
 {
@@ -59,18 +60,19 @@ namespace Auth.Api
             services.AddScoped<IUserStore<PingUser>, SpidStore>();
 
 
-           /* services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.Name = "epingcookie";
-                options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                options.LoginPath = "/Account/Login";
-                // ReturnUrlParameter requires 
-                //using Microsoft.AspNetCore.Authentication.Cookies;
-                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
-                options.SlidingExpiration = true;
-            });*/
-            services.AddIdentityServer()
+            /* services.ConfigureApplicationCookie(options =>
+             {
+                 options.Cookie.Name = "epingcookie";
+                 options.Cookie.HttpOnly = true;
+                 options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                 options.LoginPath = "/Account/Login";
+                 // ReturnUrlParameter requires 
+                 //using Microsoft.AspNetCore.Authentication.Cookies;
+                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                 options.SlidingExpiration = true;
+             });*/
+
+            //services.AddIdentityServer()
 
             services.AddDefaultIdentity<PingUser>()
                 .AddUserStore<SpidStore>()
@@ -83,20 +85,54 @@ namespace Auth.Api
             services
                 .AddAuthentication(options=> {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                   // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
                 .AddJwtBearer(cfg =>
                 {
+                    cfg.BackchannelHttpHandler=new HttpClientHandler() { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator };
                     cfg.RequireHttpsMetadata = false;
                     cfg.SaveToken = true;
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
+                        ValidateIssuer = true,
                         ValidIssuer = Configuration["auth:barear:JwtIssuer"],
+                        ValidateAudience=true,
                         ValidAudience = Configuration["auth:barear:JwtIssuer"],
+                        ValidateIssuerSigningKey=true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["auth:barear:JwtKey"])),
-                        ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                        ValidateLifetime=true,
+                        ClockSkew = TimeSpan.Zero, // remove delay of token when expire,
+                        
                     };
+                   /* cfg.Events = new JwtBearerEvents()
+                    {
+                        OnAuthenticationFailed= ctx =>
+                        {
+                            ctx.Success();
+                            var payload = new JObject
+                            {
+                                ["error"] = ctx.Exception.Message,
+                               // ["error_description"] = ctx.ErrorDescription,
+                                ["error_uri"] = ctx.Request.ToString()
+                            };
+
+                            return ctx.Response.WriteAsync(payload.ToString());
+                        },
+                        OnChallenge=  ctx =>
+                        {
+                            ctx.HandleResponse();
+                            var payload = new JObject
+                            {
+                                ["error"] = ctx.Error,
+                                ["error_description"] = ctx.ErrorDescription,
+                                ["error_uri"] = ctx.ErrorUri
+                            };
+
+                            return  ctx.Response.WriteAsync(payload.ToString());
+                        }
+                        
+                    };*/
                 })
             ;
 
@@ -112,7 +148,7 @@ namespace Auth.Api
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
             services
-                .AddHttpClient(Configuration["auth: name"], c => {
+                .AddHttpClient(Configuration["auth:name"], c => {
 
                     c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
                     c.DefaultRequestHeaders.Add("Accept", "text/xml");
