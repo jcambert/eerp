@@ -49,6 +49,7 @@ namespace Auth.Api.Services
 
             if (result == null)
             {
+                
                 ErrorDescriber.InvalidUserName(licence);
             }
             return result;

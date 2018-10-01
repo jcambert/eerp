@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Auth.Api.Models;
 using Auth.Api.Services;
+using IdentityServer4.Services;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,21 +28,33 @@ namespace Auth.Api.Controllers
         private readonly SpidSignInManager _signInManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AccountController> _logger;
+        private readonly IResourceOwnerPasswordValidator _pv;
+
         public LoginController(SpidUserManager userManager,
                                 SpidSignInManager signInManager,
                                 IConfiguration configuration,
-                                ILoggerFactory loggerFactory)
+                                ILoggerFactory loggerFactory,
+                               IResourceOwnerPasswordValidator pv)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _logger = loggerFactory.CreateLogger<AccountController>();
-
+            _pv = pv;
+       
         }
-        //
+
+       /* [HttpPost("i4")]
+        [AllowAnonymous]
+        public async Task<ActionResult<LoginResult>> LoginWithIdentityServer4([FromQuery] string licence, [FromQuery]bool rememberMe = false, [FromQuery]string returnUrl = null)
+        {
+            
+            HttpContext.Authentication.SignInAsync(licence,)
+            return new LoginResult() { };
+        }*/
+
         // POST: /Login/
         [HttpPost]
-
         [AllowAnonymous]
         // [ValidateAntiForgeryToken]
         public async Task<ActionResult<LoginResult>> Index([FromQuery] string licence, [FromQuery]bool rememberMe = false, [FromQuery]string returnUrl = null)
@@ -76,7 +90,7 @@ namespace Auth.Api.Controllers
             };*/
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["auth:barear:JwtKey"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var creds = new SigningCredentials(key, SecurityAlgorithms.Sha256);
                 var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["auth:barear:JwtExpireDays"]));
 
                 var token = new JwtSecurityToken(

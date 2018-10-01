@@ -1,6 +1,12 @@
 ﻿using Auth.Api.Data;
 using Auth.Api.Models;
+using Auth.Api.Repositories;
 using Auth.Api.Services;
+using AutoMapper;
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.Services;
+using IdentityServer4.Validation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,18 +15,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Polly;
 using Polly.Extensions.Http;
 using System;
-using System.Net.Http;
-using AutoMapper;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using System.Net.Http;
 using System.Text;
-using Newtonsoft.Json.Linq;
-
 namespace Auth.Api
 {
     public class Startup
@@ -43,112 +44,62 @@ namespace Auth.Api
             services.AddScoped<SignInManager<PingUser>, SpidSignInManager>();
             services.AddTransient<HttpClientRequest>();
             services.AddTransient<SpidRequest<PingDbContext>>();
+            services.AddTransient<JoueurRepository>();
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<PingDbContext>(options =>
-                //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
                 options.UseSqlite(connectionString)
                 );
 
             services.AddScoped<IUserStore<PingUser>, SpidStore>();
 
 
-            /* services.ConfigureApplicationCookie(options =>
-             {
-                 options.Cookie.Name = "epingcookie";
-                 options.Cookie.HttpOnly = true;
-                 options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                 options.LoginPath = "/Account/Login";
-                 // ReturnUrlParameter requires 
-                 //using Microsoft.AspNetCore.Authentication.Cookies;
-                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
-                 options.SlidingExpiration = true;
-             });*/
-
-            //services.AddIdentityServer()
-
             services.AddDefaultIdentity<PingUser>()
-                .AddUserStore<SpidStore>()
-                .AddEntityFrameworkStores<PingDbContext>()
-                .AddUserManager<SpidUserManager>()
-                .AddDefaultTokenProviders();
+               .AddUserStore<SpidStore>()
+               .AddEntityFrameworkStores<PingDbContext>()
+               .AddUserManager<SpidUserManager>()
+               .AddDefaultTokenProviders();
 
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
+            var configConnectionString = Configuration.GetConnectionString("ConfigurationConnection");
             services
-                .AddAuthentication(options=> {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                   // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(cfg =>
+                .AddIdentityServer()
+                .AddConfigurationStore(options =>
                 {
-                    cfg.BackchannelHttpHandler=new HttpClientHandler() { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator };
-                    cfg.RequireHttpsMetadata = false;
-                    cfg.SaveToken = true;
-                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    options.ConfigureDbContext = builder =>
                     {
-                        ValidateIssuer = true,
-                        ValidIssuer = Configuration["auth:barear:JwtIssuer"],
-                        ValidateAudience=true,
-                        ValidAudience = Configuration["auth:barear:JwtIssuer"],
-                        ValidateIssuerSigningKey=true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["auth:barear:JwtKey"])),
-                        ValidateLifetime=true,
-                        ClockSkew = TimeSpan.Zero, // remove delay of token when expire,
-                        
+                        builder.UseSqlite(configConnectionString);
+
                     };
-                   /* cfg.Events = new JwtBearerEvents()
-                    {
-                        OnAuthenticationFailed= ctx =>
-                        {
-                            ctx.Success();
-                            var payload = new JObject
-                            {
-                                ["error"] = ctx.Exception.Message,
-                               // ["error_description"] = ctx.ErrorDescription,
-                                ["error_uri"] = ctx.Request.ToString()
-                            };
-
-                            return ctx.Response.WriteAsync(payload.ToString());
-                        },
-                        OnChallenge=  ctx =>
-                        {
-                            ctx.HandleResponse();
-                            var payload = new JObject
-                            {
-                                ["error"] = ctx.Error,
-                                ["error_description"] = ctx.ErrorDescription,
-                                ["error_uri"] = ctx.ErrorUri
-                            };
-
-                            return  ctx.Response.WriteAsync(payload.ToString());
-                        }
-                        
-                    };*/
                 })
-            ;
+                .AddDeveloperSigningCredential()
+                .AddInMemoryPersistedGrants()
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApiResources())
+                .AddInMemoryClients(Config.GetClients());
+
 
             services
-                .AddHttpClient(Configuration["ping:name"], c => {
+                .AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>()
+                .AddTransient<IProfileService, ProfileService>();
+
+
+            
+            services
+                .AddHttpClient(Configuration["ping:name"], c =>
+                {
 
                     c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
                     c.DefaultRequestHeaders.Add("Accept", "text/xml");
-
+                    
                 })
                 //.AddHttpMessageHandler<HttpMessageLogger>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
             services
-                .AddHttpClient(Configuration["auth:name"], c => {
+                .AddHttpClient(Configuration["auth:name"], c =>
+                {
 
                     c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
                     c.DefaultRequestHeaders.Add("Accept", "text/xml");
@@ -159,11 +110,11 @@ namespace Auth.Api
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-        
+
             services.AddAutoMapper();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-        }
+       }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -178,14 +129,19 @@ namespace Auth.Api
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            app.UseStaticFiles();
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
+                var configContext = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 if (env.IsDevelopment())
                 {
                     context.Database.EnsureDeleted();
                     context.Database.EnsureCreated();
+
+                    configContext.Database.EnsureDeleted();
+                    configContext.Database.EnsureCreated();
                 }
             }
 
@@ -193,7 +149,8 @@ namespace Auth.Api
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
+            app.UseIdentityServer();
 
             app.UseMvc(routes =>
             {
