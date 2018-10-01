@@ -1,27 +1,21 @@
 ﻿using Auth.Api.Data;
-using Auth.Api.Models;
+using Auth.Api.Middlewares;
 using Auth.Api.Repositories;
 using Auth.Api.Services;
 using AutoMapper;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Polly;
 using Polly.Extensions.Http;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
-using System.Text;
 namespace Auth.Api
 {
     public class Startup
@@ -38,28 +32,30 @@ namespace Auth.Api
         {
             services.Configure<AppSettings>(Configuration);
 
-            services.AddScoped<SpidUserManager>();
-            services.AddScoped<SpidSignInManager>();
-            services.AddScoped<UserManager<PingUser>, SpidUserManager>();
-            services.AddScoped<SignInManager<PingUser>, SpidSignInManager>();
+            //services.AddScoped<SpidUserManager>();
+            //services.AddScoped<SpidSignInManager>();
+            //services.AddScoped<UserManager<PingUser>, SpidUserManager>();
+            //services.AddScoped<SignInManager<PingUser>, SpidSignInManager>();
             services.AddTransient<HttpClientRequest>();
             services.AddTransient<SpidRequest<PingDbContext>>();
             services.AddTransient<JoueurRepository>();
-
+            // services.AddScoped<IUserStore<PingUser>, SpidStore>();
+            services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+            services.AddTransient<IProfileService, ProfileService>();
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<PingDbContext>(options =>
                 options.UseSqlite(connectionString)
                 );
 
-            services.AddScoped<IUserStore<PingUser>, SpidStore>();
 
+            /*
 
-            services.AddDefaultIdentity<PingUser>()
-               .AddUserStore<SpidStore>()
-               .AddEntityFrameworkStores<PingDbContext>()
-               .AddUserManager<SpidUserManager>()
-               .AddDefaultTokenProviders();
+               services.AddDefaultIdentity<PingUser>()
+                  .AddUserStore<SpidStore>()
+                  .AddEntityFrameworkStores<PingDbContext>()
+                  .AddUserManager<SpidUserManager>()
+                  .AddDefaultTokenProviders();*/
 
             var configConnectionString = Configuration.GetConnectionString("ConfigurationConnection");
             services
@@ -78,20 +74,13 @@ namespace Auth.Api
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients());
 
-
-            services
-                .AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>()
-                .AddTransient<IProfileService, ProfileService>();
-
-
-            
             services
                 .AddHttpClient(Configuration["ping:name"], c =>
                 {
 
                     c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
                     c.DefaultRequestHeaders.Add("Accept", "text/xml");
-                    
+
                 })
                 //.AddHttpMessageHandler<HttpMessageLogger>()
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
@@ -114,7 +103,9 @@ namespace Auth.Api
             services.AddAutoMapper();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-       }
+
+
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -123,6 +114,8 @@ namespace Auth.Api
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                app.UseMiddleware<ByPassAuthorizationMiddleware>();
+
             }
             else
             {
@@ -151,6 +144,7 @@ namespace Auth.Api
 
             //app.UseAuthentication();
             app.UseIdentityServer();
+
 
             app.UseMvc(routes =>
             {
