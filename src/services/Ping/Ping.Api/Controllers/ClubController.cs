@@ -1,43 +1,69 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Ping.Api.services;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace Ping.Api.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ClubController : SpidControllerBase
     {
-        
-        public ClubController(ISpidRequest request, ISpidConfiguration configuration):base(request,configuration)
+
+        public ClubController(ISpidRequest request, ISpidConfiguration configuration) : base(request, configuration)
         {
 
 
         }
 
-        [HttpGet("numero/{numero}")]
-        public async Task<ActionResult<string>> GetByNumero(string numero)
+        [HttpGet("{numero}/licencies")]
+        public async Task<ActionResult<string>> GetByClub(string numero)
         {
-            return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
-                {"numero", numero }
-            });
-
-        }
-        [HttpGet("{nom}")]
-        [HttpGet("nom/{nom}")]
-        public async Task<ActionResult<string>> GetByNom(string nom)
-        {
-            return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubFFTT, new NameValueCollection() {
-                {"nom", nom }
+            return await SpidRequest.Execute(Configuration.ApiName, Configuration.LicenceJoueur, new NameValueCollection() {
+                {"club", numero }
             });
         }
 
+        [HttpGet("{nomornumero}/detail")]
+        [HttpGet("{nomornumero}")]
+        public async Task<ActionResult<string>> GetByNomOuNumero(string nomornumero)
+        {
+            int numero;
+
+            if(Request.Path.Value.Contains("detail"))
+                return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubDetail, new NameValueCollection() {
+                    {"club", nomornumero}
+                });
+            if (int.TryParse(nomornumero, out numero))
+            {
+                if (nomornumero.Length == 2)//Département
+                    return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                        {"dep", nomornumero }
+                    });
+                if (nomornumero.Length == 5)//Code Postal
+                    return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                        {"code", nomornumero }
+                    });
+
+                //Numero du club
+                return await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                    {"numero", nomornumero }
+                });
+
+            }
+            else
+            {
+                var result = await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
+                    {"ville", nomornumero}
+                });
+                
+                return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubFFTT, new NameValueCollection() {
+                    {"nom", nomornumero }
+                });
+            }
+        }
+        /*
         [HttpGet("dept/{dept}")]
         public async Task<ActionResult<string>> GetByDepartement(string dept)
         {
@@ -45,7 +71,7 @@ namespace Ping.Api.Controllers
                 {"dep", dept }
             });
         }
-        
+
         [HttpGet("cp/{cp}")]
         public async Task<ActionResult<string>> GetByCodePostal(string cp)
         {
@@ -53,7 +79,7 @@ namespace Ping.Api.Controllers
                 {"code", cp }
             });
         }
-        
+
         [HttpGet("ville/{ville}")]
         public async Task<ActionResult<string>> GetByVille(string ville)
         {
@@ -61,24 +87,26 @@ namespace Ping.Api.Controllers
                 {"ville", ville}
             });
         }
+        */
 
-        [HttpGet("detail/{numero}")]
+            /*
+        [HttpGet("{numero}/detail")]
         public async Task<ActionResult<string>> GetDetailByNumero(string numero)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubDetail, new NameValueCollection() {
                 {"club", numero}
             });
-        }
+        }*/
 
-        [HttpGet("equipe/{numero}/{type}")]
-        public async Task<ActionResult<string>> GetEquipe(string numero,string @type)
+        [HttpGet("{numero}/equipe/{type}")]
+        public async Task<ActionResult<string>> GetEquipe(string numero, string @type)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubEquipe, new NameValueCollection() {
                 {"numclu", numero},
                 {"type",@type }
             });
         }
-
+        
         [HttpGet("classement/{division}")]
         public async Task<ActionResult<string>> GetByClassementDivision(string division)
         {

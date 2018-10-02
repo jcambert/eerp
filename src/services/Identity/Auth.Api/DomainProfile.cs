@@ -30,6 +30,8 @@ namespace Auth.Api
 
                 ;
             CreateMap<LoginResultViewModel, LoginResult>().ReverseMap();
+
+           
         }
     }
 }

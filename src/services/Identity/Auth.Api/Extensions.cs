@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -42,5 +43,7 @@ namespace Auth.Api
         {
             return string.Format(me, parameters);
         }
+
+        public static string BaseUrl(this HttpRequest request) => $"{request.Scheme}://{request.Host}{request.PathBase}";
     }
 }

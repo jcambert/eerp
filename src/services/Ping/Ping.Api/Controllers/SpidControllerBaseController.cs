@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ping.Api.services;
 
 namespace Ping.Api.Controllers
 {
-
+    //[Authorize]
     public abstract class SpidControllerBase : ControllerBase
     {
 

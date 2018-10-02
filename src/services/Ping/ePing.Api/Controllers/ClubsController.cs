@@ -30,7 +30,7 @@ namespace ePing.Api.Controllers
         }
 
         // GET: api/Clubs/5
-        [HttpGet("load/{numero}")]
+        [HttpGet("{numero}/load")]
         [HttpGet("{numero}")]
         public async Task<IActionResult> GetClub([FromRoute] string numero)
         {
@@ -46,7 +46,7 @@ namespace ePing.Api.Controllers
             if (club == null)
             {
                 
-                if (Request.Path.Value.Contains("load/"))
+                if (Request.Path.Value.Contains("/load"))
                 {
                     club = await _service.loadFromSpid(numero, true);
                 }

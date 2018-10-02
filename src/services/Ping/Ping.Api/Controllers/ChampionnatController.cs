@@ -11,6 +11,7 @@ using Ping.Api.services;
 
 namespace Ping.Api.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ChampionnatController : SpidControllerBase
@@ -20,7 +21,7 @@ namespace Ping.Api.Controllers
 
         }
 
-        [HttpGet("resultat/{division}/{poule}")]
+        [HttpGet("{division}/{poule}/resultat")]
         public async Task<string> GetResultat(string division,string poule)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.RencontreResultat, new NameValueCollection() {
@@ -30,7 +31,7 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("classement/{division}/{poule}")]
+        [HttpGet("{division}/{poule}/classement")]
         public async Task<ActionResult<string>> GetClassement(string division, string poule)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.RencontreResultat, new NameValueCollection() {
@@ -41,7 +42,7 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("resultatdetail/{division}/{poule}")]
+        [HttpGet("{division}/{poule}/resultatdetail")]
         public async Task<string> GetResultatDetail(string division, string poule)
         {
             Task<string> t = GetResultat(division, poule);

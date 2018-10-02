@@ -32,25 +32,6 @@ namespace ePing.Api.services
             return await this.InternalLoadFromSpid<ListeClubHeader,ClubDto, Club>($"/api/club/numero/{numero}", true, liste => liste.Liste.Club, (ctx, model) => { ctx.Clubs.Add(model); });
         }
 
-       /* public async Task<Club> loadFromSpid(string numero,bool addToDb)
-        {
-            var client = CreateClient();
-            string uri = $"/api/club/numero/{numero}";
-            var res = await client.GetStreamAsync(uri);
-
-            StreamReader reader = new StreamReader(res);
-            string text = reader.ReadToEnd();
-            var dto = JsonConvert.DeserializeObject<ListeClubHeader>(text);
-
-            if (dto == null) return null;
-            var club = Mapper.Map<Club>(dto.liste.club);
-            if (addToDb)
-            {
-                DbContext.Clubs.Add(club);
-                await DbContext.SaveChangesAsync();
-            }
-
-            return club;
-        }*/
+  
     }
 }

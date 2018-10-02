@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ping.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class JoueurController : SpidControllerBase
@@ -20,25 +20,18 @@ namespace Ping.Api.Controllers
 
         }
 
-        [HttpGet("club/{numero}")]
-        public async Task<ActionResult<string>> GetByClub(string numero)
-        {
-            return await SpidRequest.Execute(Configuration.ApiName, Configuration.LicenceJoueur, new NameValueCollection() {
-                {"club", numero }
-            });
-        }
 
 
         [HttpGet("liste/club/{club?}")]
         [HttpGet("liste/nom/{nom?}/{prenom?}")]
-        [HttpGet("liste/license/{license?}")]
-        public async Task<ActionResult<string>> GetList(string club = null, string nom = null,string prenom=null,string license=null)
+        [HttpGet("liste/licence/{licence?}")]
+        public async Task<ActionResult<string>> GetList(string club = null, string nom = null,string prenom=null,string licence=null)
         {
             NameValueCollection @params = new NameValueCollection();
             if (club != null) @params["club"] = club;
             if (nom != null) @params["nom"] = nom.ToUpper();
             if (prenom != null) @params["prenom"] = prenom;
-            if (license != null) @params["licence"] = license;
+            if (licence != null) @params["licence"] = licence;
 
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.ListeJoueur,@params);
         }
@@ -51,7 +44,7 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("spid/{license}")]
+        [HttpGet("{license}/spid")]
         [AllowAnonymous]
         public async Task<ActionResult<string>> GetByLicenseSpid(string license)
         {
@@ -60,15 +53,15 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("partie/{license}")]
-        public async Task<ActionResult<string>> GetByPartieSpid(string license)
+        [HttpGet("{license}/parties/{id?}")]
+        public async Task<ActionResult<string>> GetByPartieSpid(string license,string id=null)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieSpid, new NameValueCollection() {
                 {"numlic", license}
             });
         }
 
-        [HttpGet("histo/{license}")]
+        [HttpGet("{license}/histo")]
         public async Task<ActionResult<string>> GetByHistorique(string license)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.HistoriqueClassement, new NameValueCollection() {

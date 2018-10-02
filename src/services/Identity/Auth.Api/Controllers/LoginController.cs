@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Auth.Api.Models;
+using Auth.Api.Repositories;
 using Auth.Api.Services;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -24,24 +25,30 @@ namespace Auth.Api.Controllers
     public class LoginController : ControllerBase
     {
 
-        private readonly SpidUserManager _userManager;
-        private readonly SpidSignInManager _signInManager;
+       // private readonly SpidUserManager _userManager;
+        //private readonly SpidSignInManager _signInManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AccountController> _logger;
         private readonly IResourceOwnerPasswordValidator _pv;
+        private readonly AuthRequest _authRequest;
+        private readonly JoueurRepository _repo;
 
-        public LoginController(SpidUserManager userManager,
-                                SpidSignInManager signInManager,
+        public LoginController(/*SpidUserManager userManager,
+                                SpidSignInManager signInManager,*/
+                                AuthRequest authRequest,
+                                JoueurRepository repo,
                                 IConfiguration configuration,
                                 ILoggerFactory loggerFactory,
-                               IResourceOwnerPasswordValidator pv)
+                                IResourceOwnerPasswordValidator pv)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+          //  _userManager = userManager;
+          //  _signInManager = signInManager;
             _configuration = configuration;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _pv = pv;
-       
+            _authRequest = authRequest;
+            _repo = repo;
+
         }
 
        /* [HttpPost("i4")]
@@ -57,14 +64,20 @@ namespace Auth.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         // [ValidateAntiForgeryToken]
-        public async Task<ActionResult<LoginResult>> Index([FromQuery] string licence, [FromQuery]bool rememberMe = false, [FromQuery]string returnUrl = null)
+        public async Task<ActionResult<LoginResult>> Index([FromQuery] string licence)
         {
-            
+           
+            var token = await _authRequest.Login(Request.BaseUrl(), licence);
+            if (token.IsError)
+                return Unauthorized();
 
+            var user =await  _repo.FindByLicenceAsync(licence);
+
+            return new LoginResult() { Jwt = token.AccessToken, User = user };
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 //var result = await _signInManager.PasswordSignInAsync(model.Input.Licence, model.Password, model.RememberMe, lockoutOnFailure: false);
-                var result = await _signInManager.LicenceSignInAsync(licence, rememberMe);
+               /* var result = await _signInManager.LicenceSignInAsync(licence, rememberMe);
                 if (result.SignInResult.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
@@ -75,19 +88,14 @@ namespace Auth.Api.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Unauthorized();
-                }
+                }*/
 
         }
-
+/*
         private async Task<string> GenerateJwtToken(PingUser user)
         {
             var t = Task.Run(() => {
-               /* var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email??"tmp@tmp.fr"),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
-            };*/
+ 
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["auth:barear:JwtKey"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.Sha256);
@@ -104,6 +112,6 @@ namespace Auth.Api.Controllers
                 return new JwtSecurityTokenHandler().WriteToken(token);
             });
             return await t;
-        }
+        }*/
     }
 }

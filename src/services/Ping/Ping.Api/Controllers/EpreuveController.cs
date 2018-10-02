@@ -9,6 +9,7 @@ using Ping.Api.services;
 
 namespace Ping.Api.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EpreuveController : SpidControllerBase
@@ -27,7 +28,7 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("{organisme}/{epreuve}/{type}")]
+        [HttpGet("{organisme}/{type}/{epreuve}")]
         public async Task<ActionResult<string>> GetDivisionParEpreuve(string organisme,string epreuve, string @type)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.DivisionEpreuve, new NameValueCollection() {

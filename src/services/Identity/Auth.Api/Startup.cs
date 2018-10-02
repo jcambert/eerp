@@ -20,12 +20,15 @@ namespace Auth.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
+            Environment = env;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IHostingEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -38,11 +41,12 @@ namespace Auth.Api
             //services.AddScoped<SignInManager<PingUser>, SpidSignInManager>();
             services.AddTransient<HttpClientRequest>();
             services.AddTransient<SpidRequest<PingDbContext>>();
+            services.AddTransient<AuthRequest>();
             services.AddTransient<JoueurRepository>();
             // services.AddScoped<IUserStore<PingUser>, SpidStore>();
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             services.AddTransient<IProfileService, ProfileService>();
-
+            
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<PingDbContext>(options =>
                 options.UseSqlite(connectionString)
@@ -86,12 +90,12 @@ namespace Auth.Api
                 .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
+
             services
                 .AddHttpClient(Configuration["auth:name"], c =>
                 {
-
-                    c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
-                    c.DefaultRequestHeaders.Add("Accept", "text/xml");
+                    //c.BaseAddress = new Uri(Environment.ContentRootPath);
+                    c.DefaultRequestHeaders.Add("Accept", "json/application");
 
                 })
                 //.AddHttpMessageHandler<HttpMessageLogger>()
@@ -100,12 +104,14 @@ namespace Auth.Api
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
 
+
             services.AddAutoMapper();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 
         }
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
