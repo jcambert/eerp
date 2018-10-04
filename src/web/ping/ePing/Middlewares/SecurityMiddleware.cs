@@ -25,6 +25,8 @@ namespace ePing
 
             if (httpContext.Response.StatusCode == 401)
             {
+                await httpContext.Response.WriteAsync("Invalid User Key");
+                return;
                 var r = httpContext.Request;
             }
         }
