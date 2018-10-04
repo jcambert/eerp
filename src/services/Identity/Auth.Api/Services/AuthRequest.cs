@@ -1,11 +1,9 @@
-﻿using Auth.Api.dto;
-using AutoMapper;
+﻿using AutoMapper;
+using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using IdentityModel.Client;
-using System.Collections.Generic;
-using System;
 
 namespace Auth.Api.Services
 {
@@ -21,11 +19,11 @@ namespace Auth.Api.Services
 
         private bool discovered = false;
 
-       
+
 
         public AuthRequest(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper) : base(clientFactory, configuration, mapper)
         {
-            
+
         }
         public DiscoveryResponse disco { get; private set; }
 
@@ -33,26 +31,15 @@ namespace Auth.Api.Services
         {
             if (discovered) return;
             var client = CreateClient("auth:name");
-            client.BaseAddress=new Uri(baseUrl);
+            client.BaseAddress = new Uri(baseUrl);
             disco = await client.GetDiscoveryDocumentAsync();
             if (disco.IsError) throw new Exception(disco.Error);
             discovered = true;
-           
+
         }
-       /* public string GetBaseUrl()
-        {
-            var request = Request;
-            var appUrl = HttpRuntime.AppDomainAppVirtualPath;
+        
 
-            if (appUrl != "/")
-                appUrl = "/" + appUrl;
-
-            var baseUrl = string.Format("{0}://{1}{2}", request.Url.Scheme, request.Url.Authority, appUrl);
-
-            return baseUrl;
-        }*/
-
-        public async Task<TokenResponse> Login(string baseUrl,string licence)
+        public async Task<TokenResponse> Login(string baseUrl, string licenceOrName,string prenom=null)
         {
             await Discover(baseUrl);
 
@@ -64,12 +51,13 @@ namespace Auth.Api.Services
                 ClientId = "client",
                 ClientSecret = "secret",
                 Scope = "pingapi",
-                UserName = licence,
-                Password = "132"
-                
+                UserName = licenceOrName,
+                Password = prenom ?? "1"
+
 
             });
             return resp;
+
         }
     }
 }

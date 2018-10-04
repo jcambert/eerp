@@ -43,9 +43,22 @@ namespace Auth.Api.Services
             var res = await client.GetStreamAsync(uri);
 
             StreamReader reader = new StreamReader(res);
+           
             string text = reader.ReadToEnd();
-            TModelDto dto = JsonConvert.DeserializeObject<TModelDto>(text);
-            return dto;
+            try
+            {
+                 var dto = JsonConvert.DeserializeObject<TModelDto>(text);
+                return dto;
+            }
+            catch(Exception ex)
+            {
+                var e = ex.Message;
+                throw ex;
+            }
+           
+                
+            
+           
         }
 
         public async Task<TModel> ExecuteGet<TModelDto, TModel>(string clientName, string endPoint, NameValueCollection parameters = null)

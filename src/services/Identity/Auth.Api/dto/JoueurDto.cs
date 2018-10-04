@@ -7,6 +7,21 @@ using System.Threading.Tasks;
 
 namespace Auth.Api.dto
 {
+    [DataContract]
+    public class ListesJoueurHeader
+    {
+        [DataMember(Name = "liste")]
+        public JoueursDtoHeader Liste { get; set; }
+    }
+
+    public class JoueursDtoHeader
+    {
+   
+        [DataMember(Name = "joueur")]
+        [JsonProperty("joueur")]
+        public List<JoueurDto> Joueurs { get; set; }
+
+    }
 
     [DataContract]
     public class ListeJoueurHeader
@@ -24,6 +39,7 @@ namespace Auth.Api.dto
         [DataMember(Name = "licence")]
         [JsonProperty("licence")]
         public JoueurDto Licence { get; set; }
+
 
     }
     public class JoueurDto

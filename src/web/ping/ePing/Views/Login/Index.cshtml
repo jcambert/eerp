@@ -1,8 +1,9 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@{
-}
+
+@model  LoginViewModel
+
 
 <div id="app">
     <v-app id="inspire">
@@ -12,28 +13,20 @@
                     <v-flex xs12 sm8 md4>
                         <v-card class="elevation-12">
                             <v-toolbar dark color="primary">
-                                <v-toolbar-title>Login form</v-toolbar-title>
+                                <v-toolbar-title>Identifiez-vous</v-toolbar-title>
                                 <v-spacer></v-spacer>
-                                <v-tooltip bottom>
-                                    <v-btn icon
-                                           large
-                                           :href="source"
-                                           target="_blank"
-                                           slot="activator">
-                                        <v-icon large>code</v-icon>
-                                    </v-btn>
-                                    <span>Source</span>
-                                </v-tooltip>
                             </v-toolbar>
                             <v-card-text>
-                                <v-form>
-                                    <v-text-field prepend-icon="person" name="login" label="Login" type="text"></v-text-field>
-                                    <v-text-field prepend-icon="lock" name="password" label="Password" id="password" type="password"></v-text-field>
+                                <v-form ref="form" v-model="valid" >
+                                    <v-text-field prepend-icon="person" name="login" label="Licence ou Nom" type="text" v-model="licence" required :rules="licenceRules"></v-text-field>
+                                    <v-text-field v-if="!isLicence()" prepend-icon="person" name="login" label="Prenom" type="text" v-model="prenom" required  :rules="prenomRules"></v-text-field>
+                                    <input type="hidden" v-model="tokenendpoint" v-init:tokenendpoint="'@Model.TokenEndPoint'">
                                 </v-form>
                             </v-card-text>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="primary">Login</v-btn>
+                                <v-btn color="primary" v-on:click="submitForm()" :disabled="!formValid">Entrer</v-btn>
+                                <v-btn v-on:click="clearForm()">Effacer</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-flex>

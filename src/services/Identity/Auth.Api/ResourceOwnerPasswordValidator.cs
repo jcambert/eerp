@@ -1,4 +1,5 @@
-﻿using Auth.Api.Repositories;
+﻿using Auth.Api.Models;
+using Auth.Api.Repositories;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
@@ -18,9 +19,14 @@ namespace Auth.Api
         }
         public async Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
-            var user =  await _repo.FindByLicenceAsync(context.UserName);
+            PingUser user;
+            int licence;
+            if (int.TryParse(context.UserName, out licence))
+                user = await _repo.FindByLicenceAsync(context.UserName);
+            else
+                user = await _repo.FindByNameAsync(context.UserName, context.Password);
             if (user != null)
-                context.Result = new GrantValidationResult(context.UserName, "password", null, "local", null);
+                context.Result = new GrantValidationResult(context.UserName,"password", null, "local", null);
             else
             {
                 context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant) ;

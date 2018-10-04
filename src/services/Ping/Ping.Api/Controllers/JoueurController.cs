@@ -29,7 +29,7 @@ namespace Ping.Api.Controllers
         {
             NameValueCollection @params = new NameValueCollection();
             if (club != null) @params["club"] = club;
-            if (nom != null) @params["nom"] = nom.ToUpper();
+            if (nom != null) @params["nom"] = nom;
             if (prenom != null) @params["prenom"] = prenom;
             if (licence != null) @params["licence"] = licence;
 

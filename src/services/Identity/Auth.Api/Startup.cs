@@ -9,6 +9,7 @@ using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,6 +108,20 @@ namespace Auth.Api
 
             services.AddAutoMapper();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("all", policy =>
+                {
+                    policy.AllowAnyHeader().WithHeaders("access-control-allow-origin");
+                    policy.AllowAnyOrigin();
+                    policy.AllowAnyMethod();
+                   
+                });
+            });
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new CorsAuthorizationFilterFactory("all"));
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 
@@ -116,6 +131,8 @@ namespace Auth.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -128,7 +145,6 @@ namespace Auth.Api
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseStaticFiles();
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
@@ -144,10 +160,11 @@ namespace Auth.Api
                 }
             }
 
+            app.UseCors("all");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+           
             //app.UseAuthentication();
             app.UseIdentityServer();
 

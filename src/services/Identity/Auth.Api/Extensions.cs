@@ -45,5 +45,11 @@ namespace Auth.Api
         }
 
         public static string BaseUrl(this HttpRequest request) => $"{request.Scheme}://{request.Host}{request.PathBase}";
+
+        public static string TitleCase(this string s)
+        {
+            if (s == null) return null;
+            return s.Substring(0, 1).ToUpper() + s.Substring(1);
+        }
     }
 }

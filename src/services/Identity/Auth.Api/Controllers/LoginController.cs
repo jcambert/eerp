@@ -64,54 +64,24 @@ namespace Auth.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         // [ValidateAntiForgeryToken]
-        public async Task<ActionResult<LoginResult>> Index([FromQuery] string licence)
+        public async Task<ActionResult<LoginResult>> Index([FromQuery] string licenceOrName,[FromQuery] string prenom =null)
         {
-           
-            var token = await _authRequest.Login(Request.BaseUrl(), licence);
+            licenceOrName =  licenceOrName?.ToUpper();
+            prenom = prenom.TitleCase();
+
+            var token = await _authRequest.Login(Request.BaseUrl(), licenceOrName??"",prenom);
             if (token.IsError)
                 return Unauthorized();
 
-            var user =await  _repo.FindByLicenceAsync(licence);
-
-            return new LoginResult() { Jwt = token.AccessToken, User = user };
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                //var result = await _signInManager.PasswordSignInAsync(model.Input.Licence, model.Password, model.RememberMe, lockoutOnFailure: false);
-               /* var result = await _signInManager.LicenceSignInAsync(licence, rememberMe);
-                if (result.SignInResult.Succeeded)
-                {
-                    _logger.LogInformation(1, "User logged in.");
-                    //return RedirectToLocal(returnUrl);
-                    return new LoginResult() { Jwt = await GenerateJwtToken(result.User), User = result.User, ReturnUrl= returnUrl };
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Unauthorized();
-                }*/
+            int licence;
+            PingUser user;
+            if (int.TryParse(licenceOrName, out licence))
+                user = await _repo.FindByLicenceAsync(licenceOrName);
+            else
+                user = await _repo.FindByNameAsync(licenceOrName, prenom);
+            return new LoginResult() { Jwt = token.AccessToken, User = user ?? default(PingUser) };
+                
 
         }
-/*
-        private async Task<string> GenerateJwtToken(PingUser user)
-        {
-            var t = Task.Run(() => {
- 
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["auth:barear:JwtKey"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.Sha256);
-                var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["auth:barear:JwtExpireDays"]));
-
-                var token = new JwtSecurityToken(
-                    _configuration["auth:barear:JwtIssuer"],
-                    _configuration["auth:barear:JwtIssuer"],
-                    claims:new List<Claim>(),
-                    expires: expires,
-                    signingCredentials: creds
-                );
-
-                return new JwtSecurityTokenHandler().WriteToken(token);
-            });
-            return await t;
-        }*/
     }
 }
