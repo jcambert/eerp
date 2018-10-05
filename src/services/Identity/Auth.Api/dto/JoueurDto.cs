@@ -62,6 +62,8 @@ namespace Auth.Api.dto
         public string Point { get; set; }
         [DataMember(Name = "numclub")]
         public object NumeroClub { get; set; }
+        [DataMember(Name = "nclub")]
+        public object NClub { get; set; }
         [DataMember(Name = "nomclub")]
         public object NomClub { get; set; }
         [DataMember(Name = "type")]

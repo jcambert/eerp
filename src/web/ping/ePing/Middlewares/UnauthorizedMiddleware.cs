@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ePing
 {
-    public class SecurityMiddleware
+    public class UnauthorizedMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public SecurityMiddleware(RequestDelegate next)
+        public UnauthorizedMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -25,18 +25,16 @@ namespace ePing
 
             if (httpContext.Response.StatusCode == 401)
             {
-                await httpContext.Response.WriteAsync("Invalid User Key");
-                return;
-                var r = httpContext.Request;
+                await httpContext.Response.WriteAsync("You are not authorized to access this page");
             }
         }
     }
 
-    public static class SecurityMiddlewareExtensions
+    public static class UnauthorizedMiddlewareExtensions
     {
-        public static IApplicationBuilder UseSecurityMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseUnauthorizedMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<SecurityMiddleware>();
+            return builder.UseMiddleware<UnauthorizedMiddleware>();
         }
     }
 }

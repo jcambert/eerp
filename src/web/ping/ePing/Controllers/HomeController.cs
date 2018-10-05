@@ -6,16 +6,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ePing.Models;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ePing.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
+        private ApiSettings _settings;
+
+        public HomeController(IOptions<ApiSettings> settings)
+        {
+            _settings = settings.Value;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            string auth=HttpContext.Session.GetValue<string>("auth");
+            var user=JsonConvert.DeserializeObject<UserDto>(auth);
+
+            var token = JsonConvert.DeserializeObject<BearerDto>(auth);
+           
+            
+            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt, ApiSettings = _settings};
+            return View("Index",vm);
         }
+
+        
 
         public IActionResult About()
         {

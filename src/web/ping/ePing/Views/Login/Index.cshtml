@@ -1,8 +1,15 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 
-@model  LoginViewModel
+*@
+@{
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    ViewData["Title"] = "Identification";
+   
+}
+
+
+@model LoginViewModel
 
 
 <div id="app">
@@ -12,14 +19,14 @@
                 <v-layout align-center justify-center>
                     <v-flex xs12 sm8 md4>
                         <v-card class="elevation-12">
-                            <v-toolbar dark color="primary">
+                            <v-toolbar dark color="blue-grey">
                                 <v-toolbar-title>Identifiez-vous</v-toolbar-title>
                                 <v-spacer></v-spacer>
                             </v-toolbar>
                             <v-card-text>
-                                <v-form ref="form" v-model="valid" >
+                                <v-form ref="form" v-model="valid">
                                     <v-text-field prepend-icon="person" name="login" label="Licence ou Nom" type="text" v-model="licence" required :rules="licenceRules"></v-text-field>
-                                    <v-text-field v-if="!isLicence()" prepend-icon="person" name="login" label="Prenom" type="text" v-model="prenom" required  :rules="prenomRules"></v-text-field>
+                                    <v-text-field v-if="!isLicence()" prepend-icon="person" name="login" label="Prenom" type="text" v-model="prenom" required :rules="prenomRules"></v-text-field>
                                     <input type="hidden" v-model="tokenendpoint" v-init:tokenendpoint="'@Model.TokenEndPoint'">
                                 </v-form>
                             </v-card-text>

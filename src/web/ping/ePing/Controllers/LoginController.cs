@@ -24,7 +24,7 @@ namespace ePing.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
-            var endpoint = _configuration["IdentityUrl"] + _configuration["api:login_endpoint"];
+            var endpoint = _configuration["ping:auth:IdentityUrl"] + _configuration["ping:auth:login_endpoint"];
             return View("Index",new LoginViewModel() { TokenEndPoint=endpoint});
         }
 
@@ -33,16 +33,15 @@ namespace ePing.Controllers
         // [ValidateAntiForgeryToken]
         public async Task<ActionResult> Index([FromQuery] string licenceOrName, [FromQuery] string prenom = null)
         {
-            var endpoint =  _configuration["api:login_endpoint"];
+            var endpoint =  _configuration["ping:auth:login_endpoint"];
             endpoint=  String.Format(endpoint, licenceOrName, prenom ?? "");
 
             
             HttpClient client = _factory.CreateClient("login");
             var response = await client.PostAsync(endpoint, new FormUrlEncodedContent(new Dictionary<string, string>()));
             string resultContent = await response.Content.ReadAsStringAsync();
-
-            //return View("../Home/Index", resultContent);
-            return Ok(resultContent);
+            HttpContext.Session.SetValue("auth", resultContent);
+            return Ok();
 
         }
     }

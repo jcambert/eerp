@@ -16,4 +16,10 @@
     <Folder Include="wwwroot\js\NewFolder\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Shared\_LoginLayout.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>

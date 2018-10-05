@@ -39,7 +39,7 @@ namespace ePing.Api.Controllers
 
             if (Request.Path.Value.Contains("load"))
             {
-                await Service.loadListForClubFromSpid(numero, true,club);
+                await Service.loadListForClubFromSpid(numero, true, club);
 
             }
 
