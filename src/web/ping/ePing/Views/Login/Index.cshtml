@@ -32,7 +32,7 @@
                             </v-card-text>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="primary" v-on:click="submitForm()" :disabled="!formValid">Entrer</v-btn>
+                                <v-btn color="primary" v-on:click="submitForm()" :disabled="!formValid || requested">Entrer</v-btn>
                                 <v-btn v-on:click="clearForm()">Effacer</v-btn>
                             </v-card-actions>
                         </v-card>

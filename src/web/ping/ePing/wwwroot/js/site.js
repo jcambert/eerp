@@ -12,7 +12,7 @@ var mv=new Vue({
     el: '#app',
     data: () => ({
         drawer: null,
-        apiendpoint: "",
+        //apiendpoint: "",
         apisettings: {},
         items: [],
         lorem: `Lorem ipsum dolor sit amet, mel at clita quando. Te sit oratio vituperatoribus, nam ad ipsum posidonium mediocritatem, explicari dissentiunt cu mea. Repudiare disputationi vim in, mollis iriure nec cu, alienum argumentum ius ad. Pri eu justo aeque torquatos.`
@@ -22,7 +22,17 @@ var mv=new Vue({
         source: String
     },
     methods:{
-        
+        getSettings() {
+            var self = this;
+            Vue.http.get('/api/dashboard/settings')
+                .then(
+                result => { 
+                    this.apisettings = result.body; console.dir(result); 
+
+                   // Vue.http.get(this.apisettings.EndPoint+this.apisettings.Club)
+                },
+                error => { console.error(error); });
+        }
         
     },
     computed: {
@@ -30,8 +40,7 @@ var mv=new Vue({
     },
     mounted:function() {
         console.log("mounted");
-        console.log(this.apiendpoint);
-        Vue.http.get('/api/settings').then(function (result) { console.dir(result); }, function (error) { console.error(error); });
+       this.getSettings();
         
     }
 })

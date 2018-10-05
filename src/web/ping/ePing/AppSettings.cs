@@ -10,9 +10,8 @@ namespace ePing
     }
     public class ApiSettings
     {
-        public string EndPoint {
-            get;
-            set;
-        }
+        public string EndPoint {get;set;}
+
+        public string Club { get; set; }
     }
 }

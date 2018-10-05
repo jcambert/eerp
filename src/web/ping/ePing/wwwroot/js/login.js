@@ -23,6 +23,7 @@ var mv=new Vue({
         prenom: "",
         tokenendpoint: "",
         valid: false,
+        requested: false,
         licenceRules: [v => !!v || 'Votre numero de licence ou votre nom sont requis'],
         prenomRules: [v => !!v || 'Votre prenom est requis'],
     }),
@@ -33,6 +34,7 @@ var mv=new Vue({
     methods:{
         submitForm() {
             if (this.$refs.form.validate()) {
+                this.requested = true;
                 url = this.tokenendpoint.format(this.licence, this.prenom)
 
                 url = "/login/?licenceOrName={0}&prenom={1}".format(this.licence, this.prenom);
@@ -44,6 +46,7 @@ var mv=new Vue({
                     },
                     function (error) {
                         console.dir(error);
+                        this.requested = false;
                     });
                     
             }

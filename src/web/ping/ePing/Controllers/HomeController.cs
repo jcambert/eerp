@@ -17,9 +17,9 @@ namespace ePing.Controllers
     {
         private ApiSettings _settings;
 
-        public HomeController(IOptions<ApiSettings> settings)
+        public HomeController()
         {
-            _settings = settings.Value;
+            
         }
 
         public IActionResult Index()
@@ -30,7 +30,7 @@ namespace ePing.Controllers
             var token = JsonConvert.DeserializeObject<BearerDto>(auth);
            
             
-            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt, ApiSettings = _settings};
+            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt};
             return View("Index",vm);
         }
 
