@@ -18,29 +18,84 @@ namespace ePing.Api.services
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
-        private readonly PingContext _dbcontext;
+        private readonly PingDbContext _dbcontext;
         private readonly IMapper _mapper;
+        private readonly EfService _efService;
 
-        public ServiceBase(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingContext dbcontext)
+        public ServiceBase(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext,EfService efService)
         {
             _clientFactory = clientFactory;
             _configuration = configuration;
             _dbcontext = dbcontext;
             _mapper = mapper;
+            _efService = efService;
         }
 
         public IHttpClientFactory ClientFactory => _clientFactory;
 
         public IConfiguration Configuration => _configuration;
 
-        public PingContext DbContext => _dbcontext;
+        public PingDbContext DbContext => _dbcontext;
 
         public IMapper Mapper => _mapper;
 
+        public EfService EfService => _efService;
+
         public HttpClient CreateClient()=> ClientFactory.CreateClient(Configuration["ping:name"]);
 
-        protected async Task<TModel> InternalLoadFromSpid<TListDto,TModelDto,TModel>(string uri, bool addToDb,Func<TListDto, TModelDto> filter,Action<PingContext, TModel>add,Action<TModel> beforeSave =null ) 
+        protected async Task<List< TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add, Action<TModel> beforeSave = null) where TModel : Trackable
         {
+            List< TModel> model;
+            Action<TModel> addOrUpdate = async (_model) =>
+            {
+                var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
+                if (existed != null)
+                    DbContext.Entry(existed).CurrentValues.SetValues(_model);
+                else
+                    add(DbContext, _model);
+            };
+
+            var client = CreateClient();
+
+            var res = await client.GetStreamAsync(uri);
+
+            StreamReader reader = new StreamReader(res);
+            string text = reader.ReadToEnd();
+            TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
+
+            if (dto == null) return default(List<TModel>);
+            model = Mapper.Map<List<TModel>>(filter(dto));
+            if (addToDb)
+            {
+                if (model is IEnumerable<TModel>)
+                    foreach (var item in model as IEnumerable<TModel>)
+                    {
+                        addOrUpdate(item);
+                        if (beforeSave != null)
+                            beforeSave(item);
+                    }
+                
+
+
+
+                
+                await DbContext.SaveChangesAsync();
+            }
+
+            return model;
+        }
+        protected async Task<TModel> InternalLoadFromSpid<TListDto,TModelDto,TModel>(string uri, bool addToDb,Func<TListDto, TModelDto> filter,Action<PingDbContext, TModel>add,Action<TModel> beforeSave =null) where TModel : Trackable
+        {
+            TModel model;
+            Action<TModel> addOrUpdate = async (_model) =>
+            {
+                var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
+                if (existed != null)
+                    DbContext.Entry(existed).CurrentValues.SetValues(_model);
+                else
+                    add(DbContext, _model);
+            };
+
             var client = CreateClient();
             
             var res = await client.GetStreamAsync(uri);
@@ -50,10 +105,31 @@ namespace ePing.Api.services
             TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
 
             if (dto == null) return default(TModel);
-            var model = Mapper.Map<TModel>(filter(dto));
+            model = Mapper.Map<TModel>(filter(dto));
             if (addToDb)
             {
-                add(DbContext, model);
+                if (model is IEnumerable<TModel>)
+                    foreach (var item in model as IEnumerable<TModel>)
+                    {
+                        addOrUpdate(item);
+                        /*var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(item));
+                        if (existed != null)
+                            DbContext.Entry(existed).CurrentValues.SetValues(item);
+                        else
+                            add(DbContext, item);*/
+                    }
+                else
+                {
+                    addOrUpdate(model);
+                   /* var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(model));
+                    if (existed != null)
+                        DbContext.Entry(existed).CurrentValues.SetValues(model);
+                    else
+                        add(DbContext, model);*/
+                }
+
+                
+
                 if (beforeSave != null)
                     beforeSave(model);
                 await DbContext.SaveChangesAsync();

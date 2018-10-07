@@ -25,7 +25,9 @@ namespace ePing.Api.models
 
         public string Place { get; set; }
 
-        public string Point { get; set; }
+        public int Point { get; set; }
+
+        public int Classe =>(Point/100);
 
     }
 }

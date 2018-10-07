@@ -13,10 +13,10 @@ namespace ePing.Api.Controllers
     [ApiController]
     public class ClubsController : ControllerBase
     {
-        private readonly PingContext _context;
+        private readonly PingDbContext _context;
         private readonly IClubService _service;
 
-        public ClubsController(PingContext context, IClubService service)
+        public ClubsController(PingDbContext context, IClubService service)
         {
             _context = context;
             _service = service;

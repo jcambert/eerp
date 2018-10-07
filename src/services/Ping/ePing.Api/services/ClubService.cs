@@ -23,13 +23,13 @@ namespace ePing.Api.services
     {
    
 
-        public ClubService(IHttpClientFactory clientFactory, IConfiguration configuration,IMapper mapper,PingContext dbcontext):base(clientFactory,configuration,mapper,dbcontext)
+        public ClubService(IHttpClientFactory clientFactory, IConfiguration configuration,IMapper mapper,PingDbContext dbcontext, EfService efService) :base(clientFactory,configuration,mapper,dbcontext,efService)
         {
    
         }
         public async Task<Club> loadFromSpid(string numero, bool addToDb)
         {
-            return await this.InternalLoadFromSpid<ListeClubHeader,ClubDto, Club>($"/api/club/numero/{numero}", true, liste => liste.Liste.Club, (ctx, model) => { ctx.Clubs.Add(model); });
+            return await this.InternalLoadFromSpid<ListeClubHeader,ClubDto, Club>($"/api/club/{numero}/detail", true, liste => liste.Liste.Club, (ctx, model) => { ctx.Clubs.Add(model); });
         }
 
   

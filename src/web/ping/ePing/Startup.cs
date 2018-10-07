@@ -80,7 +80,7 @@ namespace ePing
            
             if (env.IsDevelopment())
             {
-                //app.UseUnauthorizedMiddleware();
+             //   app.UseUnauthorizedMiddleware();
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -147,6 +147,8 @@ namespace ePing
 
                 options.ApiName = "pingapi";
                 options.SaveToken = true;
+
+                
                 /*options.JwtBearerEvents = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents()
                 {
                     OnTokenValidated= bearer =>

@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace ePing.Api.dbcontext
 {
-    public class PingContext: DbContextWithTriggers
+    public class PingDbContext: DbContextWithTriggers
     {
-        public PingContext()
+        public PingDbContext()
         {
 
         }
-        public PingContext(DbContextOptions options):base(options)
+        public PingDbContext(DbContextOptions options):base(options)
         {
 
         }

@@ -15,7 +15,7 @@ namespace ePing.Api.Controllers
     {
 
 
-        public JoueursController(PingContext context, IJoueurService service) : base(context)
+        public JoueursController(PingDbContext context, IJoueurService service) : base(context)
         {
             Service = service;
         }
@@ -29,7 +29,7 @@ namespace ePing.Api.Controllers
             return Context.Joueur;
         }
 
-        [HttpGet("club/load/{numero}")]
+        [HttpGet("club/{numero}/load")]
         [HttpGet("club/{numero}")]
         public async Task<IActionResult> GetJoueursDuClub([FromRoute] string numero)
         {
@@ -39,12 +39,16 @@ namespace ePing.Api.Controllers
 
             if (Request.Path.Value.Contains("load"))
             {
-                await Service.loadListForClubFromSpid(numero, true, club);
+               return Ok(await Service.loadListForClubFromSpid(numero, true, club));
 
             }
 
 
-            return Ok(Context.Joueur.Where(j => j.Club.idClub == club.idClub));
+            var result= Context.Joueur.Where(j => j.Club == club);
+
+            var result1= await result.ToListAsync();
+
+            return Ok(result1);
         }
 
         // GET: api/Joueurs/5

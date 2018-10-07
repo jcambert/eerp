@@ -21,14 +21,14 @@ namespace ePing.Api.services
 
     public class JoueurService:ServiceBase,IJoueurService
     {
-        public JoueurService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingContext dbcontext) : base(clientFactory, configuration, mapper, dbcontext)
+        public JoueurService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext, EfService efService) : base(clientFactory, configuration, mapper, dbcontext,efService)
         {
 
         }
 
         public async Task<List<Joueur>> loadListForClubFromSpid(string numero, bool addToDb,Club club)
         {
-            return await this.InternalLoadFromSpid<ListeJoueurHeader, List<JoueurDto>, List<Joueur>>($"api/joueur/liste/club/{numero}", true, liste => liste.Liste.Joueurs, (ctx, model) => { ctx.Joueur.AddRange(model); },models=>  models.ForEach(model=> model.Club=club ) );
+            return await this.InternalLoadListFromSpid<ListeJoueurHeader, List<JoueurDto>, Joueur>($"api/joueur/liste/club/{numero}", true, liste => liste.Liste.Joueurs, (ctx, model) => { ctx.Joueur.AddRange(model); },model=> model.Club=club );
         }
     }
 }

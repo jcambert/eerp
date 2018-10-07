@@ -13,5 +13,7 @@ namespace ePing
         public string EndPoint {get;set;}
 
         public string Club { get; set; }
+
+        public string JoueursDuClub { get; set; }
     }
 }

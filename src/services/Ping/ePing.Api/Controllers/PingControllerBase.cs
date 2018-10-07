@@ -9,11 +9,11 @@ namespace ePing.Api.Controllers
 {
     public class PingControllerBase:ControllerBase
     {
-        public PingControllerBase(PingContext context)
+        public PingControllerBase(PingDbContext context)
         {
             Context = context;
         }
 
-        public PingContext Context { get;  }
+        public PingDbContext Context { get;  }
     }
 }

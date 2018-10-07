@@ -35,7 +35,8 @@ namespace ePing.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
+
+            services.AddSingleton<EfService>();
 
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IJoueurService, JoueurService>();
@@ -54,7 +55,7 @@ namespace ePing.Api
 
          //  var connection = new SqliteConnection("DataSource=:memory:");
             var connection = new SqliteConnection("Data Source=ping.db"); 
-            services.AddEntityFrameworkSqlite().AddDbContext<PingContext>(options=>
+            services.AddEntityFrameworkSqlite().AddDbContext<PingDbContext>(options=>
             {
                 options.UseSqlite(connection);
                
@@ -75,7 +76,9 @@ namespace ePing.Api
             ConfigureAuthService(services);
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(
+                    options => options.SerializerSettings.ReferenceLoopHandling
+                        = Newtonsoft.Json.ReferenceLoopHandling.Ignore); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,11 +87,22 @@ namespace ePing.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+                {
+                    var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
+                    if (env.IsDevelopment())
+                    {
+                        context.Database.EnsureDeleted();
+                        context.Database.EnsureCreated();
+                        
+                    }
+                }
             }
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                var context = serviceScope.ServiceProvider.GetRequiredService<PingContext>();
+                var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
             }
@@ -106,7 +120,7 @@ namespace ePing.Api
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30));
+                .CircuitBreakerAsync(2, TimeSpan.FromSeconds(10));
         }
 
         static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
@@ -114,7 +128,7 @@ namespace ePing.Api
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-                .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,retryAttempt)));
+                .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,retryAttempt)));
         }
 
         private void ConfigureAuthService(IServiceCollection services)
