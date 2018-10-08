@@ -42,5 +42,7 @@ namespace ePing.Api.services
             {
             return await this.InternalLoadListFromSpid<ListePartiesHeader, List<PartieDto>, Partie>($"api/joueur/{licence}/parties", false, liste => liste?.Liste?.Parties);
         }
+
+        
     }
 }

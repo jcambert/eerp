@@ -40,6 +40,7 @@ namespace ePing.Api
 
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IJoueurService, JoueurService>();
+            services.AddSingleton<PointService>();
 
             services
                 .AddHttpClient(Configuration["ping:name"], c => {
@@ -93,8 +94,8 @@ namespace ePing.Api
                     var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
                     if (env.IsDevelopment())
                     {
-                        //context.Database.EnsureDeleted();
-                        //context.Database.EnsureCreated();
+                        context.Database.EnsureDeleted();
+                        context.Database.EnsureCreated();
                         
                     }
                 }
