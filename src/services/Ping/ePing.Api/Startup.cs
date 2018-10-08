@@ -93,19 +93,14 @@ namespace ePing.Api
                     var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
                     if (env.IsDevelopment())
                     {
-                        context.Database.EnsureDeleted();
-                        context.Database.EnsureCreated();
+                        //context.Database.EnsureDeleted();
+                        //context.Database.EnsureCreated();
                         
                     }
                 }
             }
 
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
-            }
+           
 
 
             loggerFactory.AddConsole(Configuration);
@@ -133,20 +128,14 @@ namespace ePing.Api
 
         private void ConfigureAuthService(IServiceCollection services)
         {
-            // prevent from mapping "sub" claim to nameidentifier.
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = Configuration.GetValue<string>("IdentityUrl"); ;
+                    options.RequireHttpsMetadata = false;
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.Authority = Configuration.GetValue<string>("IdentityUrl");
-                options.Audience = "locations";
-                options.RequireHttpsMetadata = false;
-            });
+                    options.ApiName = "pingapi";
+                });
         }
 
         protected virtual void ConfigureAuth(IApplicationBuilder app)

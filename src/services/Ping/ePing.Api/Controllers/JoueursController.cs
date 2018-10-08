@@ -29,6 +29,14 @@ namespace ePing.Api.Controllers
             return Context.Joueur;
         }
 
+        // GET: api/Joueurs
+        [HttpGet("{licence}/parties")]
+        public async Task<IActionResult> GetPartiesDuJoueur([FromRoute] string licence)
+        {
+            var result = await Service.loadJoueurParties(licence);
+            return Ok(result);
+        }
+
         [HttpGet("club/{numero}/load")]
         [HttpGet("club/{numero}")]
         public async Task<IActionResult> GetJoueursDuClub([FromRoute] string numero)
@@ -39,7 +47,11 @@ namespace ePing.Api.Controllers
 
             if (Request.Path.Value.Contains("load"))
             {
-               return Ok(await Service.loadListForClubFromSpid(numero, true, club));
+                var liste = await Service.loadListForClubFromSpid(numero, true, club);
+                foreach (var joueur in liste)
+                {
+                    await Service.loadDetailJoueur(joueur.Licence, true,club);
+                }
 
             }
 

@@ -17,6 +17,8 @@ namespace ePing.Api.services
     public interface IJoueurService
     {
         Task<List<Joueur>> loadListForClubFromSpid(string numero, bool addToDb,Club club);
+        Task<Joueur> loadDetailJoueur(string licence, bool addToDb, Club club);
+        Task<List<Partie>> loadJoueurParties(string licence);
     }
 
     public class JoueurService:ServiceBase,IJoueurService
@@ -26,9 +28,19 @@ namespace ePing.Api.services
 
         }
 
+        public async Task<Joueur> loadDetailJoueur(string licence, bool addToDb, Club club)
+        {
+            return await this.InternalLoadFromSpid<ListeJoueurHeader, JoueurDto, Joueur>($"api/joueur/{licence}", addToDb, liste => liste?.Liste?.Joueur, (ctx, joueur) => { ctx.Joueur.Add(joueur); }, joueur => joueur.Club = club);
+        }
+
         public async Task<List<Joueur>> loadListForClubFromSpid(string numero, bool addToDb,Club club)
         {
-            return await this.InternalLoadListFromSpid<ListeJoueurHeader, List<JoueurDto>, Joueur>($"api/joueur/liste/club/{numero}", true, liste => liste.Liste.Joueurs, (ctx, model) => { ctx.Joueur.AddRange(model); },model=> model.Club=club );
+            return await this.InternalLoadListFromSpid<ListeJoueursHeader, List<JoueurDto>, Joueur>($"api/joueur/liste/club/{numero}", addToDb, liste => liste?.Liste?.Joueurs, (ctx, model) => { ctx.Joueur.AddRange(model); },model=> model.Club=club );
+        }
+
+        public async Task<List<Partie>> loadJoueurParties(string licence)
+            {
+            return await this.InternalLoadListFromSpid<ListePartiesHeader, List<PartieDto>, Partie>($"api/joueur/{licence}/parties", false, liste => liste?.Liste?.Parties);
         }
     }
 }

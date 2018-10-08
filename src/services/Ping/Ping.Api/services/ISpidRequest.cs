@@ -50,7 +50,7 @@ namespace Ping.Api.services
 
         private void ConfigureApis()
         {
-            apis[Configuration.LicenceJoueur] = "spid:api:licence_c";
+            apis[Configuration.LicenceJoueur] = "spid:api:licence_b";
             apis[Configuration.Departement] = "spid:api:club_dep";
             apis[Configuration.Club] = "spid:api:club";
             apis[Configuration.ClubDetail] = "spid:api:club_detail";

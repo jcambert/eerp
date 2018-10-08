@@ -33,7 +33,9 @@ namespace Ping.Api.Controllers
             if (prenom != null) @params["prenom"] = prenom;
             if (licence != null) @params["licence"] = licence;
 
-            return await SpidRequest.Execute(Configuration.ApiName, Configuration.ListeJoueur,@params);
+            var response = await SpidRequest.Execute(Configuration.ApiName, Configuration.ListeJoueur,@params);
+
+            return response;
         }
 
         [HttpGet("{license}")]

@@ -15,7 +15,7 @@ namespace ePing.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private ApiSettings _settings;
+      
 
         public HomeController()
         {

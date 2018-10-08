@@ -14,6 +14,7 @@ namespace ePing.Api
         {
             CreateMap<ClubDto, Club>().ReverseMap();
             CreateMap<JoueurDto, Joueur>().ReverseMap();
+            CreateMap<PartieDto, Partie>();
         }
     }
 }
