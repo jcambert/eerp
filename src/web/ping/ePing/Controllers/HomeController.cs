@@ -22,25 +22,30 @@ namespace ePing.Controllers
             
         }
 
-        public IActionResult Index()
+        DashboardViewModel CreateVM()
         {
-            string auth=HttpContext.Session.GetValue<string>("auth");
-            var user=JsonConvert.DeserializeObject<UserDto>(auth);
+            string auth = HttpContext.Session.GetValue<string>("auth");
+            var user = JsonConvert.DeserializeObject<UserDto>(auth);
 
             var token = JsonConvert.DeserializeObject<BearerDto>(auth);
-           
-            
-            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt};
-            return View("Index",vm);
+
+
+            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt };
+            return vm;
+        }
+
+        public IActionResult Index()
+        {
+
+            return View("Index", CreateVM());
         }
 
         
 
-        public IActionResult About()
+        public IActionResult Licencies()
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            
+            return View("Licencies", CreateVM());
         }
 
         public IActionResult Contact()

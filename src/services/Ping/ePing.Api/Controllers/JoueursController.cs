@@ -3,6 +3,7 @@ using ePing.Api.models;
 using ePing.Api.services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +16,15 @@ namespace ePing.Api.Controllers
     {
 
 
-        public JoueursController(PingDbContext context, IJoueurService service) : base(context)
+        public JoueursController(PingDbContext context, IJoueurService service,PointService pointsService) : base(context)
         {
             Service = service;
+            PointsService = pointsService;
         }
 
         public IJoueurService Service { get; }
+
+        public PointService PointsService { get;  }
 
         // GET: api/Joueurs
         [HttpGet]
@@ -33,8 +37,22 @@ namespace ePing.Api.Controllers
         [HttpGet("{licence}/parties")]
         public async Task<IActionResult> GetPartiesDuJoueur([FromRoute] string licence)
         {
-            var result = await Service.loadJoueurParties(licence);
-            return Ok(result);
+            var joueur = await Service.loadDetailJoueur(licence);
+            var parties = await Service.loadJoueurParties(joueur);
+            var journees = new List<Journee>();
+            var toto = parties.GroupBy(x => x.Date).ToList();
+            toto.ForEach(titi =>
+            {
+                var journee = new Journee() { Date = titi.Key };
+                titi.ToList().ForEach(partie =>
+                {
+                    journee.Epreuve = partie.Epreuve;
+                    journee.AddPartie(joueur, partie, PointsService);
+                });
+                journees.Add(journee);
+            });
+
+            return Ok(journees);
         }
 
         [HttpGet("club/{numero}/load")]

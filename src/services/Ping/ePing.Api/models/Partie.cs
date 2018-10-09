@@ -21,5 +21,7 @@ namespace ePing.Api.models
         public string Forfait { get; set; }
 
         public string IdPartie { get; set; }
+
+        public double PointsGagnesPerdus { get; set; }
     }
 }

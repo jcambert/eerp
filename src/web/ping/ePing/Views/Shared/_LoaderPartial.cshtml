@@ -1,0 +1,18 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<v-dialog v-model="loader"
+          persistent
+          width="300">
+    <v-card color="blue-grey"
+            dark>
+        <v-card-text>
+            Chargement en cours ...
+            <v-progress-linear indeterminate
+                               color="white"
+                               class="mb-0"></v-progress-linear>
+        </v-card-text>
+    </v-card>
+</v-dialog>

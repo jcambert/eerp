@@ -40,7 +40,10 @@ namespace ePing.Api
 
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IJoueurService, JoueurService>();
-            services.AddSingleton<PointService>();
+            services.AddTransient<PointService>();
+
+            
+            services.Configure<PointsSettings>(Configuration.GetSection("ping:points"));
 
             services
                 .AddHttpClient(Configuration["ping:name"], c => {

@@ -4,17 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ePing</title>
-    <!--
-    <environment include="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
-              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    </environment>-->
+
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" />
@@ -25,8 +15,77 @@
     <!--
     <partial name="_CookieConsentPartial" />
         -->
-    <div  id="app">
-        @RenderBody()
+    <div id="app">
+        <partial name="_LoaderPartial" />
+        <v-app id="inspire">
+            <v-navigation-drawer absolute dark temporary
+                                 v-model="drawer"
+                                 app color="blue-grey" :mini-variant="miniDrawer">
+                <v-list dense>
+                    <v-list-tile v-if="miniDrawer" v-on:click.stop="miniDrawer = !miniDrawer">
+                        <v-list-tile-action>
+                            <v-icon>chevron_right</v-icon>
+                        </v-list-tile-action>
+                    </v-list-tile>
+                    <v-list-tile avatar tag="div">
+                        <v-list-tile-avatar>
+                            <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                        </v-list-tile-avatar>
+
+                        <v-list-tile-content>
+                            <v-list-tile-title>@Model.User.Nom @Model.User.Prenom </v-list-tile-title>
+                        </v-list-tile-content>
+
+                        <v-list-tile-action>
+                            <v-btn icon v-on:click.stop="miniDrawer = !miniDrawer">
+                                <v-icon>chevron_left</v-icon>
+                            </v-btn>
+                        </v-list-tile-action>
+                    </v-list-tile>
+                    <v-list-tile v-on:click="goto('/Home')">
+                        <v-list-tile-action>
+                            <v-icon>home</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Accueil</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile v-on:click="goto('/Home/Licencies')">
+                        <v-list-tile-action>
+                            <v-icon>supervisor_account</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Licenciés</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile v-on:click="">
+                        <v-list-tile-action>
+                            <v-icon>fitness_center</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Rencontres</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </v-list>
+
+
+            </v-navigation-drawer>
+            <v-toolbar color="blue-grey" dark fixed app>
+                <v-toolbar-side-icon v-on:click.native="drawer = !drawer"></v-toolbar-side-icon>
+                <span class="title ml-3 mr-5">@Model.User.Nom @Model.User.Prenom - @Model.User.Licence [@Model.User.NomClub - @Model.User.NumeroClub]</span>
+                <v-text-field solo-inverted
+                              flat
+                              label="Search"
+                              prepend-icon="search"></v-text-field>
+                <v-spacer></v-spacer>
+
+            </v-toolbar>
+
+
+
+            @RenderBody()
+
+        </v-app>
         <hr />
         <footer>
             <p>&copy; 2018 - ePing</p>
@@ -40,9 +99,11 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1/dist/vue-resource.min.js"></script>
+        <!--<script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.1/dist/vue-router.common.min.js"></script>-->
         <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
+        <script src="~/js/common.js"asp-append-version="true"></script>
+        
     </environment>
 
     <environment exclude="Development">

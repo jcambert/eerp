@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Home\Licencies.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Shared\_LoginLayout.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

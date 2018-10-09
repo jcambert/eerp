@@ -1,0 +1,292 @@
+﻿@{
+    ViewData["Title"] = "Licenciés";
+}
+
+@model DashboardViewModel
+
+
+<v-dialog v-model="showJoueurInfo" persistent max-width="500px">
+    <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn>
+    <v-card>
+        <v-card-title>
+            <span class="headline">{{currentJoueur.nom}}&nbsp;{{currentJoueur.prenom}}</span>
+        </v-card-title>
+        <v-card-text>
+            <v-container grid-list-md>
+                <v-layout wrap>
+                    <v-flex xs12 sm6 md4>
+                        <v-text-field label="Legal first name" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                        <v-text-field label="Legal middle name" hint="example of helper text only on focus"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                        <v-text-field label="Legal last name"
+                                      hint="example of persistent helper text"
+                                      persistent-hint
+                                      required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-text-field label="Email" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-text-field label="Password" type="password" required></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6>
+                        <v-select :items="['0-17', '18-29', '30-54', '54+']"
+                                  label="Age"
+                                  required></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm6>
+                        <v-autocomplete :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
+                                        label="Interests"
+                                        multiple
+                                        chips></v-autocomplete>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+            <small>*indicates required field</small>
+        </v-card-text>
+        <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="grey-blue darken-1" flat v-on:click.native="showJoueurInfo = false">Fermer</v-btn>
+        </v-card-actions>
+    </v-card>
+</v-dialog>
+<v-content>
+    <v-container fluid fill-height grid-list-md class="blue-grey lighten-4">
+        <v-layout row wrap>
+            <v-flex d-flex xs12 sm6 md6>
+                <v-card>
+                    <v-toolbar color="blue-grey" dark>
+                        <!-- <v-toolbar-side-icon></v-toolbar-side-icon>-->
+                        <v-tooltip bottom>
+                            <v-btn icon v-on:click="reloadJoueursDuClub()" slot="activator">
+                                <v-icon>autorenew</v-icon>
+                            </v-btn>
+                            <span>Réactualiser les joueurs</span>
+                        </v-tooltip>
+                        <v-toolbar-title>Joueurs</v-toolbar-title>
+
+                        <v-spacer></v-spacer>
+
+                        <v-tooltip bottom>
+                            <v-text-field slot="activator" clearable color="blue-grey lighten-4" label="Nom ou Classe de Point" v-model="filter" click:clear="joueursFilter()"></v-text-field>
+                            <span>Filtrer en indiquant soit un partie du nom,<br /> Soit la classe de classement</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <v-btn slot="activator" icon v-on:click="orderJoueur='byName'">
+                                <v-icon>list</v-icon>
+                            </v-btn>
+                            <span>Trier par ordre alphabetique</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <v-btn slot="activator" icon v-on:click="orderJoueur='byPoints'">
+                                <v-icon>more_vert</v-icon>
+                            </v-btn>
+                            <span>Trier par ordre de points</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <v-btn slot="activator" icon v-on:click="orderJoueur='byCategorie'">
+                                <v-icon>query_builder</v-icon>
+                            </v-btn>
+                            <span>Trier par catégorie d'age</span>
+                        </v-tooltip>
+                    </v-toolbar>
+                    <v-list two-line subheader>
+                        <template v-for="(joueur,index) in joueursFilter">
+                            <v-divider v-if="showJoueurDivider(joueur,index)"></v-divider>
+                            <v-list-tile :key="joueur.licence"
+                                         avatar
+                                         v-on:click="loadPartiesDujoueur(joueur)">
+                                <v-list-tile-action>
+                                    <v-btn flat icon color="primary" v-on:click.prevent="infoJoueur(joueur)">
+                                        <v-icon>info</v-icon>
+                                    </v-btn>
+                                    <!--  <v-icon v-if="item.icon" color="pink">star</v-icon>-->
+                                </v-list-tile-action>
+
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
+                                        {{joueur.nom +' ' + joueur.prenom}}
+
+
+                                    </v-list-tile-title>
+                                    <v-list-tile-sub-title>
+
+                                        <v-chip>
+
+                                            <v-avatar color="red" v-if="joueur.progressionAnnuelle<0">
+                                                <v-icon color="white darken-2">trending_down</v-icon>
+                                            </v-avatar>
+                                            <v-avatar color="green" v-else>
+                                                <v-icon color="white darken-2">trending_up</v-icon>
+                                            </v-avatar>
+                                            <v-tooltip bottom>
+                                                <span slot="activator">
+                                                    {{joueur.progressionAnnuelle | formatNumber}}
+                                                </span>
+                                                <span>Progression Annuelle:{{joueur.progressionAnnuelle | formatNumber}} </span>
+                                            </v-tooltip>
+
+                                        </v-chip>
+
+                                        <v-chip>
+                                            <v-avatar color="red" v-if="joueur.progressionMensuelle<0">
+                                                <v-icon color="white darken-2">trending_down</v-icon>
+                                            </v-avatar>
+                                            <v-avatar color="green" v-else>
+                                                <v-icon color="white darken-2">trending_up</v-icon>
+                                            </v-avatar>
+                                            <v-tooltip bottom>
+                                                <span slot="activator">
+                                                    {{joueur.progressionMensuelle | formatNumber}}
+                                                </span>
+                                                <span>Progression Mensuelle:{{joueur.progressionMensuelle | formatNumber}} </span>
+                                            </v-tooltip>
+
+                                        </v-chip>
+
+                                        <v-chip>
+                                            <v-tooltip bottom>
+                                                <span slot="activator">
+                                                    {{joueur.classementNational }}
+                                                </span>
+                                                <span>Classement National:{{joueur.classementNational }} </span>
+                                            </v-tooltip>
+
+                                        </v-chip>
+                                        <v-chip>
+                                            <v-tooltip bottom>
+                                                <span slot="activator">
+                                                    {{joueur.rangRegional }}
+                                                </span>
+                                                <span>Classement Regionnal:{{joueur.rangRegional }} </span>
+                                            </v-tooltip>
+
+                                        </v-chip>
+                                        <v-chip>
+                                            <v-tooltip bottom>
+                                                <span slot="activator">
+                                                    {{joueur.rangDepartemental }}
+                                                </span>
+                                                <span>Classement Departemental:{{joueur.rangDepartemental }} </span>
+                                            </v-tooltip>
+
+                                        </v-chip>
+                                    </v-list-tile-sub-title>
+                                </v-list-tile-content>
+
+                                <v-list-tile-avatar>
+                                    <!-- <img :src="item.avatar">-->
+
+                                    <v-chip color="primary" text-color="white">
+                                        <v-avatar class="primary darken-4">{{joueur.point}}</v-avatar>
+                                        <v-tooltip bottom>
+                                            <span slot="activator"> {{joueur.categorie }}</span>
+                                            <span>
+                                                {{categorieAge[joueur.categorie].desc}}
+                                            </span>
+                                        </v-tooltip>
+
+                                    </v-chip>
+                                </v-list-tile-avatar>
+
+
+                            </v-list-tile>
+
+
+                        </template>
+                    </v-list>
+
+                </v-card>
+            </v-flex>
+            <v-flex d-flex xs12 sm6 md6>
+                <v-card v-if="parties.length>0">
+                    <v-toolbar color="blue-grey" dark>
+                        <!-- <v-toolbar-side-icon></v-toolbar-side-icon>-->
+
+                        <v-toolbar-title>
+                            Parties de {{currentJoueur.prenom}}
+                            <v-chip color="green" text-color="white" v-if="pointJoueur>=0">
+                                {{pointJoueur | formatNumber | formatPoints}}
+                            </v-chip>
+                            <v-chip color="red" text-color="white" v-else>
+                                {{pointJoueur| formatNumber | formatPoints}}
+                            </v-chip>
+                        </v-toolbar-title>
+
+                        <v-spacer></v-spacer>
+
+                        <v-btn icon v-on:click="">
+                            <v-icon>list</v-icon>
+                        </v-btn>
+                        <v-btn icon v-on:click="">
+                            <v-icon>more_vert</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <v-list>
+
+
+                        <template v-for="(journee,index) in partieOrdered">
+                            <v-divider v-if="showPartieDivider(journee,index)"></v-divider>
+                            <v-list-tile v-if="showPartieDivider(journee,index) ||index==0" color="blue-grey darken-4">
+                                <v-list-tile-content>
+                                    <v-list-tile-title v-text="journee.date +' ' + journee.epreuve "></v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action>
+
+                                    <v-chip color="green" text-color="white" v-if="journee.pointsGagnesPerdus>=0">
+                                        {{journee.pointsGagnesPerdus | formatNumber | formatPoints}}
+                                    </v-chip>
+                                    <v-chip color="red" text-color="white" v-else>
+                                        {{journee.pointsGagnesPerdus | formatNumber | formatPoints}}
+                                    </v-chip>
+                                </v-list-tile-action>
+                            </v-list-tile>
+                            <v-list-tile v-for="partie in journee.parties " :key="partie.idPartie"
+                                         avatar
+                                         v-on:click="">
+
+
+
+                                <v-list-tile-content>
+                                    <v-list-tile-title v-text="partie.nom"></v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action>
+                                    <v-chip color="green" text-color="white" v-if="partie.victoire=='V'">
+                                        <v-avatar class="green darken-4">{{ partie.classement}}</v-avatar>
+                                        {{partie.pointsGagnesPerdus | formatNumber | formatPoints}}
+                                    </v-chip>
+                                    <v-chip color="red" text-color="white" v-else>
+                                        <v-avatar class="red darken-4">{{ partie.classement}}</v-avatar>
+                                        {{partie.pointsGagnesPerdus | formatNumber | formatPoints}}
+                                    </v-chip>
+                                </v-list-tile-action>
+
+
+                            </v-list-tile>
+
+
+                        </template>
+                    </v-list>
+
+                </v-card>
+            </v-flex>
+            <v-flex d-flex xs12 sm6 md2 child-flex>
+                <v-card color="green lighten-2" dark>
+                    <v-card-text>{{ lorem.slice(0, 90) }}</v-card-text>
+                </v-card>
+            </v-flex>
+            <v-flex d-flex xs12 sm6 md3>
+                <v-card color="blue lighten-2" dark>
+                    <v-card-text>{{ lorem.slice(0, 100) }}</v-card-text>
+                </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
+</v-content>
+@section Scripts
+    {
+    <script src="~/js/licencies.js" asp-append-version="true"></script>
+}

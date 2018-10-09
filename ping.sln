@@ -30,7 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ping", "ping", "{71E808D6-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{B7E97E73-C1E2-49AA-904A-2B6801038AD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api", "src\services\Identity\Auth.Api\Auth.Api.csproj", "{DF1539E0-41A6-4947-A6D9-13880916285F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Api", "src\services\Identity\Auth.Api\Auth.Api.csproj", "{DF1539E0-41A6-4947-A6D9-13880916285F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPointsTest", "PingPointsTest\PingPointsTest.csproj", "{2A191AA6-4000-4262-BE99-55000395EF5E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,10 @@ Global
 		{DF1539E0-41A6-4947-A6D9-13880916285F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF1539E0-41A6-4947-A6D9-13880916285F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF1539E0-41A6-4947-A6D9-13880916285F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A191AA6-4000-4262-BE99-55000395EF5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A191AA6-4000-4262-BE99-55000395EF5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A191AA6-4000-4262-BE99-55000395EF5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A191AA6-4000-4262-BE99-55000395EF5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{71E808D6-A8CF-4EB1-8EA3-A3B5303EE469} = {623DEA39-3E44-45E8-BD1A-A02B89D7634D}
 		{B7E97E73-C1E2-49AA-904A-2B6801038AD3} = {623DEA39-3E44-45E8-BD1A-A02B89D7634D}
 		{DF1539E0-41A6-4947-A6D9-13880916285F} = {B7E97E73-C1E2-49AA-904A-2B6801038AD3}
+		{2A191AA6-4000-4262-BE99-55000395EF5E} = {699ADCB9-C9D2-4B6F-B68E-A5248BD63FBF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {91170C71-1FDD-4C77-8230-8726B6DFEDD5}
