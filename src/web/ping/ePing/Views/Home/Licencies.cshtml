@@ -201,13 +201,14 @@
 
                 </v-card>
             </v-flex>
+            
             <v-flex d-flex xs12 sm6 md6>
-                <v-card v-if="parties.length>0">
+                <v-card v-if="showDetail">
                     <v-toolbar color="blue-grey" dark>
                         <!-- <v-toolbar-side-icon></v-toolbar-side-icon>-->
 
-                        <v-toolbar-title>
-                            Parties de {{currentJoueur.prenom}}
+                        <v-toolbar-title v-if="showingPartie">
+                            Rencontres de {{currentJoueur.prenom}}
                             <v-chip color="green" text-color="white" v-if="pointJoueur>=0">
                                 {{pointJoueur | formatNumber | formatPoints}}
                             </v-chip>
@@ -215,20 +216,93 @@
                                 {{pointJoueur| formatNumber | formatPoints}}
                             </v-chip>
                         </v-toolbar-title>
+                        <v-toolbar-title v-if="showingHistorique">
+                            Historiques de {{currentJoueur.prenom}}
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="historiques.pointsGagnesPerdu>=0" slot="activator">
+                                    <v-avatar class="green darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
+                                    {{historiques.pointsGagnesPerdu}}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    <v-avatar class="red darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
+                                    {{historiques.pointsGagnesPerdu}}
+                                </v-chip>
+                                <span>Nombre de Matchs/points {{historiques.nombreDeMatch }}/{{historiques.pointsGagnesPerdu}}</span>
+                            </v-tooltip>
 
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="historiques.pointsVictoire>=0" slot="activator">
+                                    <v-avatar class="green darken-4">{{ historiques.nombreDeVictoire}}</v-avatar>
+                                    {{historiques.pointsVictoire}}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    <v-avatar class="red darken-4">{{ historiques.nombreDeVictoire}}</v-avatar>
+                                    {{historiques.pointsVictoires}}
+                                </v-chip>
+                                <span>Nombre de Victoires/points {{historiques.nombreDeVictoire }}/{{historiques.pointsVictoire}}</span>
+                            </v-tooltip>
+
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="historiques.pointsDefaite>=0" slot="activator">
+                                    <v-avatar class="green darken-4">{{ historiques.nombreDeDefaite}}</v-avatar>
+                                    {{historiques.pointsDefaite }}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    <v-avatar class="red darken-4">{{ historiques.nombreDeDefaite}}</v-avatar>
+                                    {{historiques.pointsDefaite}}
+                                </v-chip>
+                                <span>Nombre de Défaites/points {{historiques.nombreDeDefaite }}/{{historiques.pointsDefaite}}</span>
+                            </v-tooltip>
+
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="historiques.moyennePointParMatch>=0" slot="activator">
+                                    {{historiques.moyennePointParMatch | formatNumber | formatPoints}}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    {{historiques.moyennePointParMatch  | formatNumber | formatPoints}}
+                                </v-chip>
+                                <span>Moyenne de points/match {{historiques.moyennePointParMatch  | formatNumber | formatPoints}}</span>
+                            </v-tooltip>
+
+
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="historiques.moyennePointParVictoire>=0" slot="activator">
+                                    {{historiques.moyennePointParVictoire }}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    {{historiques.moyennePointParVictoire}}
+                                </v-chip>
+                                <span>Moyenne de points/victoire {{historiques.moyennePointParVictoire }}</span>
+                            </v-tooltip>
+
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="historiques.moyennePointParDefaite>=0" slot="activator">
+                                    {{historiques.moyennePointParDefaite }}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    {{historiques.moyennePointParDefaite }}
+                                </v-chip>
+                                <span>Moyenne de points/défaite {{historiques.moyennePointParDefaite }}</span>
+                            </v-tooltip>
+                        </v-toolbar-title>
                         <v-spacer></v-spacer>
-
-                        <v-btn icon v-on:click="">
-                            <v-icon>list</v-icon>
-                        </v-btn>
-                        <v-btn icon v-on:click="">
-                            <v-icon>more_vert</v-icon>
-                        </v-btn>
+                        <v-tooltip bottom>
+                            <v-btn icon v-on:click="showDetailHistoriques" slot="activator">
+                                <v-icon>fa-history</v-icon>
+                            </v-btn>
+                            <span>Voir l'historique</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <v-btn icon v-on:click="showDetailParties" slot="activator">
+                                <v-icon>more_vert</v-icon>
+                            </v-btn>
+                            <span>Voir les rencontres</span>
+                        </v-tooltip>
                     </v-toolbar>
                     <v-list>
 
 
-                        <template v-for="(journee,index) in partieOrdered">
+                        <template v-for="(journee,index) in partieOrdered" v-if="showingPartie">
                             <v-divider v-if="showPartieDivider(journee,index)"></v-divider>
                             <v-list-tile v-if="showPartieDivider(journee,index) ||index==0" color="blue-grey darken-4">
                                 <v-list-tile-content>
@@ -247,9 +321,6 @@
                             <v-list-tile v-for="partie in journee.parties " :key="partie.idPartie"
                                          avatar
                                          v-on:click="">
-
-
-
                                 <v-list-tile-content>
                                     <v-list-tile-title v-text="partie.nom"></v-list-tile-title>
                                 </v-list-tile-content>
@@ -268,6 +339,29 @@
                             </v-list-tile>
 
 
+                        </template>
+
+                        <template v-if="showingHistorique">
+                            <v-divider ></v-divider>
+                            <v-list-tile  v-for="(histo,index) in historiques.historiques" :key="index"
+                                         avatar
+                                         v-on:click="">
+                                <v-list-tile-content>
+                                    <v-list-tile-title v-text="histo.nomPrenomAdversaire"></v-list-tile-title>
+                                </v-list-tile-content>
+                                <v-list-tile-action>
+                                    <v-chip color="green" text-color="white" v-if="histo.victoire=='V'">
+                                        <v-avatar class="green darken-4">{{ histo.classementAdversaire}}</v-avatar>
+                                        {{histo.pointsGagnesPerdus | formatNumber | formatPoints}}
+                                    </v-chip>
+                                    <v-chip color="red" text-color="white" v-else>
+                                        <v-avatar class="red darken-4">{{ histo.classementAdversaire}}</v-avatar>
+                                        {{histo.pointsGagnesPerdus | formatNumber | formatPoints}}
+                                    </v-chip>
+                                </v-list-tile-action>
+
+
+                            </v-list-tile>
                         </template>
                     </v-list>
 

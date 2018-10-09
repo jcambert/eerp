@@ -47,12 +47,21 @@ namespace ePing.Api.Controllers
                 titi.ToList().ForEach(partie =>
                 {
                     journee.Epreuve = partie.Epreuve;
-                    journee.AddPartie(joueur, partie, PointsService);
+                    journee.Add(joueur, partie, PointsService);
                 });
                 journees.Add(journee);
             });
 
             return Ok(journees);
+        }
+        [HttpGet("{licence}/historique")]
+        public async Task<IActionResult> GetHistoriquesDuJoueur([FromRoute] string licence)
+        {
+            var joueur = await Service.loadDetailJoueur(licence);
+            var parties = await Service.loadJoueurHistoriques(joueur);
+            var journee = new JourneeHistoriques();
+            journee.AddRange(parties);
+            return Ok(journee);
         }
 
         [HttpGet("club/{numero}/load")]

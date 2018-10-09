@@ -66,6 +66,7 @@ namespace Ping.Api.services
             apis[Configuration.Joueur] = "spid:api:joueur";
             apis[Configuration.JoueurSpid] = "spid:api:joueurspid";
             apis[Configuration.JoueurPartieSpid] = "spid:api:joueurpartiespid";
+            apis[Configuration.JoueurPartieMySql] = "spid:api:joueurpartiemysql";
             apis[Configuration.HistoriqueClassement] = "spid:api:histoclassement";
         }
 

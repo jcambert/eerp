@@ -19,5 +19,7 @@ namespace ePing
         public string ReloadJoueursDuClub { get; set; }
 
         public string PartiesDuJoueur { get; set; }
+
+        public string HistoriquesDuJoueur { get; set; }
     }
 }

@@ -32,6 +32,7 @@ namespace Ping.Api.services
         string Joueur { get; }
         string JoueurSpid { get; }
         string JoueurPartieSpid { get; }
+        string JoueurPartieMySql { get; }
         string HistoriqueClassement { get; }
 
     }
@@ -86,6 +87,8 @@ namespace Ping.Api.services
         public string JoueurSpid => "JoueurSpid";
 
         public string JoueurPartieSpid => "JoueurPartieSpid";
+
+        public string JoueurPartieMySql => "JoueurPartieMySql";
 
         public string HistoriqueClassement => "HistoriqueClassement";
     }

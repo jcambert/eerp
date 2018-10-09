@@ -1,12 +1,15 @@
 ﻿
 var mv=new Vue({
     el: '#app',
-    data: () => (Object.assign({},data,{
+    data: () => (Object.assign({}, data, {
+        showDetail: false,
         api: {},
         club: {},
         joueurs: [],
         parties: [],
-        partiesFiltered:[],
+        partiesFiltered: [],
+        historiques: {},
+        historiquesLoaded:false,
         currentJoueur: {},
         pointJoueur:0,
         items: [],
@@ -21,6 +24,8 @@ var mv=new Vue({
         oldclasse: 5,
         
         showJoueurInfo: false,
+        showingHistorique : false,
+        showingPartie : false,
         categorieAge: {
             'N': {value:'Non determiné'},
             'P': { value: 'Poussin', desc: 'jeunes ayant 8 ans au plus' },
@@ -84,6 +89,7 @@ var mv=new Vue({
         },
         reloadJoueursDuClub() {
             this.loader = true;
+            
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.ReloadJoueursDuClub.replace('{numero}', this.api.User.numeroClub);
             console.log(uri2);
             Vue.http.get(uri2).then(
@@ -106,20 +112,50 @@ var mv=new Vue({
             return false;
         },
         loadPartiesDujoueur(joueur) {
+            
             this.parties.splice(0,this.parties.length);
             this.loader = true;
+            this.historiquesLoaded = false;
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.PartiesDuJoueur.replace('{licence}', joueur.licence);
             console.log(uri2);
             Vue.http.get(uri2).then(
                 r2 => {
+                    //console.dir(r2);
+                    _.forEach(r2.data, data => this.parties.push(data));
+                    
+                    //this.parties = r2.data;
+                    this.loader = false;
+                    this.showDetail = true;
+                    this.showDetailParties();
+                    //en arriere plan
+                    this.loadHistoriquesDujoueur(joueur);
+                },
+                error2 => {
+                    console.error(error2);
+                    this.loader = false;
+                }),
+
+                this.currentJoueur = joueur;
+        },
+        loadHistoriquesDujoueur(joueur) {
+            
+            //this.historiques.splice(0, this.historiques.length);
+            this.loader = true;
+            uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriquesDuJoueur.replace('{licence}', joueur.licence);
+            console.log(uri2);
+            Vue.http.get(uri2).then(
+                r2 => {
                     console.dir(r2);
-                    this.parties = r2.data;
+                    //this.historiques = r2.data;
+                    this.historiques = Object.assign({}, r2.data);
+                    // _.forEach(r2.data, data =>  this.historiques.push(data));
+                    this.historiquesLoaded = true;
                     this.loader = false;
                 },
                 error2 => {
                     console.error(error2);
                     this.loader = false;
-                })
+                });
             this.currentJoueur = joueur;
         },
         showPartieDivider(partie, index) {
@@ -128,6 +164,14 @@ var mv=new Vue({
                 //if (this.orderJoueur == 'byName') return this.filtered[index - 1].nom != joueur.nom;
             }
             return false;
+        },
+        showDetailHistoriques() {
+            this.showingHistorique = true;
+            this.showingPartie = false;
+        },
+        showDetailParties() {
+            this.showingHistorique = false;
+            this.showingPartie = true;
         },
         infoJoueur(joueur) {
             this.showJoueurInfo = true;

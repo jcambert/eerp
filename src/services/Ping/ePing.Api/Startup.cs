@@ -97,8 +97,8 @@ namespace ePing.Api
                     var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
                     if (env.IsDevelopment())
                     {
-                        context.Database.EnsureDeleted();
-                        context.Database.EnsureCreated();
+                       // context.Database.EnsureDeleted();
+                       // context.Database.EnsureCreated();
                         
                     }
                 }

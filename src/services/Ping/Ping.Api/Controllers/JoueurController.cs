@@ -55,11 +55,17 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("{license}/parties/{id?}")]
-        public async Task<ActionResult<string>> GetByPartieSpid(string license,string id=null)
+        [HttpGet("{licence}/parties/historique")]
+        [HttpGet("{licence}/parties")]
+        public async Task<ActionResult<string>> GetByPartieSpid(string licence)
         {
+            if(Request.Path.Value.Contains("/historique"))
+                return await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieMySql, new NameValueCollection() {
+                {"licence", licence}
+            });
+            else
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieSpid, new NameValueCollection() {
-                {"numlic", license}
+                {"numlic", licence}
             });
         }
 
