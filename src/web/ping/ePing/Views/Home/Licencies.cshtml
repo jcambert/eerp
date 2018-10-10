@@ -15,41 +15,37 @@
             <v-container grid-list-md>
                 <v-layout wrap>
                     <v-flex xs12 sm6 md4>
-                        <v-text-field label="Legal first name" required></v-text-field>
+                        <v-text-field label="Nom" readonly required v-model="currentJoueur.nom"></v-text-field>
                     </v-flex>
+                   
                     <v-flex xs12 sm6 md4>
-                        <v-text-field label="Legal middle name" hint="example of helper text only on focus"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                        <v-text-field label="Legal last name"
-                                      hint="example of persistent helper text"
-                                      persistent-hint
-                                      required></v-text-field>
+                        <v-text-field label="Prénom" readonly required v-model="currentJoueur.prenom"></v-text-field>
                     </v-flex>
                     <v-flex xs12>
-                        <v-text-field label="Email" required></v-text-field>
+                        <v-text-field label="Email"  v-model="currentJoueur.email"></v-text-field>
                     </v-flex>
                     <v-flex xs12>
-                        <v-text-field label="Password" type="password" required></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6>
-                        <v-select :items="['0-17', '18-29', '30-54', '54+']"
-                                  label="Age"
-                                  required></v-select>
-                    </v-flex>
-                    <v-flex xs12 sm6>
-                        <v-autocomplete :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-                                        label="Interests"
-                                        multiple
-                                        chips></v-autocomplete>
+                        <v-text-field label="Téléphone" v-model="currentJoueur.telephone"></v-text-field>
                     </v-flex>
                 </v-layout>
             </v-container>
-            <small>*indicates required field</small>
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="grey-blue darken-1" flat v-on:click.native="showJoueurInfo = false">Fermer</v-btn>
+            <v-btn color="green darken-1"
+                   flat="flat"
+                   v-on:click.native="undoExtra()">
+                Annuler
+                <v-icon right dark>undo</v-icon>
+            </v-btn>
+
+            <v-btn color="green darken-1"
+                   flat="flat"
+                   v-on:click.native="saveExtra()">
+                Enregistrer
+                <v-icon right dark>save</v-icon>
+            </v-btn>
         </v-card-actions>
     </v-card>
 </v-dialog>
@@ -100,7 +96,7 @@
                                          avatar
                                          v-on:click="loadPartiesDujoueur(joueur)">
                                 <v-list-tile-action>
-                                    <v-btn flat icon color="primary" v-on:click.prevent="infoJoueur(joueur)">
+                                    <v-btn flat icon color="primary" v-on:click.native="infoJoueur(joueur)">
                                         <v-icon>info</v-icon>
                                     </v-btn>
                                     <!--  <v-icon v-if="item.icon" color="pink">star</v-icon>-->
@@ -114,6 +110,24 @@
                                     </v-list-tile-title>
                                     <v-list-tile-sub-title>
 
+                                        <v-tooltip bottom>
+
+                                            <v-chip color="red" text-color="white" slot="activator" v-if="(joueur.point-joueur.pointOfficiel)<0">
+                                                <v-avatar color="red darken-2">
+                                                    <v-icon color="white darken-2">trending_down</v-icon>
+                                                </v-avatar>
+                                                <span>{{joueur.point}}</span>
+                                            </v-chip>
+                                            <v-chip color="green" text-color="white" slot="activator" v-else>
+                                                <v-avatar color="green darken-2">
+                                                    <v-icon color="white darken-2">trending_up</v-icon>
+                                                </v-avatar>
+                                                <span>{{joueur.point}}</span>
+                                            </v-chip>
+                                            <span>
+                                                Points acquis/perdu:{{joueur.point}}
+                                            </span>
+                                        </v-tooltip>
                                         <v-chip>
 
                                             <v-avatar color="red" v-if="joueur.progressionAnnuelle<0">
@@ -181,7 +195,7 @@
                                     <!-- <img :src="item.avatar">-->
 
                                     <v-chip color="primary" text-color="white">
-                                        <v-avatar class="primary darken-4">{{joueur.point}}</v-avatar>
+                                        <v-avatar class="primary darken-4">{{joueur.pointOfficiel}}</v-avatar>
                                         <v-tooltip bottom>
                                             <span slot="activator"> {{joueur.categorie }}</span>
                                             <span>
@@ -201,8 +215,8 @@
 
                 </v-card>
             </v-flex>
-            
-            <v-flex d-flex xs12 sm6 md6>
+
+            <v-flex d-flex xs12 sm6 md6 >
                 <v-card v-if="showDetail">
                     <v-toolbar color="blue-grey" dark>
                         <!-- <v-toolbar-side-icon></v-toolbar-side-icon>-->
@@ -217,7 +231,7 @@
                             </v-chip>
                         </v-toolbar-title>
                         <v-toolbar-title v-if="showingHistorique">
-                            Historiques de {{currentJoueur.prenom}}
+                            Historiques 
                             <v-tooltip bottom>
                                 <v-chip color="green" text-color="white" v-if="historiques.pointsGagnesPerdu>=0" slot="activator">
                                     <v-avatar class="green darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
@@ -342,8 +356,8 @@
                         </template>
 
                         <template v-if="showingHistorique">
-                            <v-divider ></v-divider>
-                            <v-list-tile  v-for="(histo,index) in historiques.historiques" :key="index"
+                            <v-divider></v-divider>
+                            <v-list-tile v-for="(histo,index) in historiques.historiques" :key="index"
                                          avatar
                                          v-on:click="">
                                 <v-list-tile-content>
@@ -367,20 +381,13 @@
 
                 </v-card>
             </v-flex>
-            <v-flex d-flex xs12 sm6 md2 child-flex>
-                <v-card color="green lighten-2" dark>
-                    <v-card-text>{{ lorem.slice(0, 90) }}</v-card-text>
-                </v-card>
-            </v-flex>
-            <v-flex d-flex xs12 sm6 md3>
-                <v-card color="blue lighten-2" dark>
-                    <v-card-text>{{ lorem.slice(0, 100) }}</v-card-text>
-                </v-card>
-            </v-flex>
+            
         </v-layout>
     </v-container>
 </v-content>
 @section Scripts
     {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-chartjs@3.4.0/dist/vue-chartjs.min.js"></script>
     <script src="~/js/licencies.js" asp-append-version="true"></script>
 }

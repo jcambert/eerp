@@ -29,7 +29,7 @@ namespace ePing.Api.models
         public string Latitude { get; set; }
         public string DateValidation { get; set; }
 
-        public List<Joueur> Joueurs { get; set; }
+        public List<JoueurSpid> Joueurs { get; set; }
 
     }
 }

@@ -178,6 +178,30 @@ var mv=new Vue({
         },
         goto(url) {
             window.location.href = url;
+        },
+        saveExtra() {
+            this.loader = true;
+            uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueurExtra.replace('{licence}', this.currentJoueur.licence);
+            body = {};
+            body.Email = this.currentJoueur.Email;
+            body.Telephone = this.currentJoueur.Telephone;
+            console.log(uri2);
+            Vue.http.put(uri2, JSON.stringify(body)).then(
+                response => {
+                    this.showJoueurInfo = false
+                    this.loader = false;
+                },
+                error => {
+                    console.dir(error);
+                    this.showJoueurInfo = false
+                    this.loader = false;
+                    this.loadPartiesDujoueur(this.currentJoueur);
+                }
+            );
+        },
+        undoExtra() {
+            this.showJoueurInfo = false;
+            this.loadPartiesDujoueur(this.currentJoueur);
         }
     },
     computed: {

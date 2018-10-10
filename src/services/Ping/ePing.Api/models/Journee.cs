@@ -8,7 +8,7 @@ namespace ePing.Api.models
 {
     public static class JourneeExtensions
     {
-        public static void Add(this Journee journee,Joueur joueur, Partie partie,PointService service)
+        public static void Add(this Journee journee,JoueurSpid joueur, Partie partie,PointService service)
         {
             var pts=service.CalculPointsGagnePerdu(joueur.PointOfficiel, partie.Classement, partie.Victoire.ToVictoireDefaite(), 1).PointsJoueur1;
             journee.PointsGagnesPerdus += pts;
@@ -23,6 +23,7 @@ namespace ePing.Api.models
 
         public static void AddRange(this JourneeHistoriques journee, IEnumerable< Historique> historiques)
         {
+            if (historiques == null) return;
             journee.Historiques.AddRange(historiques);
         }
     }
@@ -52,10 +53,10 @@ namespace ePing.Api.models
 
         public double pointsDefaite => PointsGagnesPerdu - PointsVictoire;
 
-        public double MoyennePointParMatch =>Math.Round( PointsGagnesPerdu / NombreDeMatch,1);
+        public double MoyennePointParMatch =>Math.Round( PointsGagnesPerdu / (NombreDeMatch==0?1:NombreDeMatch),1);
 
-        public double MoyennePointParVictoire => Math.Round(PointsVictoire / NombreDeVictoire, 1);
+        public double MoyennePointParVictoire => Math.Round(PointsVictoire /( NombreDeVictoire==0?1 : NombreDeVictoire), 1);
 
-        public double MoyennePointParDefaite => Math.Round(pointsDefaite/ NombreDeDefaite, 1);
+        public double MoyennePointParDefaite => Math.Round(pointsDefaite/ (NombreDeDefaite==0?1: NombreDeDefaite), 1);
     }
 }

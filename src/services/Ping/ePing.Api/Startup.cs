@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using ePing.Api.dbcontext;
+using ePing.Api.services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Polly;
-using Polly.CircuitBreaker;
 using Polly.Extensions.Http;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using ePing.Api.services;
-using AutoMapper;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System;
+using System.Net.Http;
 
 namespace ePing.Api
 {
@@ -42,12 +35,13 @@ namespace ePing.Api
             services.AddScoped<IJoueurService, JoueurService>();
             services.AddTransient<PointService>();
 
-            
+
             services.Configure<PointsSettings>(Configuration.GetSection("ping:points"));
 
             services
-                .AddHttpClient(Configuration["ping:name"], c => {
-                    
+                .AddHttpClient(Configuration["ping:name"], c =>
+                {
+
                     c.BaseAddress = new Uri(Configuration["ping:api:endpoint"]);
                     c.DefaultRequestHeaders.Add("Accept", "text/xml");
 
@@ -57,12 +51,12 @@ namespace ePing.Api
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-         //  var connection = new SqliteConnection("DataSource=:memory:");
-            var connection = new SqliteConnection("Data Source=ping.db"); 
-            services.AddEntityFrameworkSqlite().AddDbContext<PingDbContext>(options=>
+            //  var connection = new SqliteConnection("DataSource=:memory:");
+            var connection = new SqliteConnection("Data Source=ping.db");
+            services.AddEntityFrameworkSqlite().AddDbContext<PingDbContext>(options =>
             {
                 options.UseSqlite(connection);
-               
+
             });
 
             services.AddAutoMapper();
@@ -82,12 +76,14 @@ namespace ePing.Api
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(
                     options => options.SerializerSettings.ReferenceLoopHandling
-                        = Newtonsoft.Json.ReferenceLoopHandling.Ignore); 
+                        = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors("CorsPolicy");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -97,18 +93,18 @@ namespace ePing.Api
                     var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
                     if (env.IsDevelopment())
                     {
-                       // context.Database.EnsureDeleted();
-                       // context.Database.EnsureCreated();
-                        
+                        context.Database.EnsureDeleted();
+                        context.Database.EnsureCreated();
+
                     }
                 }
             }
 
-           
+
 
 
             loggerFactory.AddConsole(Configuration);
-            app.UseCors("CorsPolicy");
+
 
             ConfigureAuth(app);
 
@@ -127,7 +123,7 @@ namespace ePing.Api
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
-                .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,retryAttempt)));
+                .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
         }
 
         private void ConfigureAuthService(IServiceCollection services)

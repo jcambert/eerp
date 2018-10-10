@@ -74,9 +74,17 @@ namespace ePing.Api.services
 
 
 
+                try
+                {
+                    await DbContext.SaveChangesAsync();
+                }
+                catch (Exception ex )
+                {
+                    var msg = ex.Message;
+                    throw ex;
+                }
 
-
-                await DbContext.SaveChangesAsync();
+               
             }
 
             return model;

@@ -103,7 +103,7 @@ namespace ePing.Api.services
         }
 
             
-        public PointResultat CalculPointsGagnePerdu(Joueur j1, Joueur j2, VictoireDefaite vd, double coeficient = 1.0)
+        public PointResultat CalculPointsGagnePerdu(JoueurSpid j1, JoueurSpid j2, VictoireDefaite vd, double coeficient = 1.0)
         {
             return CalculPointsGagnePerdu(j1.PointOfficiel, j2.PointOfficiel, vd, coeficient);
             
