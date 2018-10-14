@@ -1,0 +1,39 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+    <v-dialog v-model="chartdialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+
+        <v-card>
+            <v-toolbar dark color="blue-grey">
+                <v-btn icon dark v-on:click.native="chartdialog = false">
+                    <v-icon>close</v-icon>
+                </v-btn>
+                <v-toolbar-title>Graphiques</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <!--<v-toolbar-items>
+        <v-btn dark flat v-on:click.native="chartdialog = false">Save</v-btn>
+    </v-toolbar-items>-->
+            </v-toolbar>
+            <v-tabs v-model="activeChart"
+                    color="blue-grey"
+                    dark
+                    slider-color="yellow">
+                <v-tab v-for="chart in charts"
+                       :key="chart.id"
+                       ripple>
+                    {{ chart.title }}
+
+                </v-tab>
+                <v-tab-item v-for="chart in charts"
+                            :key="chart.id">
+                    <v-card flat>
+                        <v-card-text>{{ chart.text }}</v-card-text>
+                    </v-card>
+                </v-tab-item>
+            </v-tabs>
+
+        </v-card>
+    </v-dialog>

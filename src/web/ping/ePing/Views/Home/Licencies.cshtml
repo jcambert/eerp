@@ -4,51 +4,8 @@
 
 @model DashboardViewModel
 
-
-<v-dialog v-model="showJoueurInfo" persistent max-width="500px">
-    <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn>
-    <v-card>
-        <v-card-title>
-            <span class="headline">{{currentJoueur.nom}}&nbsp;{{currentJoueur.prenom}}</span>
-        </v-card-title>
-        <v-card-text>
-            <v-container grid-list-md>
-                <v-layout wrap>
-                    <v-flex xs12 sm6 md4>
-                        <v-text-field label="Nom" readonly required v-model="currentJoueur.nom"></v-text-field>
-                    </v-flex>
-                   
-                    <v-flex xs12 sm6 md4>
-                        <v-text-field label="Prénom" readonly required v-model="currentJoueur.prenom"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field label="Email"  v-model="currentJoueur.email"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field label="Téléphone" v-model="currentJoueur.telephone"></v-text-field>
-                    </v-flex>
-                </v-layout>
-            </v-container>
-        </v-card-text>
-        <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="grey-blue darken-1" flat v-on:click.native="showJoueurInfo = false">Fermer</v-btn>
-            <v-btn color="green darken-1"
-                   flat="flat"
-                   v-on:click.native="undoExtra()">
-                Annuler
-                <v-icon right dark>undo</v-icon>
-            </v-btn>
-
-            <v-btn color="green darken-1"
-                   flat="flat"
-                   v-on:click.native="saveExtra()">
-                Enregistrer
-                <v-icon right dark>save</v-icon>
-            </v-btn>
-        </v-card-actions>
-    </v-card>
-</v-dialog>
+<partial name="_ChartDialogPartial" />
+<partial name="_JoueurFormPartial"/>
 <v-content>
     <v-container fluid fill-height grid-list-md class="blue-grey lighten-4">
         <v-layout row wrap>
@@ -231,8 +188,17 @@
                             </v-chip>
                         </v-toolbar-title>
                         <v-toolbar-title v-if="showingHistorique">
-                            Historiques 
-                            <v-tooltip bottom>
+                           
+                                <v-btn slot="activator"
+                                       color="teal"
+                                       round
+                                       dark
+                                       v-on:click.native="chartDialog=true">
+                                    <v-icon dark>fa-chart-line</v-icon>
+                                </v-btn>
+                                
+                                <v-tooltip bottom>
+
                                 <v-chip color="green" text-color="white" v-if="historiques.pointsGagnesPerdu>=0" slot="activator">
                                     <v-avatar class="green darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
                                     {{historiques.pointsGagnesPerdu}}
@@ -242,8 +208,8 @@
                                     {{historiques.pointsGagnesPerdu}}
                                 </v-chip>
                                 <span>Nombre de Matchs/points {{historiques.nombreDeMatch }}/{{historiques.pointsGagnesPerdu}}</span>
-                            </v-tooltip>
-
+                                </v-tooltip>
+                              
                             <v-tooltip bottom>
                                 <v-chip color="green" text-color="white" v-if="historiques.pointsVictoire>=0" slot="activator">
                                     <v-avatar class="green darken-4">{{ historiques.nombreDeVictoire}}</v-avatar>

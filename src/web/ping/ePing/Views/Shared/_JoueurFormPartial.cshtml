@@ -1,0 +1,48 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<v-dialog v-model="showJoueurInfo" persistent max-width="500px">
+    <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn>
+    <v-card>
+        <v-card-title>
+            <span class="headline">{{currentJoueur.nom}}&nbsp;{{currentJoueur.prenom}}</span>
+        </v-card-title>
+        <v-card-text>
+            <v-container grid-list-md>
+                <v-layout wrap>
+                    <v-flex xs12 sm6 md4>
+                        <v-text-field label="Nom" readonly required v-model="currentJoueur.nom"></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12 sm6 md4>
+                        <v-text-field label="Prénom" readonly required v-model="currentJoueur.prenom"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-text-field label="Email" v-model="currentJoueur.email"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-text-field label="Téléphone" v-model="currentJoueur.telephone"></v-text-field>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-card-text>
+        <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="grey-blue darken-1" flat v-on:click.native="showJoueurInfo = false">Fermer</v-btn>
+            <v-btn color="green darken-1"
+                   flat="flat"
+                   v-on:click.native="undoExtra()">
+                Annuler
+                <v-icon right dark>undo</v-icon>
+            </v-btn>
+
+            <v-btn color="green darken-1"
+                   flat="flat"
+                   v-on:click.native="saveExtra()">
+                Enregistrer
+                <v-icon right dark>save</v-icon>
+            </v-btn>
+        </v-card-actions>
+    </v-card>
+</v-dialog>

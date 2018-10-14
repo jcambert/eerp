@@ -45,7 +45,8 @@ var mv=new Vue({
             'V4': { value: 'Veteran 4', desc: 'adultes agés de 70 à 79 ans' },
             'V5': { value: 'Veteran 1', desc: 'adultes agés de plus de 80 ans' }
         },
-        lorem: `Lorem ipsum dolor sit amet, mel at clita quando. Te sit oratio vituperatoribus, nam ad ipsum posidonium mediocritatem, explicari dissentiunt cu mea. Repudiare disputationi vim in, mollis iriure nec cu, alienum argumentum ius ad. Pri eu justo aeque torquatos.`
+        chartdialog: false,
+        charts: [{ id: 0, title: 'Classement', text: 'Classement' }, { id: 1, title: 'Points', text: 'Points' }, { id: 2, title: 'Moyenne', text: 'Moyenne' }, { id: 3, title: 'Victoire', text: 'Victoire' }, { id: 4, title: 'Défaite', text: 'Défaite' }]
        
     })),
     props: {
@@ -195,13 +196,13 @@ var mv=new Vue({
                     console.dir(error);
                     this.showJoueurInfo = false
                     this.loader = false;
-                    this.loadPartiesDujoueur(this.currentJoueur);
+                    //this.loadPartiesDujoueur(this.currentJoueur);
                 }
             );
         },
         undoExtra() {
             this.showJoueurInfo = false;
-            this.loadPartiesDujoueur(this.currentJoueur);
+           // this.loadPartiesDujoueur(this.currentJoueur);
         }
     },
     computed: {
