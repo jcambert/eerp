@@ -268,9 +268,13 @@ var mv=new Vue({
         },
         onActiveChartChanged(index) {
             console.log(index);
-            this.buildChart(index);
+            this.buildChart(this.currentJoueur, index);
         },
-        buildChart(index) {
+        showChart(joueur) {
+            this.buildChart(joueur, 0);
+            this.chartDialog = true;
+        },
+        buildChart(joueur,index) {
             this.labels.splice(0, this.labels.length);
             _.forEach(['January', 'February', 'March', 'April', 'May', 'June', 'July'], month=>{ this.labels.push(month); });
 
@@ -280,7 +284,7 @@ var mv=new Vue({
             for (var i = 0; i< 2; i++) {
                 this.datasets['chart' + index].push(
                     {
-                        label: 'My ' + index + ' dataset',
+                        label: 'My ' + joueur.prenom + ' dataset',
                         backgroundColor: window.randomColor(),
                         borderColor: window.randomColor(),
                         data: [
