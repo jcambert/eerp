@@ -1,4 +1,62 @@
-﻿
+﻿Vue.component('line-chart', {
+    extends: VueChartJs.Line,
+    render: function (createElement) {
+        return createElement(
+            'div', {
+                style: this.styles,
+                class: this.cssClasses
+            },
+            [
+                createElement(
+                    'canvas', {
+                        attrs: {
+                            id: this.id,
+                            type: this.chartId,
+                            width: this.width,
+                            height: this.height
+                        },
+                        ref: 'canvas'
+                    }
+                )
+            ]
+        )
+    },
+    //mixins: [mixins.reactiveProp],
+    watch: {
+        datasets: {
+            handler: function (val, oldVal) {
+                if (oldVal == val) return;
+                console.log('datasets change');
+                this.renderChart({ labels: this.labels, datasets: this.datasets }, this.options);
+            },
+            deep: true
+        }
+    },
+    props: {
+        id: {
+            required: true,
+            type: String
+        },
+        datasets: {
+            default: [],
+            type: Array
+        },
+        labels: {
+            default: [],
+            type: Array
+        },
+        options: {
+            default: function () { return { responsive: true, maintainAspectRatio: false } },
+            type:Object
+        }
+    },
+    mounted() {
+        console.log('chart line mounted');
+        this.renderChart({ labels: this.labels, datasets: this.datasets }, this.options);
+    }
+
+})
+
 var mv=new Vue({
     el: '#app',
     data: () => (Object.assign({}, data, {
@@ -9,25 +67,25 @@ var mv=new Vue({
         parties: [],
         partiesFiltered: [],
         historiques: {},
-        historiquesLoaded:false,
+        historiquesLoaded: false,
         currentJoueur: {},
-        pointJoueur:0,
+        pointJoueur: 0,
         items: [],
         filter: "",
         orderJoueurChoices: {
             'byName': { 'fields': ['nom', 'prenom'], 'orders': ['asc', 'asc'] },
             'byPoints': { 'fields': ['point', 'nom', 'prenom'], 'orders': ['desc', 'asc', 'asc'] },
-            'byCategorie': { 'fields': ['categorie', 'nom', 'prenom'], 'orders': ['desc', 'asc','asc']}
+            'byCategorie': { 'fields': ['categorie', 'nom', 'prenom'], 'orders': ['desc', 'asc', 'asc'] }
         },
         orderJoueur: 'byName',
         filtered: [],
         oldclasse: 5,
-        
+
         showJoueurInfo: false,
-        showingHistorique : false,
-        showingPartie : false,
+        showingHistorique: false,
+        showingPartie: false,
         categorieAge: {
-            'N': {value:'Non determiné'},
+            'N': { value: 'Non determiné' },
             'P': { value: 'Poussin', desc: 'jeunes ayant 8 ans au plus' },
             'B1': { value: 'Benjamin 1', desc: 'jeunes agés de 8 à 9 ans' },
             'B2': { value: 'Benjamin 2', desc: 'jeunes agés de 9 à 10 ans' },
@@ -45,8 +103,12 @@ var mv=new Vue({
             'V4': { value: 'Veteran 4', desc: 'adultes agés de 70 à 79 ans' },
             'V5': { value: 'Veteran 1', desc: 'adultes agés de plus de 80 ans' }
         },
-        chartdialog: false,
-        charts: [{ id: 0, title: 'Classement', text: 'Classement' }, { id: 1, title: 'Points', text: 'Points' }, { id: 2, title: 'Moyenne', text: 'Moyenne' }, { id: 3, title: 'Victoire', text: 'Victoire' }, { id: 4, title: 'Défaite', text: 'Défaite' }]
+        activeChart: "tabs-0",
+        chartDialog: false,
+        charts: [{ id: 0, title: 'Classement', text: 'Classement' }, { id: 1, title: 'Points', text: 'Points' }, { id: 2, title: 'Moyenne', text: 'Moyenne' }, { id: 3, title: 'Victoire', text: 'Victoire' }, { id: 4, title: 'Défaite', text: 'Défaite' }],
+        chartData: {},
+        datasets: {chart0:[],chart1:[],chart2:[],chart3:[],chart4:[]},
+        labels:[]
        
     })),
     props: {
@@ -203,6 +265,42 @@ var mv=new Vue({
         undoExtra() {
             this.showJoueurInfo = false;
            // this.loadPartiesDujoueur(this.currentJoueur);
+        },
+        onActiveChartChanged(index) {
+            console.log(index);
+            this.buildChart(index);
+        },
+        buildChart(index) {
+            this.labels.splice(0, this.labels.length);
+            _.forEach(['January', 'February', 'March', 'April', 'May', 'June', 'July'], month=>{ this.labels.push(month); });
+
+            //this.datasets.splice(0, this.datasets.length);
+            //datasets = [];
+            this.datasets['chart' + index] = [];
+            for (var i = 0; i< 2; i++) {
+                this.datasets['chart' + index].push(
+                    {
+                        label: 'My ' + index + ' dataset',
+                        backgroundColor: window.randomColor(),
+                        borderColor: window.randomColor(),
+                        data: [
+                            randomScalingFactor(),
+                            randomScalingFactor(),
+                            randomScalingFactor(),
+                            randomScalingFactor(),
+                            randomScalingFactor(),
+                            randomScalingFactor(),
+                            randomScalingFactor()
+                        ],
+                        fill: false,
+                    });
+            }
+
+            //this.datasets['chart' + index] = {};
+            //this.datasets['chart' + index]['datas'] = datasets;
+            console.dir()
+            console.dir(this.labels);
+            console.dir(this.datasets['chart' + index]);
         }
     },
     computed: {
@@ -236,8 +334,9 @@ var mv=new Vue({
     },
     mounted:function() {
         console.log("mounted");
-       this.getSettings();
-        
+      
+
+        this.getSettings();
     }
 })
 

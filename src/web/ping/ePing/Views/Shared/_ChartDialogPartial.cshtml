@@ -4,36 +4,46 @@
 *@
 
 
-    <v-dialog v-model="chartdialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+<v-dialog v-model="chartDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+    
+    <v-card>
+        <v-toolbar dark color="blue-grey">
+            <v-btn icon dark v-on:click.native="chartDialog = false">
+                <v-icon>close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Graphiques</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <!--<v-toolbar-items>
+                <v-btn dark flat v-on:click.native="chartdialog = false">Save</v-btn>
+            </v-toolbar-items>-->
+        </v-toolbar>
+        <v-tabs v-model="activeChart"
+                v-on:input="onActiveChartChanged"
+                color="blue-grey"
+                dark
+                slider-color="yellow">
+            <v-tab v-for="chart in charts"
+                   :key="'tabs-'+chart.id"
+                   ripple>
+                {{ chart.title }}
 
-        <v-card>
-            <v-toolbar dark color="blue-grey">
-                <v-btn icon dark v-on:click.native="chartdialog = false">
-                    <v-icon>close</v-icon>
-                </v-btn>
-                <v-toolbar-title>Graphiques</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <!--<v-toolbar-items>
-        <v-btn dark flat v-on:click.native="chartdialog = false">Save</v-btn>
-    </v-toolbar-items>-->
-            </v-toolbar>
-            <v-tabs v-model="activeChart"
-                    color="blue-grey"
-                    dark
-                    slider-color="yellow">
-                <v-tab v-for="chart in charts"
-                       :key="chart.id"
-                       ripple>
-                    {{ chart.title }}
+            </v-tab>
+            <v-tab-item :id="'tabs-0'">
+                <line-chart id="toto0" v-if="datasets.chart0.length>0" :datasets="datasets.chart0" :labels="labels"></line-chart>
+            </v-tab-item>
+            <v-tab-item :id="'tabs-1'">
+                <line-chart id="toto1" v-if="datasets.chart1.length>0" :datasets="datasets.chart1" :labels="labels"></line-chart>
+            </v-tab-item>
+            <v-tab-item :id="'tabs-2'">
+                <line-chart id="toto2" v-if="datasets.chart2.length>0" :datasets="datasets.chart2" :labels="labels"></line-chart>
+            </v-tab-item>
+            <v-tab-item :id="'tabs-3'">
+                <line-chart id="toto3" v-if="datasets.chart3.length>0" :datasets="datasets.chart3" :labels="labels"></line-chart>
+            </v-tab-item>
+            <v-tab-item :id="'tabs-4'">
+                <line-chart id="toto4" v-if="datasets.chart4.length>0" :datasets="datasets.chart4" :labels="labels"></line-chart>
+            </v-tab-item>
+        </v-tabs>
 
-                </v-tab>
-                <v-tab-item v-for="chart in charts"
-                            :key="chart.id">
-                    <v-card flat>
-                        <v-card-text>{{ chart.text }}</v-card-text>
-                    </v-card>
-                </v-tab-item>
-            </v-tabs>
-
-        </v-card>
-    </v-dialog>
+    </v-card>
+</v-dialog>
