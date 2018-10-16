@@ -69,7 +69,7 @@ namespace Ping.Api.Controllers
             });
         }
 
-        [HttpGet("{license}/histo")]
+        [HttpGet("{license}/histoclass")]
         public async Task<ActionResult<string>> GetByHistorique(string license)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.HistoriqueClassement, new NameValueCollection() {

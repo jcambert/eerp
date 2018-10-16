@@ -64,6 +64,17 @@ namespace ePing.Api.Controllers
             return Ok(journee);
         }
 
+        [HttpGet("{licence}/histoclass")]
+        public async Task<IActionResult>GetHistoriqueClassementDujoueur([FromRoute] string licence)
+        {
+            var joueur = await Service.loadDetailJoueur(licence);
+            var histo = await Service.loadHistoriqueClassement(joueur);
+
+            histo.AddClassementActuel(joueur);
+
+            return Ok(histo);
+        }
+
         [HttpGet("club/{numero}/load")]
         [HttpGet("club/{numero}")]
         public async Task<IActionResult> GetJoueursDuClub([FromRoute] string numero)

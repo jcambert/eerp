@@ -18,5 +18,7 @@
         public string HistoriquesDuJoueur { get; set; }
 
         public string JoueurExtra { get; set; }
+
+        public string HistoriqueClassementDuJoueur { get; set; }
     }
 }

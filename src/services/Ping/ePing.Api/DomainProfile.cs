@@ -16,6 +16,7 @@ namespace ePing.Api
             CreateMap<JoueurSpidDto, JoueurSpid>().ReverseMap();
             CreateMap<PartieDto, Partie>();
             CreateMap<PartieHistoDto, Historique>();
+            CreateMap<ClassementDto, Classement>();
         }
     }
 }

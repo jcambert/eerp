@@ -46,7 +46,27 @@
             type: Array
         },
         options: {
-            default: function () { return { responsive: true, maintainAspectRatio: false } },
+            default: function () {
+                return {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    showTooltips: false,
+                    onAnimationComplete: function () {
+
+                        var ctx = this.chart.ctx;
+                        ctx.font = this.scale.font;
+                        ctx.fillStyle = this.scale.textColor
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "bottom";
+
+                        this.datasets.forEach(function (dataset) {
+                            dataset.points.forEach(function (points) {
+                                ctx.fillText(points.value, points.x, points.y - 10);
+                            });
+                        })
+                    }
+                }
+            },
             type:Object
         }
     },
@@ -276,32 +296,61 @@ var mv=new Vue({
         },
         buildChart(joueur,index) {
             this.labels.splice(0, this.labels.length);
-            _.forEach(['January', 'February', 'March', 'April', 'May', 'June', 'July'], month=>{ this.labels.push(month); });
-
-            //this.datasets.splice(0, this.datasets.length);
-            //datasets = [];
             this.datasets['chart' + index] = [];
-            for (var i = 0; i< 2; i++) {
-                this.datasets['chart' + index].push(
-                    {
-                        label: 'My ' + joueur.prenom + ' dataset',
-                        backgroundColor: window.randomColor(),
-                        borderColor: window.randomColor(),
-                        data: [
-                            randomScalingFactor(),
-                            randomScalingFactor(),
-                            randomScalingFactor(),
-                            randomScalingFactor(),
-                            randomScalingFactor(),
-                            randomScalingFactor(),
-                            randomScalingFactor()
-                        ],
-                        fill: false,
-                    });
-            }
+            //console.dir(joueur); return;
+            if (index == 0) {
+                this.loader = true;
+                uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriqueClassementDuJoueur.replace('{licence}', joueur.licence);
+                Vue.http.get(uri2).then(
+                    response => {
+                       // window.data = response.data;
+                        data = [];
+                        _.forEach(response.data, cl => {
+                            this.labels.push(cl.date);
+                            data.push(cl.point);
+                        })
+                        this.datasets['chart' + index].push(
+                            {
+                                label: 'Historique de classement de ' + joueur.prenom ,
+                                backgroundColor: window.randomColor(),
+                                borderColor: window.randomColor(),
+                                data: data,
+                                fill: false,
+                            });
+                        this.loader = false;
+                    },
+                    error => {
+                        console.dir(error);
+                        
+                        this.loader = false;
+                    }
+                );
+            } else {
 
-            //this.datasets['chart' + index] = {};
-            //this.datasets['chart' + index]['datas'] = datasets;
+                _.forEach(['January', 'February', 'March', 'April', 'May', 'June', 'July'], month => { this.labels.push(month); });
+
+
+
+                for (var i = 0; i < 2; i++) {
+                    this.datasets['chart' + index].push(
+                        {
+                            label: 'My ' + joueur.prenom + ' dataset',
+                            backgroundColor: window.randomColor(),
+                            borderColor: window.randomColor(),
+                            data: [
+                                randomScalingFactor(),
+                                randomScalingFactor(),
+                                randomScalingFactor(),
+                                randomScalingFactor(),
+                                randomScalingFactor(),
+                                randomScalingFactor(),
+                                randomScalingFactor()
+                            ],
+                            fill: false,
+                        });
+                }
+
+            }
             console.dir()
             console.dir(this.labels);
             console.dir(this.datasets['chart' + index]);
