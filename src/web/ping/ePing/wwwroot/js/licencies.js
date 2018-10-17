@@ -311,7 +311,7 @@ var mv=new Vue({
                         })
                         this.datasets['chart' + index].push(
                             {
-                                label: 'Historique de classement de ' + joueur.prenom ,
+                                label: 'Historique du classement de ' + joueur.prenom ,
                                 backgroundColor: window.randomColor(),
                                 borderColor: window.randomColor(),
                                 data: data,
@@ -322,6 +322,34 @@ var mv=new Vue({
                     error => {
                         console.dir(error);
                         
+                        this.loader = false;
+                    }
+                );
+            } if (index == 1) {
+                this.loader = true; 
+                uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriquePointDuJoueur.replace('{licence}', joueur.licence);
+
+                Vue.http.get(uri2).then(
+                    response => {
+                        // window.data = response.data;
+                        data = [];
+                        _.forEach(response.data, cl => {
+                            this.labels.push(cl.date);
+                            data.push(cl.pointsGagnesPerdus);
+                        })
+                        this.datasets['chart' + index].push(
+                            {
+                                label: 'Historique des point de ' + joueur.prenom,
+                                backgroundColor: window.randomColor(),
+                                borderColor: window.randomColor(),
+                                data: data,
+                                fill: false,
+                            });
+                        this.loader = false;
+                    },
+                    error => {
+                        console.dir(error);
+
                         this.loader = false;
                     }
                 );

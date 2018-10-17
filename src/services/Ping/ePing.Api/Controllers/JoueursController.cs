@@ -4,6 +4,7 @@ using ePing.Api.models;
 using ePing.Api.services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace ePing.Api.Controllers
         {
             var joueur = await Service.loadDetailJoueur(licence);
             var parties = await Service.loadJoueurParties(joueur);
+            
             var journees = new List<Journee>();
             var toto = parties.GroupBy(x => x.Date).ToList();
             toto.ForEach(titi =>
@@ -51,7 +53,7 @@ namespace ePing.Api.Controllers
                 });
                 journees.Add(journee);
             });
-
+            
             return Ok(journees);
         }
         [HttpGet("{licence}/historique")]
@@ -73,6 +75,34 @@ namespace ePing.Api.Controllers
             histo.AddClassementActuel(joueur);
 
             return Ok(histo);
+        }
+        [HttpGet("{licence}/histopoint")]
+        public async Task<IActionResult> GetHistoriquePointDujoueur([FromRoute] string licence)
+        {
+            var joueur = await Service.loadDetailJoueur(licence);
+            var parties = await Service.loadJoueurParties(joueur);
+
+            var journees = new List<Journee>();
+            var toto = parties.GroupBy(x => x.Date).ToList();
+            toto.ForEach(titi =>
+            {
+                var journee = new Journee() { Date = titi.Key };
+                titi.ToList().ForEach(partie =>
+                {
+                    journee.Epreuve = partie.Epreuve;
+                    journee.Add(joueur, partie, PointsService);
+                });
+                journees.Add(journee);
+            });
+
+            var histo = Service.ConvertToHistoriquePoint(journees).OrderByDescending(h => DateTime.Parse(h.Date)).ToArray();
+            for (int i = 1; i < histo.Count(); i++)
+            {
+                histo[i].PointsGagnesPerdus += histo[i - 1].PointsGagnesPerdus;
+            }
+            
+            
+            return Ok(histo );
         }
 
         [HttpGet("club/{numero}/load")]

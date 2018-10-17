@@ -17,6 +17,10 @@ namespace ePing.Api
             CreateMap<PartieDto, Partie>();
             CreateMap<PartieHistoDto, Historique>();
             CreateMap<ClassementDto, Classement>();
+            CreateMap<Journee, HistoriquePointDto>().ConvertUsing(journee =>
+            {
+                return new HistoriquePointDto() { Date = journee.Date, PointsGagnesPerdus = journee.PointsGagnesPerdus };
+            });
         }
     }
 }

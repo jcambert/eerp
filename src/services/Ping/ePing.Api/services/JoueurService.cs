@@ -16,6 +16,7 @@ namespace ePing.Api.services
         Task<List<Partie>> loadJoueurParties(JoueurSpid joueur);
         Task<List<Historique>> loadJoueurHistoriques(JoueurSpid joueur);
         Task<List<Classement>>  loadHistoriqueClassement(JoueurSpid joueur);
+        List<HistoriquePointDto> ConvertToHistoriquePoint(List<Journee> journees);
     }
 
     public class JoueurService : ServiceBase, IJoueurService
@@ -48,6 +49,11 @@ namespace ePing.Api.services
         public async Task<List<Classement>> loadHistoriqueClassement(JoueurSpid joueur)
         {
             return await this.InternalLoadListFromSpid<ListeClassementHeader, List<ClassementDto>, Classement>($"api/joueur/{joueur.Licence}/histoclass", false, liste => liste?.Liste?.Classements);
+        }
+
+        public List<HistoriquePointDto> ConvertToHistoriquePoint(List<Journee> journees)
+        {
+            return Mapper.Map<List<HistoriquePointDto>>(journees);
         }
     }
 }
