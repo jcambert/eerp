@@ -30,12 +30,43 @@ namespace ePing.Api.models
 
     public class Journee
     {
+        int _victoire = -1;
+        int _defaite = -1;
+        public Journee()
+        {
+
+        }
         public string Date { get; set; }
         public string Epreuve { get; set; }
         public List<Partie> Parties { get;  } = new List<Partie>();
         public double PointsGagnesPerdus { get; set; } = 0;
+        public int NombreVictoire
+        {
+            get
+            {
+                if (_victoire == -1)
+                {
+                    _victoire = 0;
+                    Parties.ForEach(partie => _victoire += (partie.Victoire == "V" ? 1: 0));
+                }
+                return _victoire;
+            }
+        }
 
-    }
+        public int NombreDefaite
+        {
+            get
+            {
+                if (_defaite == -1)
+                {
+                    _defaite = 0;
+                    Parties.ForEach(partie => _defaite += (partie.Victoire == "D" ? 1 : 0));
+                }
+                return _defaite;
+            }
+        }
+
+        }
 
     public class JourneeHistoriques
     {

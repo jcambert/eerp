@@ -1,8 +1,6 @@
 ﻿namespace ePing
 {
-    public class AppSettings
-    {
-    }
+
     public class ApiSettings
     {
         public string EndPoint { get; set; }
@@ -22,5 +20,9 @@
         public string HistoriqueClassementDuJoueur { get; set; }
 
         public string HistoriquePointDuJoueur { get; set; }
+
+        public string HistoriqueVictoireDuJoueur { get; set; }
+
+        public string HistoriqueDefaiteDuJoueur { get; set; }
     }
 }

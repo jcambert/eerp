@@ -27,7 +27,7 @@
             handler: function (val, oldVal) {
                 if (oldVal == val) return;
                 console.log('datasets change');
-                this.renderChart({ labels: this.labels, datasets: this.datasets }, this.options);
+                this.renderChart({ labels: this.labels, datasets: val }, this.options);
             },
             deep: true
         }
@@ -72,6 +72,8 @@
     },
     mounted() {
         console.log('chart line mounted');
+        console.dir(this.labels);
+        console.dir(this.datasets);
         this.renderChart({ labels: this.labels, datasets: this.datasets }, this.options);
     }
 
@@ -123,18 +125,28 @@ var mv=new Vue({
             'V4': { value: 'Veteran 4', desc: 'adultes agés de 70 à 79 ans' },
             'V5': { value: 'Veteran 1', desc: 'adultes agés de plus de 80 ans' }
         },
-        activeChart: "tabs-0",
+        activeChart: "tabs-",
         chartDialog: false,
         charts: [{ id: 0, title: 'Classement', text: 'Classement' }, { id: 1, title: 'Points', text: 'Points' }, { id: 2, title: 'Moyenne', text: 'Moyenne' }, { id: 3, title: 'Victoire', text: 'Victoire' }, { id: 4, title: 'Défaite', text: 'Défaite' }],
         chartData: {},
-        datasets: {chart0:[],chart1:[],chart2:[],chart3:[],chart4:[]},
-        labels:[]
+        datasets: [],
+        labels: [],
+        snackbar: {visible:false,timeout:4000,message:'',color:'info'},
+        snackbar_timeout: 4000,
+
+        snackbar: false,
+        snackbar_message: ''
+
        
     })),
     props: {
         source: String
     },
-    methods:{
+    methods: {
+        showSnackbar(options) {
+            _.merge(this.snackbar, options);
+            this.snackbar.visible = true;
+        },
         getSettings() {
             var self = this;
             this.loader = true;
@@ -168,7 +180,9 @@ var mv=new Vue({
                                 });
                         
                 },
-                error => { console.error(error); this.loader = false;});
+                error => {
+                    console.error(error); this.loader = false;
+                });
         },
         reloadJoueursDuClub() {
             this.loader = true;
@@ -184,7 +198,7 @@ var mv=new Vue({
                 error2 => {
                     console.error(error2);
                     this.loader = false;
-                })
+                });
         },
         showJoueurDivider(joueur,index) {
             if (index > 0) {
@@ -205,20 +219,22 @@ var mv=new Vue({
                 r2 => {
                     //console.dir(r2);
                     _.forEach(r2.data, data => this.parties.push(data));
-                    
+
                     //this.parties = r2.data;
                     this.loader = false;
                     this.showDetail = true;
                     this.showDetailParties();
                     //en arriere plan
                     this.loadHistoriquesDujoueur(joueur);
+                    this.currentJoueur = joueur;
                 },
-                error2 => {
-                    console.error(error2);
+                error => {
+                    console.error(error);
+                    this.showSnackbar({ color: 'error', message: error });
                     this.loader = false;
-                }),
+                });
 
-                this.currentJoueur = joueur;
+                
         },
         loadHistoriquesDujoueur(joueur) {
             
@@ -287,101 +303,194 @@ var mv=new Vue({
            // this.loadPartiesDujoueur(this.currentJoueur);
         },
         onActiveChartChanged(index) {
+            console.log('Chart tab change to:'+index)
+            if (!_.has(this.currentJoueur, 'licence')) return;
             console.log(index);
-            this.buildChart(this.currentJoueur, index);
+            this.showChart(this.currentJoueur, index);
         },
-        showChart(joueur) {
-            this.buildChart(joueur, 0);
-            this.chartDialog = true;
+        showChart(joueur,index) {
+            this.loader = true;
+            this.currentJoueur = joueur;
+            this.labels.splice(0,this.labels.length);
+            this.datasets.splice(0,this.datasets.length) ;
+            this.buildChart(joueur, index == undefined ? 0 : index).then(
+                result => { 
+                    console.dir(result);
+                    this.labels = result.labels;
+                    this.datasets = result.datasets;
+                    this.loader = false;
+                    this.chartDialog = true; 
+                },
+                error => {
+                    console.error(error);
+                    this.showSnackbar({ color: 'error', message: error });
+                    this.loader = false;
+                });
+           
         },
-        buildChart(joueur,index) {
-            this.labels.splice(0, this.labels.length);
-            this.datasets['chart' + index] = [];
-            //console.dir(joueur); return;
-            if (index == 0) {
-                this.loader = true;
-                uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriqueClassementDuJoueur.replace('{licence}', joueur.licence);
-                Vue.http.get(uri2).then(
-                    response => {
-                       // window.data = response.data;
-                        data = [];
-                        _.forEach(response.data, cl => {
-                            this.labels.push(cl.date);
-                            data.push(cl.point);
-                        })
-                        this.datasets['chart' + index].push(
-                            {
-                                label: 'Historique du classement de ' + joueur.prenom ,
-                                backgroundColor: window.randomColor(),
-                                borderColor: window.randomColor(),
-                                data: data,
-                                fill: false,
-                            });
-                        this.loader = false;
-                    },
-                    error => {
-                        console.dir(error);
-                        
-                        this.loader = false;
-                    }
-                );
-            } if (index == 1) {
-                this.loader = true; 
-                uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriquePointDuJoueur.replace('{licence}', joueur.licence);
-
-                Vue.http.get(uri2).then(
-                    response => {
-                        // window.data = response.data;
-                        data = [];
-                        _.forEach(response.data, cl => {
-                            this.labels.push(cl.date);
-                            data.push(cl.pointsGagnesPerdus);
-                        })
-                        this.datasets['chart' + index].push(
-                            {
-                                label: 'Historique des point de ' + joueur.prenom,
-                                backgroundColor: window.randomColor(),
-                                borderColor: window.randomColor(),
-                                data: data,
-                                fill: false,
-                            });
-                        this.loader = false;
-                    },
-                    error => {
-                        console.dir(error);
-
-                        this.loader = false;
-                    }
-                );
-            } else {
-
-                _.forEach(['January', 'February', 'March', 'April', 'May', 'June', 'July'], month => { this.labels.push(month); });
-
-
-
-                for (var i = 0; i < 2; i++) {
-                    this.datasets['chart' + index].push(
-                        {
-                            label: 'My ' + joueur.prenom + ' dataset',
-                            backgroundColor: window.randomColor(),
-                            borderColor: window.randomColor(),
-                            data: [
-                                randomScalingFactor(),
-                                randomScalingFactor(),
-                                randomScalingFactor(),
-                                randomScalingFactor(),
-                                randomScalingFactor(),
-                                randomScalingFactor(),
-                                randomScalingFactor()
-                            ],
-                            fill: false,
-                        });
+        buildChart(joueur, index) {
+            
+            
+            return new Promise((resolve, reject) => {
+                if (index == undefined) return reject();
+                console.log('BuildChart:' + index);
+                _datasets = [];
+                _labels = [];
+                //console.dir(joueur); return;
+                if (index === 0) {
+                   
+                    uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriqueClassementDuJoueur.replace('{licence}', joueur.licence);
+                    Vue.http.get(uri2).then(
+                        response => {
+                            // window.data = response.data;
+                            data = [];
+                            _.forEach(response.data, cl => {
+                                _labels.push(cl.date);
+                                data.push(cl.point);
+                            })
+                           _datasets.push(
+                                {
+                                    label: 'Historique du classement de ' + joueur.prenom,
+                                    backgroundColor: window.randomColor(),
+                                    borderColor: window.randomColor(),
+                                    data: data,
+                                    fill: false,
+                                });
+                            console.dir(_labels);
+                            console.dir(_datasets);
+                           return resolve({labels:_labels,datasets:_datasets});
+                        },
+                        error => {
+                            //console.dir(error);
+                            return reject(error);
+                            //this.loader = false;
+                        }
+                    );
                 }
+                else if (index === 1) {
+                    uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriquePointDuJoueur.replace('{licence}', joueur.licence);
 
-            }
-            console.dir()
-            console.dir(this.labels);
-            console.dir(this.datasets['chart' + index]);
+                    Vue.http.get(uri2).then(
+                        response => {
+                            // window.data = response.data;
+                            data = [];
+                            _.forEach(response.data, cl => {
+                                _labels.push(cl.date);
+                                data.push(cl.pointsGagnesPerdus);
+                            })
+                            _datasets.push(
+                                {
+                                    label: 'Historique des points de ' + joueur.prenom,
+                                    backgroundColor: window.randomColor(),
+                                    borderColor: window.randomColor(),
+                                    data: data,
+                                    fill: false,
+                                });
+                            console.dir(_labels);
+                            console.dir(_datasets);
+                            return resolve({ labels: _labels, datasets: _datasets });
+                        },
+                        error => {
+                            return reject(error);
+                           // console.dir(error);
+
+                           // this.loader = false;
+                        }
+                    );
+                }
+                else if (index === 3) {
+                    uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriqueVictoireDuJoueur.replace('{licence}', joueur.licence);
+
+                    Vue.http.get(uri2).then(
+                        response => {
+                            // window.data = response.data;
+                            data = [];
+                            _.forEach(response.data, cl => {
+                                _labels.push(cl.date);
+                                data.push(cl.victoire);
+                            })
+                            _datasets.push(
+                                {
+                                    label: 'Historique des victoires de ' + joueur.prenom,
+                                    backgroundColor: window.randomColor(),
+                                    borderColor: window.randomColor(),
+                                    data: data,
+                                    fill: false,
+                                });
+                            console.dir(_labels);
+                            console.dir(_datasets);
+                            return resolve({ labels: _labels, datasets: _datasets });
+                        },
+                        error => {
+                            return reject(error);
+                            // console.dir(error);
+
+                            // this.loader = false;
+                        }
+                    );
+                }
+                else if (index === 4) {
+                    uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriqueDefaiteDuJoueur.replace('{licence}', joueur.licence);
+
+                    Vue.http.get(uri2).then(
+                        response => {
+                            // window.data = response.data;
+                            data = [];
+                            _.forEach(response.data, cl => {
+                                _labels.push(cl.date);
+                                data.push(cl.defaite);
+                            })
+                            _datasets.push(
+                                {
+                                    label: 'Historique des defaites de ' + joueur.prenom,
+                                    backgroundColor: window.randomColor(),
+                                    borderColor: window.randomColor(),
+                                    data: data,
+                                    fill: false,
+                                });
+                            console.dir(_labels);
+                            console.dir(_datasets);
+                            return resolve({ labels: _labels, datasets: _datasets });
+                        },
+                        error => {
+                            return reject(error);
+                            // console.dir(error);
+
+                            // this.loader = false;
+                        }
+                    );
+                }
+                else {
+
+                    _.forEach(['January', 'February', 'March', 'April', 'May', 'June', 'July'], month => { _labels.push(month); });
+
+
+
+                    for (var i = 0; i < 2; i++) {
+                        _datasets.push(
+                            {
+                                label: 'My ' + joueur.prenom + ' dataset',
+                                backgroundColor: window.randomColor(),
+                                borderColor: window.randomColor(),
+                                data: [
+                                    randomScalingFactor(),
+                                    randomScalingFactor(),
+                                    randomScalingFactor(),
+                                    randomScalingFactor(),
+                                    randomScalingFactor(),
+                                    randomScalingFactor(),
+                                    randomScalingFactor()
+                                ],
+                                fill: false,
+                            });
+                    }
+                    console.dir(_labels);
+                    console.dir(_datasets);
+                    return resolve({ labels: _labels, datasets: _datasets });
+
+                }
+               
+            });
         }
     },
     computed: {

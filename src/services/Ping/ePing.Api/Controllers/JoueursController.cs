@@ -42,7 +42,7 @@ namespace ePing.Api.Controllers
             var parties = await Service.loadJoueurParties(joueur);
             
             var journees = new List<Journee>();
-            var toto = parties.GroupBy(x => x.Date).ToList();
+            var toto = parties/*.GroupBy(x => x.Date)*/.OrderByDescending(d=>DateTime.Parse(d.Date)).GroupBy(x=>x.Date).ToList();
             toto.ForEach(titi =>
             {
                 var journee = new Journee() { Date = titi.Key };
@@ -104,6 +104,63 @@ namespace ePing.Api.Controllers
             
             return Ok(histo );
         }
+
+        [HttpGet("{licence}/histovictoire")]
+        public async Task<IActionResult>GetHistoriqueVictoireDuJoueur([FromRoute] string licence)
+        {
+            var joueur = await Service.loadDetailJoueur(licence);
+            var parties = await Service.loadJoueurParties(joueur);
+
+            var journees = new List<Journee>();
+            var toto = parties.GroupBy(x => x.Date).ToList();
+            toto.ForEach(titi =>
+            {
+                var journee = new Journee() { Date = titi.Key };
+                titi.ToList().ForEach(partie =>
+                {
+                    journee.Epreuve = partie.Epreuve;
+                    journee.Add(joueur, partie, PointsService);
+                });
+                journees.Add(journee);
+            });
+
+            var histo = Service.ConvertToHistoriqueVictoire(journees).OrderBy(h => DateTime.Parse(h.Date)).ToArray();
+
+            for (int i = 1; i < histo.Count(); i++)
+            {
+                histo[i].Victoire += histo[i - 1].Victoire;
+            }
+            return Ok(histo);
+        }
+
+        [HttpGet("{licence}/histodefaite")]
+        public async Task<IActionResult> GetHistoriquedefaiteDuJoueur([FromRoute] string licence)
+        {
+            var joueur = await Service.loadDetailJoueur(licence);
+            var parties = await Service.loadJoueurParties(joueur);
+
+            var journees = new List<Journee>();
+            var toto = parties.GroupBy(x => x.Date).ToList();
+            toto.ForEach(titi =>
+            {
+                var journee = new Journee() { Date = titi.Key };
+                titi.ToList().ForEach(partie =>
+                {
+                    journee.Epreuve = partie.Epreuve;
+                    journee.Add(joueur, partie, PointsService);
+                });
+                journees.Add(journee);
+            });
+
+            var histo = Service.ConvertToHistoriqueDefaite(journees).OrderBy(h => DateTime.Parse(h.Date)).ToArray();
+
+            for (int i = 1; i < histo.Count(); i++)
+            {
+                histo[i].Defaite+= histo[i - 1].Defaite;
+            }
+            return Ok(histo);
+        }
+
 
         [HttpGet("club/{numero}/load")]
         [HttpGet("club/{numero}")]

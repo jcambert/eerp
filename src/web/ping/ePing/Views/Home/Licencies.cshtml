@@ -5,8 +5,19 @@
 @model DashboardViewModel
 
 <partial name="_ChartDialogPartial" />
-<partial name="_JoueurFormPartial"/>
-
+<partial name="_JoueurFormPartial" />
+<v-snackbar v-model="snackbar.visible"
+            :color="snackbar.color"
+            :multi-line="true"
+            :timeout="snackbar.timeout"
+            :vertical="true">
+    {{ snackbar.message }}
+    <v-btn dark
+           flat
+           v-on:click="snackbar.visible = false">
+        Fermer
+    </v-btn>
+</v-snackbar>
 <v-content>
     <v-container fluid fill-height grid-list-md class="blue-grey lighten-4">
         <v-layout row wrap>
@@ -52,7 +63,7 @@
                             <v-divider v-if="showJoueurDivider(joueur,index)"></v-divider>
                             <v-list-tile :key="joueur.licence"
                                          avatar
-                                         v-on:click="loadPartiesDujoueur(joueur)">
+                                         >
                                 <v-list-tile-action>
                                     <v-btn flat icon color="primary" v-on:click.native="infoJoueur(joueur)">
                                         <v-icon>info</v-icon>
@@ -61,7 +72,7 @@
                                 </v-list-tile-action>
 
                                 <v-list-tile-content>
-                                    <v-list-tile-title>
+                                    <v-list-tile-title v-on:click="loadPartiesDujoueur(joueur)" >
                                         <b>{{joueur.nom +' ' + joueur.prenom}}</b>
 
 
@@ -185,7 +196,7 @@
                 </v-card>
             </v-flex>
 
-            <v-flex d-flex xs12 sm6 md6 >
+            <v-flex d-flex xs12 sm6 md6>
                 <v-card v-if="showDetail">
                     <v-toolbar color="blue-grey" dark>
                         <!-- <v-toolbar-side-icon></v-toolbar-side-icon>-->
@@ -200,28 +211,28 @@
                             </v-chip>
                         </v-toolbar-title>
                         <v-toolbar-title v-if="showingHistorique">
-                           
-                                <v-btn slot="activator"
-                                       color="teal"
-                                       round
-                                       dark
-                                       v-on:click.native="chartDialog=true">
-                                    <v-icon dark>fa-chart-line</v-icon>
-                                </v-btn>
-                                
-                                <v-tooltip bottom>
 
-                                    <v-chip color="green" text-color="white" v-if="historiques.pointsGagnesPerdu>=0" slot="activator">
-                                        <v-avatar class="green darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
-                                        {{historiques.pointsGagnesPerdu}}
-                                    </v-chip>
-                                    <v-chip color="red" text-color="white" v-else slot="activator">
-                                        <v-avatar class="red darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
-                                        {{historiques.pointsGagnesPerdu}}
-                                    </v-chip>
-                                    <span>Nombre de Matchs/points {{historiques.nombreDeMatch }}/{{historiques.pointsGagnesPerdu}}</span>
-                                </v-tooltip>
-                              
+                            <v-btn slot="activator"
+                                   color="teal"
+                                   round
+                                   dark
+                                   v-on:click.native="chartDialog=true">
+                                <v-icon dark>fa-chart-line</v-icon>
+                            </v-btn>
+
+                            <v-tooltip bottom>
+
+                                <v-chip color="green" text-color="white" v-if="historiques.pointsGagnesPerdu>=0" slot="activator">
+                                    <v-avatar class="green darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
+                                    {{historiques.pointsGagnesPerdu}}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    <v-avatar class="red darken-4">{{ historiques.nombreDeMatch}}</v-avatar>
+                                    {{historiques.pointsGagnesPerdu}}
+                                </v-chip>
+                                <span>Nombre de Matchs/points {{historiques.nombreDeMatch }}/{{historiques.pointsGagnesPerdu}}</span>
+                            </v-tooltip>
+
                             <v-tooltip bottom>
                                 <v-chip color="green" text-color="white" v-if="historiques.pointsVictoire>=0" slot="activator">
                                     <v-avatar class="green darken-4">{{ historiques.nombreDeVictoire}}</v-avatar>
@@ -359,7 +370,7 @@
 
                 </v-card>
             </v-flex>
-            
+
         </v-layout>
     </v-container>
 </v-content>

@@ -18,7 +18,7 @@
             </v-toolbar-items>-->
         </v-toolbar>
         <v-tabs v-model="activeChart"
-                v-on:input="onActiveChartChanged"
+                v-on:change="onActiveChartChanged"
                 color="blue-grey"
                 dark
                 slider-color="yellow">
@@ -28,20 +28,20 @@
                 {{ chart.title }}
 
             </v-tab>
-            <v-tab-item :id="'tabs-0'">
-                <line-chart id="toto0" v-if="datasets.chart0.length>0" :datasets="datasets.chart0" :labels="labels"></line-chart>
+            <v-tab-item :value="'tabs-0'">
+                <line-chart id="toto0" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :id="'tabs-1'">
-                <line-chart id="toto1" v-if="datasets.chart1.length>0" :datasets="datasets.chart1" :labels="labels"></line-chart>
+            <v-tab-item :value="'tabs-1'">
+                <line-chart id="toto1" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :id="'tabs-2'">
-                <line-chart id="toto2" v-if="datasets.chart2.length>0" :datasets="datasets.chart2" :labels="labels"></line-chart>
+            <v-tab-item :value="'tabs-2'">
+                <line-chart id="toto2"  :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :id="'tabs-3'">
-                <line-chart id="toto3" v-if="datasets.chart3.length>0" :datasets="datasets.chart3" :labels="labels"></line-chart>
+            <v-tab-item :value="'tabs-3'">
+                <line-chart id="toto3" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :id="'tabs-4'">
-                <line-chart id="toto4" v-if="datasets.chart4.length>0" :datasets="datasets.chart4" :labels="labels"></line-chart>
+            <v-tab-item :value="'tabs-4'">
+                <line-chart id="toto4"  :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
         </v-tabs>
 

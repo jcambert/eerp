@@ -99,7 +99,7 @@ namespace ePing.Api.services
             var tab2 = GetDico(diffPoints, vd == VictoireDefaite.Victoire ? VictoireDefaite.Defaite : VictoireDefaite.Victoire, out res2);
             var key1 = tab1.Keys.Where(k => k <= Math.Abs(diffPoints)).LastOrDefault();
             var key2 = tab2.Keys.Where(k => k <= Math.Abs(diffPoints)).LastOrDefault();
-            return new PointResultat() { PointsJoueur1 = tab1[key2] * coeficient, ResultatJoueur1 = res1, PointsJoueur2 = tab2[key2] * coeficient, ResultatJoueur2 = res2 };
+            return new PointResultat() { PointsJoueur1 = tab1[key1] * coeficient, ResultatJoueur1 = res1, PointsJoueur2 = tab2[key2] * coeficient, ResultatJoueur2 = res2 };
         }
 
             

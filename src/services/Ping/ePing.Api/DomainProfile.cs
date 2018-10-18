@@ -21,6 +21,16 @@ namespace ePing.Api
             {
                 return new HistoriquePointDto() { Date = journee.Date, PointsGagnesPerdus = journee.PointsGagnesPerdus };
             });
+            CreateMap<Journee, HistoriqueVictoireDto>().ConstructUsing(journee =>
+            {
+                return new HistoriqueVictoireDto() { Date = journee.Date, Victoire = journee.NombreVictoire };
+            });
+
+            CreateMap<Journee, HistoriqueDefaiteDto>().ConstructUsing(journee =>
+            {
+                return new HistoriqueDefaiteDto() { Date = journee.Date, Defaite = journee.NombreDefaite };
+            });
+
         }
     }
 }
