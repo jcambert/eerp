@@ -4,7 +4,27 @@
 
 @model DashboardViewModel
 
+<v-content>
+    <v-container fluid fill-height grid-list-md class="blue-grey lighten-4">
+        <v-layout row wrap>
+            <v-flex d-flex xs12 sm6 md6>
+                <v-card>
+                    <v-toolbar color="blue-grey" dark>
+                        <v-toolbar-title>Coordonnées</v-toolbar-title>
+                        <v-spacer></v-spacer>
+
+                    </v-toolbar>
+                </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
+</v-content>
+
+
 @section Scripts
     {
+
+    
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/index.js" asp-append-version="true"></script>
 }

@@ -1,0 +1,17 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<v-snackbar v-model="snackbar.visible"
+            :color="snackbar.color"
+            :multi-line="true"
+            :timeout="snackbar.timeout"
+            :vertical="true">
+    {{ snackbar.message }}
+    <v-btn dark
+           flat
+           v-on:click="snackbar.visible = false">
+        Fermer
+    </v-btn>
+</v-snackbar>

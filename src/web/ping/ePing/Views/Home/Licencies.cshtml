@@ -6,18 +6,7 @@
 
 <partial name="_ChartDialogPartial" />
 <partial name="_JoueurFormPartial" />
-<v-snackbar v-model="snackbar.visible"
-            :color="snackbar.color"
-            :multi-line="true"
-            :timeout="snackbar.timeout"
-            :vertical="true">
-    {{ snackbar.message }}
-    <v-btn dark
-           flat
-           v-on:click="snackbar.visible = false">
-        Fermer
-    </v-btn>
-</v-snackbar>
+<partial name="_SnackbarPartial"/>
 <v-content>
     <v-container fluid fill-height grid-list-md class="blue-grey lighten-4">
         <v-layout row wrap>
@@ -376,7 +365,5 @@
 </v-content>
 @section Scripts
     {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.2/dist/Chart.bundle.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-chartjs@3.4.0/dist/vue-chartjs.js"></script>
     <script src="~/js/licencies.js" asp-append-version="true"></script>
 }
