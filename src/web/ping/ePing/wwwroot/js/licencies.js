@@ -46,7 +46,7 @@ var mv=new Vue({
             'V4': { value: 'Veteran 4', desc: 'adultes agés de 70 à 79 ans' },
             'V5': { value: 'Veteran 1', desc: 'adultes agés de plus de 80 ans' }
         },
-        activeChart: "tabs-",
+        activeChart:0,
         chartDialog: false,
         charts: [{ id: 0, title: 'Classement', text: 'Classement' }, { id: 1, title: 'Points', text: 'Points' }, { id: 2, title: 'Moyenne', text: 'Moyenne' }, { id: 3, title: 'Victoire', text: 'Victoire' }, { id: 4, title: 'Défaite', text: 'Défaite' }],
         chartData: {},
@@ -136,6 +136,7 @@ var mv=new Vue({
                     this.loader = false;
                 });
             this.currentJoueur = joueur;
+            
         },
         showPartieDivider(partie, index) {
             if (index > 0) {
@@ -183,8 +184,9 @@ var mv=new Vue({
            // this.loadPartiesDujoueur(this.currentJoueur);
         },
         onActiveChartChanged(index) {
-            console.log('Chart tab change to:'+index)
+           
             if (!_.has(this.currentJoueur, 'licence')) return;
+            console.log('Chart tab change to:' + index)
             console.log(index);
             this.showChart(this.currentJoueur, index);
         },
@@ -407,6 +409,21 @@ var mv=new Vue({
       
 
         this.getSettings();
+    },
+    watch: {
+        activeChart: function(newval, oldval) {
+            if (newval == -1) return;
+            console.log('activeChart changed to ' + newval);
+            console.dir(this.currentJoueur);
+            if (!_.has(this.currentJoueur, 'licence')) return;
+            console.log('Chart tab change to:' + newval)
+            console.log(newval);
+            this.showChart(this.currentJoueur, newval);
+        },
+        currentJoueur: function(neval, oldval)  {
+            console.log('Current joueur has changed');
+            this.activeChart = -1;
+        }
     }
 })
 

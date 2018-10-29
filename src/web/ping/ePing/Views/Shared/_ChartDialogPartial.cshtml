@@ -18,29 +18,29 @@
             </v-toolbar-items>-->
         </v-toolbar>
         <v-tabs v-model="activeChart"
-                v-on:input="onActiveChartChanged"
+              
                 color="blue-grey"
                 dark
                 slider-color="yellow">
             <v-tab v-for="chart in charts"
-                   :key="'tabs-'+chart.id"
+                   :key="chart.id"
                    ripple>
                 {{ chart.title }}
 
             </v-tab>
-            <v-tab-item :value="'tabs-0'">
+            <v-tab-item  :key="0">
                 <line-chart id="toto0" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :value="'tabs-1'">
+            <v-tab-item  :key="1">
                 <line-chart id="toto1" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :value="'tabs-2'">
+            <v-tab-item  :key="2">
                 <line-chart id="toto2"  :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :value="'tabs-3'">
+            <v-tab-item  :key="3">
                 <line-chart id="toto3" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item :value="'tabs-4'">
+            <v-tab-item  :key="4">
                 <line-chart id="toto4"  :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
         </v-tabs>
