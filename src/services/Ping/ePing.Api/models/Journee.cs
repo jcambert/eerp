@@ -70,7 +70,10 @@ namespace ePing.Api.models
 
     public class JourneeHistoriques
     {
+
         public List<Historique> Historiques { get; set; } = new List<Historique>();
+
+        public IOrderedEnumerable<Historique> HistoriquesOrdered=>Historiques.OrderBy(h=>DateTime.Parse(h.Date));
 
         public int NombreDeMatch => Historiques.Count();
 

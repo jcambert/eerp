@@ -1,4 +1,11 @@
 ﻿
+function extendFunction(oldOne, newOne) {
+    return (function () {
+        oldOne();
+        newOne();
+    })();
+}
+
 Vue.filter("formatNumber", function (value) {
     return numeral(value).format("0.0"); // displaying other groupings/separators is possible, look at the docs
 });
@@ -99,16 +106,25 @@ data = {
     drawer: null,
     miniDrawer: false,
     loader: false,
+    loaderMessage: null,
     api: {},
     datasets: [],
     labels: [],
-    snackbar: { visible: false, timeout: 4000, message: '', color: 'info' },
+    snackbar: { visible: false, timeout: 3000, message: '', color: 'info' },
+
 }
 
 methods = {
-    
+    showLoader(message) {
+        this.loaderMessage = message;
+        this.loader = true;
+    },
+    hideLoader() {
+        this.loader = false;
+    },
     showSnackbar(options) {
         _.merge(this.snackbar, options);
+        console.dir(this.snackbar);
         this.snackbar.visible = true;
     },
     goto(url) {
@@ -116,7 +132,7 @@ methods = {
     },
     getSettings() {
         var self = this;
-        this.loader = true;
+        this.showLoader("Connexion à la base de données en cours")
         Vue.http.get('/api/dashboard/settings')
             .then(
                 result => {
@@ -134,22 +150,34 @@ methods = {
                                 r2 => {
                                     console.dir(r2);
                                     this.joueurs = this.filtered = r2.data;
-                                    this.loader = false;
+                                    this.hideLoader();
+                                    this.showSnackbar({ color: 'success', message:'Connexion reussie' });
                                 },
                                 error2 => {
                                     console.error(error2);
-                                    this.loader = false;
+                                    this.hideLoader();
+                                    this.showSnackbar({ color: 'error', message: error2 });
                                 })
                         },
                             error => {
                                 console.error(error);
-                                this.loader = false;
+                                this.hideLoader();
+                                this.showSnackbar({ color: 'error', message: error });
                             });
 
                 },
                 error => {
-                    console.error(error); this.loader = false;
+                    console.error(error);
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'error', message: error });
                 });
     }
-}
+};
+
+mounted = function(){
+    console.log("start mounted");
+
+
+    //this.getSettings();
+};
 

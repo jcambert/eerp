@@ -3,7 +3,10 @@
     data: () => (Object.assign({}, data, {})),
     methods: Object.assign({}, methods, {}),
     mounted: function () {
-        console.log("mounted");
         this.getSettings();
+        console.log('Index mounted');
     }
+
+       
+    
 });

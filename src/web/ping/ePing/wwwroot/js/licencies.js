@@ -65,7 +65,7 @@ var mv=new Vue({
         },*/
         
         reloadJoueursDuClub() {
-            this.loader = true;
+            this.showLoader("Chargement des joueurs");
             
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.ReloadJoueursDuClub.replace('{numero}', this.api.User.numeroClub);
             console.log(uri2);
@@ -73,11 +73,13 @@ var mv=new Vue({
                 r2 => {
                     console.dir(r2);
                     this.joueurs = this.filtered = r2.data;
-                    this.loader = false;
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'success', message: 'Chargement des joueurs terminé' });
                 },
                 error2 => {
                     console.error(error2);
-                    this.loader = false;
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'error', message: error2 });
                 });
         },
         showJoueurDivider(joueur,index) {
@@ -91,35 +93,41 @@ var mv=new Vue({
         loadPartiesDujoueur(joueur) {
             
             this.parties.splice(0,this.parties.length);
-            this.loader = true;
+            
+            this.showLoader('Chargement des parties de <br>' + joueur.prenom);
             this.historiquesLoaded = false;
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.PartiesDuJoueur.replace('{licence}', joueur.licence);
             console.log(uri2);
             Vue.http.get(uri2).then(
                 r2 => {
-                    //console.dir(r2);
+                    this.currentJoueur = joueur;
+                    
                     _.forEach(r2.data, data => this.parties.push(data));
-
-                    //this.parties = r2.data;
-                    this.loader = false;
+                    
+                    this.hideLoader();
                     this.showDetail = true;
                     this.showDetailParties();
                     //en arriere plan
-                    this.loadHistoriquesDujoueur(joueur);
-                    this.currentJoueur = joueur;
+                    this.loadHistoriquesDujoueur(joueur, true);
+                    this.showSnackbar({ color: 'success', message: 'Chargement des parties terminé' });
+                    
                 },
                 error => {
                     console.error(error);
                     this.showSnackbar({ color: 'error', message: error });
-                    this.loader = false;
+                    this.hideLoader();
                 });
 
                 
         },
-        loadHistoriquesDujoueur(joueur) {
+        loadHistoriquesDujoueur(joueur,background) {
             
             //this.historiques.splice(0, this.historiques.length);
-            this.loader = true;
+            //this.loader = background || true;
+            if (! _.isUndefined(background))
+                this.loader = true;
+            else
+                this.showLoader('Chargement de l\'historique de ' + joueur.prenom);
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriquesDuJoueur.replace('{licence}', joueur.licence);
             console.log(uri2);
             Vue.http.get(uri2).then(
@@ -129,13 +137,15 @@ var mv=new Vue({
                     this.historiques = Object.assign({}, r2.data);
                     // _.forEach(r2.data, data =>  this.historiques.push(data));
                     this.historiquesLoaded = true;
-                    this.loader = false;
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'success', message: 'Chargement de l\'historique terminé' });
                 },
                 error2 => {
                     console.error(error2);
-                    this.loader = false;
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'error', message: error2 });
                 });
-            this.currentJoueur = joueur;
+            //this.currentJoueur = joueur;
             
         },
         showPartieDivider(partie, index) {
@@ -160,7 +170,7 @@ var mv=new Vue({
             window.location.href = url;
         },
         saveExtra() {
-            this.loader = true;
+            this.showLoader('Sauvegarde en cours ....');
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueurExtra.replace('{licence}', this.currentJoueur.licence);
             body = {};
             body.Email = this.currentJoueur.Email;
@@ -169,12 +179,14 @@ var mv=new Vue({
             Vue.http.put(uri2, JSON.stringify(body)).then(
                 response => {
                     this.showJoueurInfo = false
-                    this.loader = false;
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'success', message: 'Sauvegarde terminée' });
                 },
                 error => {
                     console.dir(error);
                     this.showJoueurInfo = false
-                    this.loader = false;
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'error', message: error});
                     //this.loadPartiesDujoueur(this.currentJoueur);
                 }
             );
@@ -183,32 +195,40 @@ var mv=new Vue({
             this.showJoueurInfo = false;
            // this.loadPartiesDujoueur(this.currentJoueur);
         },
-        onActiveChartChanged(index) {
+        /*onActiveChartChanged(index) {
            
             if (!_.has(this.currentJoueur, 'licence')) return;
             console.log('Chart tab change to:' + index)
             console.log(index);
             this.showChart(this.currentJoueur, index);
-        },
-        showChart(joueur,index) {
-            this.loader = true;
+        },*/
+        showChart(joueur, index) {
             this.currentJoueur = joueur;
-            this.labels.splice(0,this.labels.length);
-            this.datasets.splice(0,this.datasets.length) ;
-            this.buildChart(joueur, index == undefined ? 0 : index).then(
-                result => { 
+            this.chartDialog = true;
+            
+            
+           
+        },
+        _innerShowChart(joueur, index) {
+            console.log('Show chart for joueur:', joueur.nom, joueur.prenom, ' index:', index);
+            this.showLoader('Chargement des données en cours ....');
+            this.labels.splice(0, this.labels.length);
+            this.datasets.splice(0, this.datasets.length);
+            this.buildChart(this.currentJoueur, index == undefined ? 0 : index).then(
+                result => {
                     console.dir(result);
                     this.labels = result.labels;
                     this.datasets = result.datasets;
-                    this.loader = false;
-                    this.chartDialog = true; 
+                    this.hideLoader();
+                    this.showSnackbar({ color: 'success', message: 'Chargement terminé' });
                 },
                 error => {
                     console.error(error);
                     this.showSnackbar({ color: 'error', message: error });
-                    this.loader = false;
+                    this.hideLoader();
+                    
+                    //this.chartDialog = false;
                 });
-           
         },
         buildChart(joueur, index) {
             
@@ -238,8 +258,8 @@ var mv=new Vue({
                                     data: data,
                                     fill: false,
                                 });
-                            console.dir(_labels);
-                            console.dir(_datasets);
+                            //console.dir(_labels);
+                            //console.dir(_datasets);
                            return resolve({labels:_labels,datasets:_datasets});
                         },
                         error => {
@@ -268,8 +288,8 @@ var mv=new Vue({
                                     data: data,
                                     fill: false,
                                 });
-                            console.dir(_labels);
-                            console.dir(_datasets);
+                            //console.dir(_labels);
+                            //console.dir(_datasets);
                             return resolve({ labels: _labels, datasets: _datasets });
                         },
                         error => {
@@ -299,8 +319,8 @@ var mv=new Vue({
                                     data: data,
                                     fill: false,
                                 });
-                            console.dir(_labels);
-                            console.dir(_datasets);
+                            //console.dir(_labels);
+                            //console.dir(_datasets);
                             return resolve({ labels: _labels, datasets: _datasets });
                         },
                         error => {
@@ -330,8 +350,8 @@ var mv=new Vue({
                                     data: data,
                                     fill: false,
                                 });
-                            console.dir(_labels);
-                            console.dir(_datasets);
+                            //console.dir(_labels);
+                            //console.dir(_datasets);
                             return resolve({ labels: _labels, datasets: _datasets });
                         },
                         error => {
@@ -404,23 +424,23 @@ var mv=new Vue({
         }
         
     },
-    mounted:function() {
-        console.log("mounted");
-      
-
+    mounted: function () {
         this.getSettings();
-    },
+        console.log('Licencies mounted');
+    }
+    ,
     watch: {
-        activeChart: function(newval, oldval) {
-            if (newval == -1) return;
-            console.log('activeChart changed to ' + newval);
-            console.dir(this.currentJoueur);
-            if (!_.has(this.currentJoueur, 'licence')) return;
-            console.log('Chart tab change to:' + newval)
-            console.log(newval);
-            this.showChart(this.currentJoueur, newval);
+        activeChart: function(index, oldval) {
+            if (index == -1 || this.chartDialog == false) return;
+            console.log('activeChart has changed to',index);
+            //this.chartDialog = true;
+            this._innerShowChart(this.currentJoueur, index);
         },
-        currentJoueur: function(neval, oldval)  {
+        chartDialog: function (newval) {
+            if (!newval) return;
+            this._innerShowChart(this.currentJoueur, 0);
+        },
+        currentJoueur: function(newval, oldval)  {
             console.log('Current joueur has changed');
             this.activeChart = -1;
         }

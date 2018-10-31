@@ -15,8 +15,9 @@
     <!--
     <partial name="_CookieConsentPartial" />
         -->
-    <div id="app">
+    <div id="app" v-cloak>
         <partial name="_LoaderPartial" />
+        <partial name="_SnackbarPartial"/>
         <v-app id="inspire">
             <v-navigation-drawer absolute dark temporary
                                  v-model="drawer"
@@ -75,7 +76,7 @@
                 <span class="title ml-3 mr-5">@Model.User.Nom @Model.User.Prenom - @Model.User.Licence [@Model.User.NomClub - @Model.User.NumeroClub]</span>
                 <v-text-field solo-inverted
                               flat
-                              label="Search"
+                              label="Rechercher"
                               prepend-icon="search"></v-text-field>
                 <v-spacer></v-spacer>
 

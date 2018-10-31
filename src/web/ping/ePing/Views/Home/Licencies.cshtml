@@ -52,7 +52,7 @@
                             <v-divider v-if="showJoueurDivider(joueur,index)"></v-divider>
                             <v-list-tile :key="joueur.licence"
                                          avatar
-                                         >
+                                         v-on:click.native="loadPartiesDujoueur(joueur)">
                                 <v-list-tile-action>
                                     <v-btn flat icon color="primary" v-on:click.native="infoJoueur(joueur)">
                                         <v-icon>info</v-icon>
@@ -60,8 +60,8 @@
                                     <!--  <v-icon v-if="item.icon" color="pink">star</v-icon>-->
                                 </v-list-tile-action>
 
-                                <v-list-tile-content>
-                                    <v-list-tile-title v-on:click="loadPartiesDujoueur(joueur)" >
+                                <v-list-tile-content  >
+                                    <v-list-tile-title >
                                         <b>{{joueur.nom +' ' + joueur.prenom}}</b>
 
 
@@ -198,6 +198,15 @@
                             <v-chip color="red" text-color="white" v-else>
                                 {{pointJoueur| formatNumber | formatPoints}}
                             </v-chip>
+                            <v-tooltip bottom>
+                                <v-chip color="green" text-color="white" v-if="pointJoueur>=0" slot="activator">
+                                    {{pointJoueur+currentJoueur.pointOfficiel | formatNumber | formatPoints}}
+                                </v-chip>
+                                <v-chip color="red" text-color="white" v-else slot="activator">
+                                    {{pointJoueur+currentJoueur.pointOfficiel | formatNumber | formatPoints}}
+                                </v-chip>
+                                <span>Points Virtuels {{pointJoueur+currentJoueur.pointOfficiel | formatNumber | formatPoints}}</span>
+                            </v-tooltip>
                         </v-toolbar-title>
                         <v-toolbar-title v-if="showingHistorique">
 
@@ -205,7 +214,8 @@
                                    color="teal"
                                    round
                                    dark
-                                   v-on:click.native="chartDialog=true">
+                                   small
+                                   v-on:click.native="showChart(currentJoueur,0)">
                                 <v-icon dark>fa-chart-line</v-icon>
                             </v-btn>
 

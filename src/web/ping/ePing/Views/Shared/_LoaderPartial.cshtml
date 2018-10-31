@@ -9,7 +9,7 @@
     <v-card color="blue-grey"
             dark>
         <v-card-text>
-            Chargement en cours ...
+            {{ loaderMessage || 'Chargement en cours ...'}}
             <v-progress-linear indeterminate
                                color="white"
                                class="mb-0"></v-progress-linear>
