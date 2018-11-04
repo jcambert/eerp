@@ -1,0 +1,137 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ePing.Api.dbcontext;
+using ePing.Api.models;
+using ePing.Api.services;
+
+namespace ePing.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OrganismesController : PingControllerBase
+    {
+        
+
+        public OrganismesController(PingDbContext context,IOrganismeService service):base(context)
+        {
+            this.Service = service;
+        }
+
+        public IOrganismeService Service { get;  }
+
+
+        
+
+
+        // GET: api/Organismes
+        [HttpGet]
+        [HttpGet("force")]
+        public async Task<IEnumerable<Organisme>> GetOrganisme()
+        {
+           await Service.LoadFromSpid(Request.Path.Value.Contains("force"));
+
+            return Context.Organisme;
+        }
+
+        // GET: api/Organismes/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrganisme([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await Service.LoadFromSpid();
+            var organisme = await Context.Organisme.FindAsync(id);
+
+            if (organisme == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(organisme);
+        }
+
+        // PUT: api/Organismes/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutOrganisme([FromRoute] string id, [FromBody] Organisme organisme)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != organisme.Id)
+            {
+                return BadRequest();
+            }
+
+            Context.Entry(organisme).State = EntityState.Modified;
+
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OrganismeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Organismes
+        [HttpPost]
+        public async Task<IActionResult> PostOrganisme([FromBody] Organisme organisme)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Context.Organisme.Add(organisme);
+            await Context.SaveChangesAsync();
+
+            return CreatedAtAction("GetOrganisme", new { id = organisme.Id }, organisme);
+        }
+
+        // DELETE: api/Organismes/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOrganisme([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var organisme = await Context.Organisme.FindAsync(id);
+            if (organisme == null)
+            {
+                return NotFound();
+            }
+
+            Context.Organisme.Remove(organisme);
+            await Context.SaveChangesAsync();
+
+            return Ok(organisme);
+        }
+
+        private bool OrganismeExists(string id)
+        {
+            return Context.Organisme.Any(e => e.Id == id);
+        }
+    }
+}

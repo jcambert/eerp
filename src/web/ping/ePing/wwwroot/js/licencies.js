@@ -1,10 +1,10 @@
 ﻿
 
-var mv=new Vue({
+var mv = new Vue({
     el: '#app',
     data: () => (Object.assign({}, data, {
         showDetail: false,
-        
+
         club: {},
         joueurs: [],
         parties: [],
@@ -46,14 +46,14 @@ var mv=new Vue({
             'V4': { value: 'Veteran 4', desc: 'adultes agés de 70 à 79 ans' },
             'V5': { value: 'Veteran 1', desc: 'adultes agés de plus de 80 ans' }
         },
-        activeChart:0,
+        activeChart: 0,
         chartDialog: false,
         charts: [{ id: 0, title: 'Classement', text: 'Classement' }, { id: 1, title: 'Points', text: 'Points' }, { id: 2, title: 'Moyenne', text: 'Moyenne' }, { id: 3, title: 'Victoire', text: 'Victoire' }, { id: 4, title: 'Défaite', text: 'Défaite' }],
         chartData: {},
-        
-        
 
-       
+
+
+
     })),
     props: {
         source: String
@@ -63,10 +63,10 @@ var mv=new Vue({
             _.merge(this.snackbar, options);
             this.snackbar.visible = true;
         },*/
-        
+
         reloadJoueursDuClub() {
             this.showLoader("Chargement des joueurs");
-            
+
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.ReloadJoueursDuClub.replace('{numero}', this.api.User.numeroClub);
             console.log(uri2);
             Vue.http.get(uri2).then(
@@ -82,7 +82,7 @@ var mv=new Vue({
                     this.showSnackbar({ color: 'error', message: error2 });
                 });
         },
-        showJoueurDivider(joueur,index) {
+        showJoueurDivider(joueur, index) {
             if (index > 0) {
                 if (this.orderJoueur == 'byPoints') return joueur.classement != this.filtered[index - 1].classement;
                 if (this.orderJoueur == 'byName') return this.filtered[index - 1].nom != joueur.nom;
@@ -91,9 +91,9 @@ var mv=new Vue({
             return false;
         },
         loadPartiesDujoueur(joueur) {
-            
-            this.parties.splice(0,this.parties.length);
-            
+
+            this.parties.splice(0, this.parties.length);
+
             this.showLoader('Chargement des parties de <br>' + joueur.prenom);
             this.historiquesLoaded = false;
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.PartiesDuJoueur.replace('{licence}', joueur.licence);
@@ -101,16 +101,16 @@ var mv=new Vue({
             Vue.http.get(uri2).then(
                 r2 => {
                     this.currentJoueur = joueur;
-                    
+
                     _.forEach(r2.data, data => this.parties.push(data));
-                    
+
                     this.hideLoader();
                     this.showDetail = true;
                     this.showDetailParties();
                     //en arriere plan
                     this.loadHistoriquesDujoueur(joueur, true);
                     this.showSnackbar({ color: 'success', message: 'Chargement des parties terminé' });
-                    
+
                 },
                 error => {
                     console.error(error);
@@ -118,13 +118,13 @@ var mv=new Vue({
                     this.hideLoader();
                 });
 
-                
+
         },
-        loadHistoriquesDujoueur(joueur,background) {
-            
+        loadHistoriquesDujoueur(joueur, background) {
+
             //this.historiques.splice(0, this.historiques.length);
             //this.loader = background || true;
-            if (! _.isUndefined(background))
+            if (!_.isUndefined(background))
                 this.loader = true;
             else
                 this.showLoader('Chargement de l\'historique de ' + joueur.prenom);
@@ -146,7 +146,7 @@ var mv=new Vue({
                     this.showSnackbar({ color: 'error', message: error2 });
                 });
             //this.currentJoueur = joueur;
-            
+
         },
         showPartieDivider(partie, index) {
             if (index > 0) {
@@ -186,14 +186,14 @@ var mv=new Vue({
                     console.dir(error);
                     this.showJoueurInfo = false
                     this.hideLoader();
-                    this.showSnackbar({ color: 'error', message: error});
+                    this.showSnackbar({ color: 'error', message: error });
                     //this.loadPartiesDujoueur(this.currentJoueur);
                 }
             );
         },
         undoExtra() {
             this.showJoueurInfo = false;
-           // this.loadPartiesDujoueur(this.currentJoueur);
+            // this.loadPartiesDujoueur(this.currentJoueur);
         },
         /*onActiveChartChanged(index) {
            
@@ -205,9 +205,9 @@ var mv=new Vue({
         showChart(joueur, index) {
             this.currentJoueur = joueur;
             this.chartDialog = true;
-            
-            
-           
+
+
+
         },
         _innerShowChart(joueur, index) {
             console.log('Show chart for joueur:', joueur.nom, joueur.prenom, ' index:', index);
@@ -226,13 +226,13 @@ var mv=new Vue({
                     console.error(error);
                     this.showSnackbar({ color: 'error', message: error });
                     this.hideLoader();
-                    
+
                     //this.chartDialog = false;
                 });
         },
         buildChart(joueur, index) {
-            
-            
+
+
             return new Promise((resolve, reject) => {
                 if (index == undefined) return reject();
                 console.log('BuildChart:' + index);
@@ -240,7 +240,7 @@ var mv=new Vue({
                 _labels = [];
                 //console.dir(joueur); return;
                 if (index === 0) {
-                   
+
                     uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.HistoriqueClassementDuJoueur.replace('{licence}', joueur.licence);
                     Vue.http.get(uri2).then(
                         response => {
@@ -250,7 +250,7 @@ var mv=new Vue({
                                 _labels.push(cl.date);
                                 data.push(cl.point);
                             })
-                           _datasets.push(
+                            _datasets.push(
                                 {
                                     label: 'Historique du classement de ' + joueur.prenom,
                                     backgroundColor: window.randomColor(),
@@ -260,7 +260,7 @@ var mv=new Vue({
                                 });
                             //console.dir(_labels);
                             //console.dir(_datasets);
-                           return resolve({labels:_labels,datasets:_datasets});
+                            return resolve({ labels: _labels, datasets: _datasets });
                         },
                         error => {
                             //console.dir(error);
@@ -294,9 +294,9 @@ var mv=new Vue({
                         },
                         error => {
                             return reject(error);
-                           // console.dir(error);
+                            // console.dir(error);
 
-                           // this.loader = false;
+                            // this.loader = false;
                         }
                     );
                 }
@@ -391,7 +391,7 @@ var mv=new Vue({
                     return resolve({ labels: _labels, datasets: _datasets });
 
                 }
-               
+
             });
         }
     }),
@@ -402,37 +402,47 @@ var mv=new Vue({
             if (this.filter == "") {
                 console.log("restore filter");
                 this.filtered = this.joueurs;
-            }else
+            } else
                 if (_.isFinite(parseInt(this.filter))) {
                     console.log("classe filter");
-                this.filtered = this.joueurs.filter(joueur => {  return joueur.classement == parseInt(this.filter); });
-            } else {
-                console.log("name filter");
-                this.filtered = this.joueurs.filter(joueur => { return joueur.nom.toLowerCase().match(this.filter.toLowerCase()); });
-                console.dir(this.filtered);
+                    this.filtered = this.joueurs.filter(joueur => { return joueur.classement == parseInt(this.filter); });
+                } else {
+                    console.log("name filter");
+                    this.filtered = this.joueurs.filter(joueur => { return joueur.nom.toLowerCase().match(this.filter.toLowerCase()); });
+                    console.dir(this.filtered);
                 }
             this.filtered = _.orderBy(this.filtered, this.orderJoueurChoices[this.orderJoueur].fields, this.orderJoueurChoices[this.orderJoueur].orders);
             return this.filtered;
         },
         partieOrdered() {
-            
+
             this.pointJoueur = 0;
             this.partiesFiltered = _.orderBy(this.parties, ['date', 'idPartie'], ['asc', 'desc']);
-            _.forEach(this.partiesFiltered,(value, key) => { console.dir(value); this.pointJoueur += value.pointsGagnesPerdus});
+            _.forEach(this.partiesFiltered, (value, key) => { console.dir(value); this.pointJoueur += value.pointsGagnesPerdus });
 
             return this.partiesFiltered;
         }
-        
+
     },
     mounted: function () {
-        this.getSettings();
-        console.log('Licencies mounted');
+        this.getSettings()
+            .then(response => {
+                this.showLoader("Recherche des joueurs du clubs");
+                //this.club = response.data;
+                uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.api.User.numeroClub);
+                return uri
+            })
+            .then(get)
+            .then(response => {
+                this.joueurs = this.filtered = response.data;
+                this.hideLoader();
+            });
     }
     ,
     watch: {
-        activeChart: function(index, oldval) {
+        activeChart: function (index, oldval) {
             if (index == -1 || this.chartDialog == false) return;
-            console.log('activeChart has changed to',index);
+            console.log('activeChart has changed to', index);
             //this.chartDialog = true;
             this._innerShowChart(this.currentJoueur, index);
         },
@@ -440,10 +450,9 @@ var mv=new Vue({
             if (!newval) return;
             this._innerShowChart(this.currentJoueur, 0);
         },
-        currentJoueur: function(newval, oldval)  {
+        currentJoueur: function (newval, oldval) {
             console.log('Current joueur has changed');
             this.activeChart = -1;
         }
     }
 })
-

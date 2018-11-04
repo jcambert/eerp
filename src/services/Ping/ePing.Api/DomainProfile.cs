@@ -30,6 +30,10 @@ namespace ePing.Api
             {
                 return new HistoriqueDefaiteDto() { Date = journee.Date, Defaite = journee.NombreDefaite };
             });
+            CreateMap<EquipeDto, Equipe>().ReverseMap();
+            CreateMap<OrganismeDto, Organisme>();
+            CreateMap<ResultatRencontreDto, ResultatRencontre>();
+            CreateMap<ClassementEquipeDto, ClassementEquipe>();
 
         }
     }

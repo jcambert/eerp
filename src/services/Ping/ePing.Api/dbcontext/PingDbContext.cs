@@ -50,5 +50,6 @@ namespace ePing.Api.dbcontext
             base.Dispose();
             //joueurSpidObserveInserted.Dispose();
         }
+        public DbSet<ePing.Api.models.Organisme> Organisme { get; set; }
     }
 }

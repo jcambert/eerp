@@ -101,7 +101,13 @@ Vue.component('line-chart', {
         this.renderChart({ labels: this.labels, datasets: this.datasets }, this.options);
     }
 
-})
+});
+
+var get = function (uri) {
+    console.log("Make get request:", uri);
+    return Vue.http.get(uri);
+}
+
 data = {
     drawer: null,
     miniDrawer: false,
@@ -111,6 +117,7 @@ data = {
     datasets: [],
     labels: [],
     snackbar: { visible: false, timeout: 3000, message: '', color: 'info' },
+    organismes: []
 
 }
 
@@ -130,54 +137,75 @@ methods = {
     goto(url) {
         window.location.href = url;
     },
+    createApiUri(name, queries) {
+        //console.dir(this.api.ApiSettings.EndPoint); 
+        uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings[name];
+        //console.dir(uri);
+        _.forEach(queries, query => {
+            uri = uri.replace("{"+query.key+"}", query.value);
+        });
+        return  uri;
+    },
     getSettings() {
-        var self = this;
-        this.showLoader("Connexion à la base de données en cours")
-        Vue.http.get('/api/dashboard/settings')
-            .then(
+        
+            this.showLoader("Connexion à la base de données en cours");
+            return get('/api/dashboard/settings')
+                .then(
                 result => {
-                    this.api = result.data; console.dir(result);
-                    uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.Club.replace('{numero}', this.api.User.numeroClub);
-                    console.dir(uri);
-                    Vue.http.get(uri)
-                        .then(r => {
-                            console.dir(r);
-                            this.club = r.data;
+                    this.showLoader("Recherche du club");
+                        this.api = result.data; console.dir(result);
+                        //uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.Club.replace('{numero}', this.api.User.numeroClub);
+                        this.createApiUri("Club", [{ key: "numero", value: this.api.User.numeroClub }]);
+                        //console.dir(uri);
 
-                            uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.api.User.numeroClub);
-                            console.log(uri2);
-                            Vue.http.get(uri2).then(
-                                r2 => {
-                                    console.dir(r2);
-                                    this.joueurs = this.filtered = r2.data;
-                                    this.hideLoader();
-                                    this.showSnackbar({ color: 'success', message:'Connexion reussie' });
-                                },
-                                error2 => {
-                                    console.error(error2);
-                                    this.hideLoader();
-                                    this.showSnackbar({ color: 'error', message: error2 });
-                                })
-                        },
-                            error => {
-                                console.error(error);
-                                this.hideLoader();
-                                this.showSnackbar({ color: 'error', message: error });
-                            });
+                        return uri;
+                       
 
-                },
-                error => {
+                })
+                .then(get)
+                .then(response => {
+                    //this.showLoader("Recherche des joueurs du clubs");
+                    this.club = response.data;
+                    //uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.api.User.numeroClub);
+                    //return uri
+                })
+                /*.then(get)
+                .then(response => {
+                    this.joueurs = this.filtered = response.data;
+                    return this.api;
+                })*/
+                .catch(error => {
                     console.error(error);
                     this.hideLoader();
                     this.showSnackbar({ color: 'error', message: error });
+                })
+           
+            
+        
+    },
+
+    getOrganismes() {
+        
+        return new Promise((resolve, reject) => {
+            this.showLoader("Recherche des organismes");
+            uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.Organismes;
+            get(uri).then(
+                response => {
+                    this.organismes.splice(0, this.organismes.length);
+                    _.forEach(response.data, organisme => { this.organismes.push(organisme); });
+                    return resolve({ organismes: this.organismes });
+                },
+                error => {
+                    return reject(error);
                 });
+
+        });
     }
 };
 
-mounted = function(){
+mounted = function () {
     console.log("start mounted");
 
 
     //this.getSettings();
 };
-

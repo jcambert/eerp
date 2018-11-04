@@ -3,6 +3,7 @@ using ePing.Api.models;
 using ePing.Api.services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,22 +12,30 @@ namespace ePing.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClubsController : ControllerBase
+    public class ClubsController : PingControllerBase
     {
-        private readonly PingDbContext _context;
-        private readonly IClubService _service;
 
-        public ClubsController(PingDbContext context, IClubService service)
+
+
+        public ClubsController(PingDbContext context, IClubService service, IOrganismeService organismeService, IChampionnatService championnatService, QueryService queryService) : base(context)
         {
-            _context = context;
-            _service = service;
+
+            Service = service;
+            OrganismeService = organismeService;
+            ChampionnatService = championnatService;
+            QueryService = queryService;
         }
+
+        public IClubService Service { get; }
+        public IOrganismeService OrganismeService { get; }
+        public IChampionnatService ChampionnatService { get; }
+        public QueryService QueryService { get; }
 
         // GET: api/Clubs
         [HttpGet]
         public IEnumerable<Club> GetClubs()
         {
-            return _context.Clubs;
+            return Context.Clubs;
         }
 
         // GET: api/Clubs/5
@@ -39,24 +48,55 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-           
 
-            var club = await _context.Clubs.FindAsync(numero);
+
+            var club = await Context.Clubs.FindAsync(numero);
 
             if (club == null)
             {
-                
+
                 if (Request.Path.Value.Contains("/load"))
                 {
-                    club = await _service.loadFromSpid(numero, true);
+                    club = await Service.loadFromSpid(numero, true);
                 }
-                if (club == null)return NotFound();
+                if (club == null) return NotFound();
             }
 
             return Ok(club);
         }
 
 
+        [HttpGet("{numero}/equipes/")]
+        [HttpGet("{numero}/equipes/resultats")]
+        public async Task<IActionResult> GetEquipesDuclub([FromRoute]string numero)
+        {
+            var full = Request.Path.Value.Contains("resultats");
+            var organismes = await OrganismeService.LoadFromSpid(true);
+            var equipes = await Service.loadEquipes(numero, "M");
+
+            Func<Equipe, Task> updateClassementsAsync = (equipe) =>
+               {
+                   return ChampionnatService.GetClassements(equipe);
+               };
+            Func<Equipe, Task> updateResultatsAsync = (equipe) =>
+            {
+                return ChampionnatService.GetResultats(equipe);
+            };
+            var tasks = new List<Task>();
+            foreach (var equipe in equipes)
+            {
+                var pere = QueryService.Parse(equipe.LienDivision).Where(q => q.Key == "organisme_pere").FirstOrDefault();
+
+                equipe.Organisme = organismes.Where(o => o.Identifiant == pere.Value).FirstOrDefault();
+                if (full)
+                {
+                    tasks.Add(updateClassementsAsync(equipe));
+                    tasks.Add(updateResultatsAsync(equipe));
+                }
+            }
+            await Task.WhenAll(tasks);
+            return Ok(equipes);
+        }
 
         // PUT: api/Clubs/5
         [HttpPut("{id}")]
@@ -72,11 +112,11 @@ namespace ePing.Api.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(club).State = EntityState.Modified;
+            Context.Entry(club).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await Context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -102,8 +142,8 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            _context.Clubs.Add(club);
-            await _context.SaveChangesAsync();
+            Context.Clubs.Add(club);
+            await Context.SaveChangesAsync();
 
             return CreatedAtAction("GetClub", new { id = club.idClub }, club);
         }
@@ -117,21 +157,21 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var club = await _context.Clubs.FindAsync(id);
+            var club = await Context.Clubs.FindAsync(id);
             if (club == null)
             {
                 return NotFound();
             }
 
-            _context.Clubs.Remove(club);
-            await _context.SaveChangesAsync();
+            Context.Clubs.Remove(club);
+            await Context.SaveChangesAsync();
 
             return Ok(club);
         }
 
         private bool ClubExists(string id)
         {
-            return _context.Clubs.Any(e => e.idClub == id);
+            return Context.Clubs.Any(e => e.idClub == id);
         }
 
 

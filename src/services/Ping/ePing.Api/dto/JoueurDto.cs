@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace ePing.Api.dto
 {
+
     public class JoueurDto
     {
         public string Licence { get; set; } = "";

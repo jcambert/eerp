@@ -48,6 +48,11 @@ namespace ePing.Controllers
             return View("Licencies", CreateVM());
         }
 
+        public IActionResult Equipes()
+        {
+            return View("Equipes", CreateVM());
+        }
+
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";

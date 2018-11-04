@@ -40,7 +40,7 @@ namespace ePing.Api.services
 
         public HttpClient CreateClient() => ClientFactory.CreateClient(Configuration["ping:name"]);
 
-        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add=null, Action<TModel> beforeSave = null) where TModel : Trackable
+        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add=null, Action<TModel> beforeSave = null, Action<TModel> beforeAdd = null) where TModel : Trackable
         {
             List<TModel> model;
             Action<TModel> addOrUpdate = async (_model) =>
@@ -67,6 +67,8 @@ namespace ePing.Api.services
                 if (model is IEnumerable<TModel>)
                     foreach (var item in model as IEnumerable<TModel>)
                     {
+                        if (beforeAdd != null)
+                            beforeAdd(item);
                         addOrUpdate(item);
                         if (beforeSave != null)
                             beforeSave(item);
@@ -89,7 +91,7 @@ namespace ePing.Api.services
 
             return model;
         }
-        protected async Task<TModel> InternalLoadFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add, Action<TModel> beforeSave = null) where TModel : Trackable
+        protected async Task<TModel> InternalLoadFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add, Action<TModel> beforeSave = null, Action<TModel> beforeAdd = null) where TModel : Trackable
         {
             TModel model;
             Action<TModel> addOrUpdate = async (_model) =>
@@ -115,7 +117,8 @@ namespace ePing.Api.services
                 model = Mapper.Map<TModel>(filter(dto));
                 if (addToDb && model!=null)
                 {
-
+                    if (beforeAdd != null)
+                        beforeAdd(model);
                     addOrUpdate(model);
 
                     if (beforeSave != null)

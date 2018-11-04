@@ -25,7 +25,8 @@ namespace ePing
 
             if (httpContext.Response.StatusCode == 401)
             {
-                await httpContext.Response.WriteAsync("You are not authorized to access this page");
+
+                 httpContext.Response.Redirect("/Login");// await WriteAsync("You are not authorized to access this page");
             }
         }
     }

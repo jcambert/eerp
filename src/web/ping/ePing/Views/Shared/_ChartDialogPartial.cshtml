@@ -1,11 +1,10 @@
-﻿
-@*
+﻿@*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
 
 
 <v-dialog v-model="chartDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-    
+
     <v-card>
         <v-toolbar dark color="blue-grey">
             <v-btn icon dark v-on:click.native="chartDialog = false">
@@ -18,7 +17,6 @@
             </v-toolbar-items>-->
         </v-toolbar>
         <v-tabs v-model="activeChart"
-              
                 color="blue-grey"
                 dark
                 slider-color="yellow">
@@ -28,20 +26,20 @@
                 {{ chart.title }}
 
             </v-tab>
-            <v-tab-item  :key="0">
+            <v-tab-item :key="0">
                 <line-chart id="toto0" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item  :key="1">
+            <v-tab-item :key="1">
                 <line-chart id="toto1" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item  :key="2">
-                <line-chart id="toto2"  :datasets="datasets" :labels="labels"></line-chart>
+            <v-tab-item :key="2">
+                <line-chart id="toto2" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item  :key="3">
+            <v-tab-item :key="3">
                 <line-chart id="toto3" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
-            <v-tab-item  :key="4">
-                <line-chart id="toto4"  :datasets="datasets" :labels="labels"></line-chart>
+            <v-tab-item :key="4">
+                <line-chart id="toto4" :datasets="datasets" :labels="labels"></line-chart>
             </v-tab-item>
         </v-tabs>
 

@@ -80,7 +80,8 @@ namespace ePing
            
             if (env.IsDevelopment())
             {
-             //   app.UseUnauthorizedMiddleware();
+                app.UseStatusCodePagesWithRedirects("/Login");
+                app.UseUnauthorizedMiddleware();
                 app.UseDeveloperExceptionPage();
             }
             else

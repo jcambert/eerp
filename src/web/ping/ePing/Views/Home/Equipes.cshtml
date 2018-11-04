@@ -1,0 +1,168 @@
+﻿
+@{
+    ViewData["Title"] = "Equipes";
+}
+
+@model DashboardViewModel
+
+<partial name="_SnackbarPartial" />
+<v-content>
+    <v-container fluid fill-height grid-list-md class="blue-grey lighten-4">
+        <v-layout row wrap>
+            <v-flex d-flex xs12 sm6 md6>
+                <v-card>
+                    <v-toolbar color="blue-grey" dark>
+                        <v-toolbar-title>Equipes</v-toolbar-title>
+                    </v-toolbar>
+                    <v-list two-line subheader>
+                        <template v-for="(equipe,index) in equipes">
+                            <v-divider></v-divider>
+                            <v-list-tile :key="index"
+                                         avatar
+                                         v-on:click.native="currentEquipe=equipe">
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
+
+                                        {{equipe.division}}-{{equipe.libelle}}
+                                    </v-list-tile-title>
+                                    <v-list-tile-sub-title>
+
+                                        <v-tooltip bottom>
+
+                                            <v-chip color="success" text-color="white" slot="activator" v-if="equipe.classement<=2">
+                                                <v-avatar color="green darken-4">
+                                                    {{equipe.classements.length+1}}
+
+                                                </v-avatar>
+                                                <span>{{equipe.classement}}</span>
+                                            </v-chip>
+                                            <v-chip color="error" text-color="white" slot="activator" v-else-if="(equipe.classements.length+1-equipe.classement)<=2">
+                                                <v-avatar color="red darken-4">
+                                                    {{equipe.classements.length+1}}
+
+                                                </v-avatar>
+                                                <span>{{equipe.classement}}</span>
+                                            </v-chip>
+                                            <v-chip color="primary" text-color="white" slot="activator" v-else>
+                                                <v-avatar color="blue darken-4">
+                                                    {{equipe.classements.length+1}}
+
+                                                </v-avatar>
+                                                <span>{{equipe.classement}}</span>
+                                            </v-chip>
+                                            <span>
+                                                Classement {{equipe.classement}}ème / {{equipe.classements.length+1}}
+                                            </span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+
+                                            <v-chip color="success" text-color="white" slot="activator">
+                                                <v-avatar color="green darken-4">
+                                                    <v-icon color="white darken-4">trending_up</v-icon>
+                                                </v-avatar>
+                                                <span>{{equipe.nombreMatchGagne}}</span>
+                                            </v-chip>
+                                            <span>
+                                                Nombre de Match Gagnés {{equipe.nombreMatchGagne}}
+                                            </span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <v-chip color="primary" text-color="white" slot="activator">
+                                                <v-avatar color="blue darken-4">
+                                                    <v-icon color="white darken-4">trending_flat</v-icon>
+                                                </v-avatar>
+                                                <span>{{equipe.nombreMatchNul}}</span>
+                                            </v-chip>
+                                            <span>
+                                                Nombre de Match Nuls {{equipe.nombreMatchNul}}
+                                            </span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+
+                                            <v-chip color="error" text-color="white" slot="activator">
+                                                <v-avatar color="red darken-4">
+                                                    <v-icon color="white darken-4">trending_down</v-icon>
+                                                </v-avatar>
+                                                <span>{{equipe.nombreMatchPerdu}}</span>
+                                            </v-chip>
+                                            <span>
+                                                Nombre de Match Perdus {{equipe.nombreMatchPersu}}
+                                            </span>
+                                        </v-tooltip>
+                                    </v-list-tile-sub-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                        </template>
+                    </v-list>
+                </v-card>
+            </v-flex>
+
+            <v-flex d-flex xs12 sm6 md6>
+                <v-card v-if="currentEquipe!=null">
+                    <v-toolbar color="blue-grey" dark>
+                        <v-toolbar-title>{{currentEquipe.nom}}</v-toolbar-title>
+                    </v-toolbar>
+                    <v-tabs color="blue-grey"
+                            dark
+                            slider-color="yellow">
+                        <v-tab :key="'classement'"
+                               ripple>
+                            Classement
+                        </v-tab>
+                        <v-tab :key="'tour'"
+                               ripple>
+                            Journées
+                        </v-tab>
+                        <v-tab-item :key="'classement'">
+                            <v-card flat v-if="currentEquipe!=null">
+                                <v-list>
+                                    <template v-for="(cl,index) in currentEquipe.classements">
+                                        <v-list-tile>
+                                            <v-list-tile-action>
+                                                <v-btn fab dark small color="success" v-if="(index+1)<=2">{{cl.classement}}</v-btn>
+                                                <v-btn fab dark small color="error" v-else-if="(currentEquipe.classements.length- index)<=2">{{cl.classement}}</v-btn>
+                                                <v-btn fab dark small color="primary" v-else>{{cl.classement}}</v-btn>
+                                            </v-list-tile-action>
+                                            <v-list-tile-content>
+                                                {{cl.equipe}}
+                                            </v-list-tile-content>
+                                            <v-list-tile-action>
+                                                <v-btn fab dark small color="primary">{{cl.pointRencontre}}</v-btn>
+                                            </v-list-tile-action>
+                                        </v-list-tile>
+                                    </template>
+                                </v-list>
+                            </v-card>
+                        </v-tab-item>
+                        <v-tab-item :key="'tour'">
+                            <template v-for="(tour, index) in currentEquipe.tours">
+                                <v-subheader>{{tour.date}}</v-subheader>
+                                <v-divider></v-divider>
+                                <v-template v-for="resultat in tour.resultats">
+                                    <v-card>
+                                        <v-card-text>
+                                            <p class="text-xs-center">
+                                                <span>{{resultat.equipeA}}</span>
+                                                <span><v-btn fab dark small :color="getColorA(resultat)">{{resultat.scoreA}}</v-btn></span>
+                                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                                <span><v-btn fab dark small :color="getColorB(resultat)">{{resultat.scoreB}}</v-btn></span>
+                                                <span>{{resultat.equipeB}}</span>
+                                            </p>
+                                        </v-card-text>
+                                    </v-card>
+
+
+                                </v-template>
+
+                            </template>
+                        </v-tab-item>
+                    </v-tabs>
+                </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
+</v-content>
+@section Scripts
+    {
+    <script src="~/js/equipes.js" asp-append-version="true"></script>
+}

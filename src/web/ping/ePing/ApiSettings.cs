@@ -24,5 +24,13 @@
         public string HistoriqueVictoireDuJoueur { get; set; }
 
         public string HistoriqueDefaiteDuJoueur { get; set; }
+
+        public string EquipesDuclub { get; set; }
+
+        public string Organismes { get; set; }
+
+        public string ResultatEquipe { get; set; }
+
+        public string ClassementEquipe { get; set; }
     }
 }

@@ -28,11 +28,13 @@ namespace ePing.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddSingleton<QueryService>();
             services.AddSingleton<EfService>();
 
             services.AddScoped<IClubService, ClubService>();
             services.AddScoped<IJoueurService, JoueurService>();
+            services.AddScoped<IOrganismeService, OrganismeService>();
+            services.AddScoped<IChampionnatService, ChampionnatService>();
             services.AddTransient<PointService>();
 
 

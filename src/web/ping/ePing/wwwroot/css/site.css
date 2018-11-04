@@ -1,8 +1,5 @@
 ﻿
 /* VUEJS*/
-[v-cloak] {
-    display: none;
-}
 
 #keep main .container {
     height: 660px;

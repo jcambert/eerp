@@ -98,8 +98,8 @@ namespace Ping.Api.Controllers
             });
         }*/
 
-        [HttpGet("{numero}/equipe/{type}")]
-        public async Task<ActionResult<string>> GetEquipe(string numero, string @type)
+        [HttpGet("{numero}/equipes/{type?}")]
+        public async Task<ActionResult<string>> GetEquipes(string numero, string @type=null)
         {
             return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubEquipe, new NameValueCollection() {
                 {"numclu", numero},
