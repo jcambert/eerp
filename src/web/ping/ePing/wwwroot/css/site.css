@@ -12,3 +12,20 @@
   .text {
     font-weight: 400;
   }
+
+
+    .tour span:first-child {
+        text-align: right;
+        width: 34%;
+        display: inline-block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tour span:last-child {
+        text-align: left;
+        width: 34%;
+        display: inline-block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
