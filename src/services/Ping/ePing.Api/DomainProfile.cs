@@ -32,8 +32,35 @@ namespace ePing.Api
             });
             CreateMap<EquipeDto, Equipe>().ReverseMap();
             CreateMap<OrganismeDto, Organisme>();
-            CreateMap<ResultatRencontreDto, ResultatRencontre>();
-            CreateMap<ClassementEquipeDto, ClassementEquipe>();
+            CreateMap<ResultatRencontreDto, ResultatRencontre>().ConstructUsing(x=>
+            {
+                DateTime dt;
+                if (!DateTime.TryParse(x.DatePrevue, out dt))
+                    dt = DateTime.Now;
+                return new ResultatRencontre() {
+                    DatePrevue=dt,
+                    DateReelle=x.DateReelle,
+                    EquipeA=x.EquipeA,
+                    EquipeB=x.EquipeB,
+                    Libelle=x.Libelle,
+                    LienRencontre=x.LienRencontre,
+                    ScoreA=x.ScoreA,
+                    ScoreB=x.ScoreB
+                };
+            });
+            CreateMap<ClassementEquipeDto, ClassementEquipe>().ConvertUsing(x=>
+            {
+                return new ClassementEquipe()
+                {
+                    Classement = x.Classement,
+                    LibelleEquipe=x.Equipe,
+                    NombreJoue=x.NombreJoue,
+                    Numero=x.Numero,
+                    PointRencontre=x.PointRencontre,
+                    LibellePoule= x.Poule
+
+                };
+            });
 
         }
     }

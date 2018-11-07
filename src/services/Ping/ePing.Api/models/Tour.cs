@@ -7,7 +7,8 @@ namespace ePing.Api.models
 {
     public class Tour
     {
-        public string Date { get; set; }
+        
+        public DateTime Date { get; set; }
 
         public List<ResultatRencontre> Resultats { get; set; }
     }

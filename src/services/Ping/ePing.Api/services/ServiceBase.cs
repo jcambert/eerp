@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace ePing.Api.services
 {
+    
+
     public abstract class ServiceBase
     {
         private readonly IHttpClientFactory _clientFactory;
@@ -18,6 +20,7 @@ namespace ePing.Api.services
         private readonly PingDbContext _dbcontext;
         private readonly IMapper _mapper;
         private readonly EfService _efService;
+        private readonly CacheService _cache;
 
         public ServiceBase(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext, EfService efService)
         {
@@ -38,6 +41,8 @@ namespace ePing.Api.services
 
         public EfService EfService => _efService;
 
+        public CacheService CacheService => _cache;
+
         public HttpClient CreateClient() => ClientFactory.CreateClient(Configuration["ping:name"]);
 
         protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add=null, Action<TModel> beforeSave = null, Action<TModel> beforeAdd = null) where TModel : Trackable
@@ -49,6 +54,7 @@ namespace ePing.Api.services
                 if (existed != null)
                     DbContext.Entry(existed).CurrentValues.SetValues(_model);
                 else
+                    
                     add(DbContext, _model);
             };
 

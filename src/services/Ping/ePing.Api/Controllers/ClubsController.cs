@@ -17,20 +17,21 @@ namespace ePing.Api.Controllers
 
 
 
-        public ClubsController(PingDbContext context, IClubService service, IOrganismeService organismeService, IChampionnatService championnatService, QueryService queryService) : base(context)
+        public ClubsController(PingDbContext context, IClubService service, IOrganismeService organismeService, IChampionnatService championnatService, QueryService queryService/*, CacheService cache*/) : base(context)
         {
 
             Service = service;
             OrganismeService = organismeService;
             ChampionnatService = championnatService;
             QueryService = queryService;
+          //  CacheService = cache;
         }
 
         public IClubService Service { get; }
         public IOrganismeService OrganismeService { get; }
         public IChampionnatService ChampionnatService { get; }
         public QueryService QueryService { get; }
-
+        //public CacheService CacheService { get; }
         // GET: api/Clubs
         [HttpGet]
         public IEnumerable<Club> GetClubs()
@@ -50,14 +51,14 @@ namespace ePing.Api.Controllers
 
 
 
-            var club = await Context.Clubs.FindAsync(numero);
+            var club = await Service.LoadClub(numero);
 
             if (club == null)
             {
 
                 if (Request.Path.Value.Contains("/load"))
                 {
-                    club = await Service.loadFromSpid(numero, true);
+                    club = await Service.LoadClubFromSpid(numero, true);
                 }
                 if (club == null) return NotFound();
             }
@@ -70,31 +71,37 @@ namespace ePing.Api.Controllers
         [HttpGet("{numero}/equipes/resultats")]
         public async Task<IActionResult> GetEquipesDuclub([FromRoute]string numero)
         {
+            var club = await Service.LoadClub(numero);
+            if (club == null) return NotFound();
             var full = Request.Path.Value.Contains("resultats");
-            var organismes = await OrganismeService.LoadFromSpid(true);
-            var equipes = await Service.loadEquipes(numero, "M");
-
-            Func<Equipe, Task> updateClassementsAsync = (equipe) =>
+            //var organismes = await OrganismeService.Load();
+            var equipes = await Service.LoadEquipes(club, "M");
+            if (full)
+            {
+               /* Func<Equipe, Task> getClassementsAsync = (equipe) =>
                {
-                   return ChampionnatService.GetClassements(equipe);
+                   return ChampionnatService.LoadClassements(equipe);
+                 
                };
-            Func<Equipe, Task> updateResultatsAsync = (equipe) =>
-            {
-                return ChampionnatService.GetResultats(equipe);
-            };
-            var tasks = new List<Task>();
-            foreach (var equipe in equipes)
-            {
-                var pere = QueryService.Parse(equipe.LienDivision).Where(q => q.Key == "organisme_pere").FirstOrDefault();
-
-                equipe.Organisme = organismes.Where(o => o.Identifiant == pere.Value).FirstOrDefault();
-                if (full)
+                Func<Equipe, Task> getResultatsAsync = (equipe) =>
                 {
-                    tasks.Add(updateClassementsAsync(equipe));
-                    tasks.Add(updateResultatsAsync(equipe));
+                    return ChampionnatService.LoadResultats(equipe);
+                };*/
+                //var tasks = new List<Task>();
+                foreach (var equipe in equipes)
+                {
+                    //var pere = QueryService.Parse(equipe.LienDivision).Where(q => q.Key == "organisme_pere").FirstOrDefault();
+
+                    //equipe.Organisme = organismes.Where(o => o.Identifiant == pere.Value).FirstOrDefault();
+                    await ChampionnatService.LoadClassements(equipe);
+                    await ChampionnatService.LoadResultats(equipe);
+                    //tasks.Add(getClassementsAsync(equipe));
+                    //tasks.Add(getResultatsAsync(equipe));
                 }
+               // await Task.WhenAll(tasks);
             }
-            await Task.WhenAll(tasks);
+            
+        
             return Ok(equipes);
         }
 

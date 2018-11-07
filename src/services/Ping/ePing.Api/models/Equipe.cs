@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
@@ -6,6 +7,7 @@ namespace ePing.Api.models
 {
     public class Equipe : Trackable
     {
+        [Key]
         public string Libelle { get; set; }
 
         public string Division { get; set; }
@@ -24,7 +26,9 @@ namespace ePing.Api.models
         public string IdOrganismePere { get; set; }
 
         [NotMapped]
-        public Organisme Organisme { get; internal set; }
+        public Organisme Organisme { get;  set; }
+
+        public Club Club { get; set; }
 
         public string Nom => Libelle.Split("-")[0].Trim();
 
@@ -34,7 +38,7 @@ namespace ePing.Api.models
         {
             get
             {
-                var result = Classements?.IndexOf(Classements?.Where(c => c.Equipe == this.Nom).FirstOrDefault());
+                var result = Classements?.IndexOf(Classements?.Where(c => c.LibelleEquipe== this.Nom).FirstOrDefault());
                 return result!=null?result+1: 0;
             }
         }
@@ -45,7 +49,7 @@ namespace ePing.Api.models
             get
             {
 
-                return Classements?.Where(c => c.Equipe == this.Nom).FirstOrDefault()?.PointRencontre ?? string.Empty;
+                return Classements?.Where(c => c.LibelleEquipe == this.Nom).FirstOrDefault()?.PointRencontre ?? string.Empty;
             }
         }
 
@@ -53,19 +57,20 @@ namespace ePing.Api.models
         {
             get
             {
-                return Classements?.Where(c => c.Equipe == this.Nom).FirstOrDefault()?.NombreJoue ?? string.Empty;
+                return Classements?.Where(c => c.LibelleEquipe == this.Nom).FirstOrDefault()?.NombreJoue ?? string.Empty;
             }
         }
 
-        [NotMapped]
-        public List<ResultatRencontre> Resultats { get; set; }
+        //[NotMapped]
+        public List<ResultatRencontre> Resultats { get; set; } = new List<ResultatRencontre>();
 
-        [NotMapped]
-        public List<ClassementEquipe> Classements { get; set; }
+        //[NotMapped]
+        public List<ClassementEquipe> Classements { get; set; } = new List<ClassementEquipe>();
         public int NombreMatchGagne { get;  set; }
         public int NombreMatchNul { get;  set; }
         public int NombreMatchPerdu { get;  set; }
         [NotMapped]
-        public IEnumerable< Tour> Tours { get; set; }
+        public IEnumerable<Tour> Tours { get; set; } = new List<Tour>();
+        public string Type { get; internal set; }
     }
 }

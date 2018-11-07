@@ -58,8 +58,8 @@ namespace ePing.Api
             services.AddEntityFrameworkSqlite().AddDbContext<PingDbContext>(options =>
             {
                 options.UseSqlite(connection);
-
-            });
+                
+            }, ServiceLifetime.Transient);
 
             services.AddAutoMapper();
 

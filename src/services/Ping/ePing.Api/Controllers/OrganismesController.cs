@@ -33,9 +33,9 @@ namespace ePing.Api.Controllers
         [HttpGet("force")]
         public async Task<IEnumerable<Organisme>> GetOrganisme()
         {
-           await Service.LoadFromSpid(Request.Path.Value.Contains("force"));
+            await Service.Load();// LoadFromSpid(Request.Path.Value.Contains("force"));
 
-            return Context.Organisme;
+            return Context.Organismes;
         }
 
         // GET: api/Organismes/5
@@ -47,8 +47,8 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            await Service.LoadFromSpid();
-            var organisme = await Context.Organisme.FindAsync(id);
+            await Service.Load();// LoadFromSpid();
+            var organisme = await Context.Organismes.FindAsync(id);
 
             if (organisme == null)
             {
@@ -102,7 +102,7 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            Context.Organisme.Add(organisme);
+            Context.Organismes.Add(organisme);
             await Context.SaveChangesAsync();
 
             return CreatedAtAction("GetOrganisme", new { id = organisme.Id }, organisme);
@@ -117,13 +117,13 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var organisme = await Context.Organisme.FindAsync(id);
+            var organisme = await Context.Organismes.FindAsync(id);
             if (organisme == null)
             {
                 return NotFound();
             }
 
-            Context.Organisme.Remove(organisme);
+            Context.Organismes.Remove(organisme);
             await Context.SaveChangesAsync();
 
             return Ok(organisme);
@@ -131,7 +131,7 @@ namespace ePing.Api.Controllers
 
         private bool OrganismeExists(string id)
         {
-            return Context.Organisme.Any(e => e.Id == id);
+            return Context.Organismes.Any(e => e.Id == id);
         }
     }
 }

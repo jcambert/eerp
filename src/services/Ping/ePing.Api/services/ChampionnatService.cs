@@ -3,7 +3,6 @@ using ePing.Api.dbcontext;
 using ePing.Api.dto;
 using ePing.Api.models;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -14,12 +13,13 @@ namespace ePing.Api.services
 
     public interface IChampionnatService
     {
-        Task<List<ResultatRencontre>> GetResultats(Equipe equipe);
-        Task<List<ResultatRencontre>> GetResultats(string division, string poule);
-        Task<List<ResultatRencontre>> GetResultats(int division, int poule);
-        Task<List<ClassementEquipe>> GetClassements(Equipe equipe);
-        Task<List<ClassementEquipe>> GetClassements(string division, string poule);
-        Task<List<ClassementEquipe>> GetClassements(int division, int poule);
+        Task<List<ResultatRencontre>> LoadResultats( Equipe equipe);
+        //Task<List<ResultatRencontre>> GetResultats(string division, string poule);
+        //Task<List<ResultatRencontre>> LoadResultats(int division, int poule);
+        Task<List<ClassementEquipe>> LoadClassements( Equipe equipe);
+        Task<List<ResultatRencontre>> LoadResultats(int division, int poule);
+        //Task<List<ClassementEquipe>> LoadClassementsFromSpid(string division, string poule);
+        Task<List<ClassementEquipe>> LoadClassements(int division, int poule);
     }
     public class ChampionnatService : ServiceBase, IChampionnatService
     {
@@ -27,38 +27,44 @@ namespace ePing.Api.services
         {
         }
 
-        public async Task<List<ClassementEquipe>> GetClassements(string division, string poule)
+        private async Task<List<ClassementEquipe>> LoadClassementsFromSpid(Equipe equipe)
         {
-            var uri = $"api/championnat/{division}/{poule}/classement";
-            return await this.InternalLoadListFromSpid<ListeClassementsEquipeHeader, List<ClassementEquipeDto>, ClassementEquipe>(uri, false, liste => liste?.Liste?.Classements);
+            var uri = $"api/championnat/{equipe.IdDivision}/{equipe.IdPoule}/classement";
+            return await this.InternalLoadListFromSpid<ListeClassementsEquipeHeader, List<ClassementEquipeDto>, ClassementEquipe>(uri, true, liste => liste?.Liste?.Classements, (ctx,c)=>ctx.ClassementsEquipes.Add(c),null, c => { c.Division = equipe.IdDivision; c.Poule = equipe.IdPoule;c.Equipe = equipe; });
         }
 
-        public async Task<List<ClassementEquipe>> GetClassements(int division, int poule)
+        public async Task<List<ClassementEquipe>> LoadClassementsFromDb(Equipe equipe)
         {
-            return await GetClassements(division.ToString(), poule.ToString());
+            var cls = DbContext.ClassementsEquipes.Where(e => e.Division == equipe.IdDivision&& e.Poule == equipe.IdPoule).ToList();
+            if (cls == null || cls.Count == 0)
+                cls = await LoadClassementsFromSpid(equipe);
+            return cls;
         }
 
-        public async Task<List<ClassementEquipe>> GetClassements(Equipe equipe)
+        public async Task<List<ClassementEquipe>> LoadClassements(Equipe equipe)
         {
-            var result = await GetClassements(equipe.IdDivision, equipe.IdPoule);
-            equipe.Classements = result;
+            var result = await LoadClassementsFromDb(equipe);
             return result;
         }
 
-        public async Task<List<ResultatRencontre>> GetResultats(string division, string poule)
+        private async Task<List<ResultatRencontre>> LoadResultatsFromSpid(Equipe equipe)
         {
-            var uri = $"api/championnat/{division}/{poule}/resultat";
-            return await this.InternalLoadListFromSpid<ListeResultatsRencontresHeader, List<ResultatRencontreDto>, ResultatRencontre>(uri, false, liste => liste?.Liste?.Resultats);
+            var uri = $"api/championnat/{equipe.IdDivision}/{equipe.IdPoule}/resultat";
+            return await this.InternalLoadListFromSpid<ListeResultatsRencontresHeader, List<ResultatRencontreDto>, ResultatRencontre>(uri, true, liste => liste?.Liste?.Resultats,(ctx,r)=>ctx.ResultatsRencontres.Add(r), null,r=>r.Equipe=equipe);
         }
 
-        public async Task<List<ResultatRencontre>> GetResultats(int division, int poule)
+
+        private async Task<List<ResultatRencontre>> LoadResultatsFromDb(Equipe equipe)
         {
-            return await GetResultats(division.ToString(), poule.ToString());
+            var rs = DbContext.ResultatsRencontres.Where(r => r.Division == equipe.IdDivision && r.Poule == equipe.IdPoule).ToList();
+            if (rs == null || rs.Count == 0)
+                rs = await LoadResultatsFromSpid(equipe);
+            return rs;
         }
 
-        public async Task<List<ResultatRencontre>> GetResultats(Equipe equipe)
+        public async Task<List<ResultatRencontre>> LoadResultats(Equipe equipe)
         {
-            var result = await GetResultats(equipe.IdDivision, equipe.IdPoule);
+            var result = await LoadResultatsFromDb(equipe);
             equipe.Resultats = result;
 
             var rs = equipe.Resultats.Where(r => (r.EquipeA == equipe.Nom || r.EquipeB == equipe.Nom) && (r.ScoreA != null && r.ScoreB != null && r.ScoreA > 0 && r.ScoreB > 0));
@@ -74,14 +80,26 @@ namespace ePing.Api.services
 
                 else if (resultat.EquipeB == equipe.Nom)
                 {
-                    equipe.NombreMatchGagne += (resultat.ScoreA < resultat.ScoreB) ?1 : 0;
+                    equipe.NombreMatchGagne += (resultat.ScoreA < resultat.ScoreB) ? 1 : 0;
                     equipe.NombreMatchNul += (resultat.ScoreA == resultat.ScoreB) ? 1 : 0;
                     equipe.NombreMatchPerdu += (resultat.ScoreA > resultat.ScoreB) ? 1 : 0;
                 }
             }
 
-            equipe.Tours=equipe.Resultats.GroupBy(r => r.DatePrevue, (key, resultats) => new Tour {Date=key,Resultats= resultats.ToList()});
+            equipe.Tours = equipe.Resultats.GroupBy(r => r.DatePrevue, (key, resultats) => new Tour { Date = key, Resultats = resultats.ToList() });
             return result;
+        }
+
+        public async Task<List<ResultatRencontre>> LoadResultats(int division, int poule)
+        {
+            var uri = $"api/championnat/{division}/{poule}/classement";
+            return await this.InternalLoadListFromSpid<ListeResultatsRencontresHeader, List<ResultatRencontreDto>, ResultatRencontre>(uri, true, liste => liste?.Liste?.Resultats);
+        }
+
+        public async Task<List<ClassementEquipe>> LoadClassements(int division, int poule)
+        {
+            var uri = $"api/championnat/{division}/{poule}/classement";
+            return await this.InternalLoadListFromSpid<ListeClassementsEquipeHeader, List<ClassementEquipeDto>, ClassementEquipe>(uri, true, liste => liste?.Liste?.Classements);
         }
     }
 }
