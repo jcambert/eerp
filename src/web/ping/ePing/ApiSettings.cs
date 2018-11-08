@@ -9,7 +9,7 @@
 
         public string JoueursDuClub { get; set; }
 
-        public string ReloadJoueursDuClub { get; set; }
+        //public string ReloadJoueursDuClub { get; set; }
 
         public string PartiesDuJoueur { get; set; }
 

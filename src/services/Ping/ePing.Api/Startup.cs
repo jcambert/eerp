@@ -31,10 +31,10 @@ namespace ePing.Api
             services.AddSingleton<QueryService>();
             services.AddSingleton<EfService>();
 
-            services.AddScoped<IClubService, ClubService>();
-            services.AddScoped<IJoueurService, JoueurService>();
-            services.AddScoped<IOrganismeService, OrganismeService>();
-            services.AddScoped<IChampionnatService, ChampionnatService>();
+            services.AddTransient<IClubService, ClubService>();
+            services.AddTransient<IJoueurService, JoueurService>();
+            services.AddTransient<IOrganismeService, OrganismeService>();
+            services.AddTransient<IChampionnatService, ChampionnatService>();
             services.AddTransient<PointService>();
 
 

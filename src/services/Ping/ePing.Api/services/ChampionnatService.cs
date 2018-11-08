@@ -30,7 +30,7 @@ namespace ePing.Api.services
         private async Task<List<ClassementEquipe>> LoadClassementsFromSpid(Equipe equipe)
         {
             var uri = $"api/championnat/{equipe.IdDivision}/{equipe.IdPoule}/classement";
-            return await this.InternalLoadListFromSpid<ListeClassementsEquipeHeader, List<ClassementEquipeDto>, ClassementEquipe>(uri, true, liste => liste?.Liste?.Classements, (ctx,c)=>ctx.ClassementsEquipes.Add(c),null, c => { c.Division = equipe.IdDivision; c.Poule = equipe.IdPoule;c.Equipe = equipe; });
+            return await this.InternalLoadListFromSpid<ListeClassementsEquipeHeader, List<ClassementEquipeDto>, ClassementEquipe>(uri, true, liste => liste?.Liste?.Classements, (ctx,c)=>ctx.ClassementsEquipes.Add(c),null,async (c )=> await Task.Run(()=> {c.Division = equipe.IdDivision; c.Poule = equipe.IdPoule; }));
         }
 
         public async Task<List<ClassementEquipe>> LoadClassementsFromDb(Equipe equipe)
@@ -44,13 +44,14 @@ namespace ePing.Api.services
         public async Task<List<ClassementEquipe>> LoadClassements(Equipe equipe)
         {
             var result = await LoadClassementsFromDb(equipe);
+            equipe.Classements = result;
             return result;
         }
 
         private async Task<List<ResultatRencontre>> LoadResultatsFromSpid(Equipe equipe)
         {
             var uri = $"api/championnat/{equipe.IdDivision}/{equipe.IdPoule}/resultat";
-            return await this.InternalLoadListFromSpid<ListeResultatsRencontresHeader, List<ResultatRencontreDto>, ResultatRencontre>(uri, true, liste => liste?.Liste?.Resultats,(ctx,r)=>ctx.ResultatsRencontres.Add(r), null,r=>r.Equipe=equipe);
+            return await this.InternalLoadListFromSpid<ListeResultatsRencontresHeader, List<ResultatRencontreDto>, ResultatRencontre>(uri, true, liste => liste?.Liste?.Resultats, (ctx, r) => ctx.ResultatsRencontres.Add(r), null, async(r) =>await Task.Run(()=> { r.Division = equipe.IdDivision;r.Poule = equipe.IdPoule;  r.EquipeLibelle = equipe.Libelle; }));
         }
 
 
@@ -86,7 +87,7 @@ namespace ePing.Api.services
                 }
             }
 
-            equipe.Tours = equipe.Resultats.GroupBy(r => r.DatePrevue, (key, resultats) => new Tour { Date = key, Resultats = resultats.ToList() });
+            equipe.Tours = equipe.Resultats.OrderBy(r=>r.DatePrevue).GroupBy(r => r.DatePrevue, (key, resultats) => new Tour { Date = key, Resultats = resultats.ToList() });
             return result;
         }
 

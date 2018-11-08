@@ -17,32 +17,34 @@ namespace ePing.Api.Controllers
     {
 
 
-        public JoueursController(PingDbContext context, IJoueurService service, PointService pointsService) : base(context)
+        public JoueursController(PingDbContext context, IJoueurService service, PointService pointsService, IClubService clubService) : base(context)
         {
             Service = service;
             PointsService = pointsService;
+            ClubService = clubService;
         }
 
         public IJoueurService Service { get; }
 
         public PointService PointsService { get; }
+        public IClubService ClubService { get; }
 
         // GET: api/Joueurs
         [HttpGet]
-        public IEnumerable<JoueurSpid> GetJoueur()
+        public IEnumerable<Joueur> GetJoueurs()
         {
-            return Context.JoueurSpid;
+            return Context.Joueurs;
         }
 
         // GET: api/Joueurs
         [HttpGet("{licence}/parties")]
         public async Task<IActionResult> GetPartiesDuJoueur([FromRoute] string licence)
         {
-            var joueur = await Service.loadDetailJoueur(licence);
+            var joueur = await Service.LoadJoueur(licence);// Service.LoadDetailJoueur(licence);
             var parties = await Service.loadJoueurParties(joueur);
-            
+
             var journees = new List<Journee>();
-            var toto = parties/*.GroupBy(x => x.Date)*/.OrderByDescending(d=>DateTime.Parse(d.Date)).GroupBy(x=>x.Date).ToList();
+            var toto = parties/*.GroupBy(x => x.Date)*/.OrderByDescending(d => DateTime.Parse(d.Date)).GroupBy(x => x.Date).ToList();
             toto.ForEach(titi =>
             {
                 var journee = new Journee() { Date = titi.Key };
@@ -53,13 +55,13 @@ namespace ePing.Api.Controllers
                 });
                 journees.Add(journee);
             });
-            
+
             return Ok(journees);
         }
         [HttpGet("{licence}/historique")]
         public async Task<IActionResult> GetHistoriquesDuJoueur([FromRoute] string licence)
         {
-            var joueur = await Service.loadDetailJoueur(licence);
+            var joueur = await Service.LoadJoueur(licence);
             var parties = await Service.loadJoueurHistoriques(joueur);
             var journee = new JourneeHistoriques();
             journee.AddRange(parties);
@@ -67,9 +69,9 @@ namespace ePing.Api.Controllers
         }
 
         [HttpGet("{licence}/histoclass")]
-        public async Task<IActionResult>GetHistoriqueClassementDujoueur([FromRoute] string licence)
+        public async Task<IActionResult> GetHistoriqueClassementDujoueur([FromRoute] string licence)
         {
-            var joueur = await Service.loadDetailJoueur(licence);
+            var joueur = await Service.LoadJoueur(licence);
             var histo = await Service.loadHistoriqueClassement(joueur);
 
             histo.AddClassementActuel(joueur);
@@ -79,7 +81,7 @@ namespace ePing.Api.Controllers
         [HttpGet("{licence}/histopoint")]
         public async Task<IActionResult> GetHistoriquePointDujoueur([FromRoute] string licence)
         {
-            var joueur = await Service.loadDetailJoueur(licence);
+            var joueur = await Service.LoadJoueur(licence);
             var parties = await Service.loadJoueurParties(joueur);
 
             var journees = new List<Journee>();
@@ -100,15 +102,15 @@ namespace ePing.Api.Controllers
             {
                 histo[i].PointsGagnesPerdus += histo[i - 1].PointsGagnesPerdus;
             }
-            
-            
-            return Ok(histo );
+
+
+            return Ok(histo);
         }
 
         [HttpGet("{licence}/histovictoire")]
-        public async Task<IActionResult>GetHistoriqueVictoireDuJoueur([FromRoute] string licence)
+        public async Task<IActionResult> GetHistoriqueVictoireDuJoueur([FromRoute] string licence)
         {
-            var joueur = await Service.loadDetailJoueur(licence);
+            var joueur = await Service.LoadJoueur(licence);
             var parties = await Service.loadJoueurParties(joueur);
 
             var journees = new List<Journee>();
@@ -136,7 +138,7 @@ namespace ePing.Api.Controllers
         [HttpGet("{licence}/histodefaite")]
         public async Task<IActionResult> GetHistoriquedefaiteDuJoueur([FromRoute] string licence)
         {
-            var joueur = await Service.loadDetailJoueur(licence);
+            var joueur = await Service.LoadJoueur(licence);
             var parties = await Service.loadJoueurParties(joueur);
 
             var journees = new List<Journee>();
@@ -156,36 +158,36 @@ namespace ePing.Api.Controllers
 
             for (int i = 1; i < histo.Count(); i++)
             {
-                histo[i].Defaite+= histo[i - 1].Defaite;
+                histo[i].Defaite += histo[i - 1].Defaite;
             }
             return Ok(histo);
         }
 
 
-        [HttpGet("club/{numero}/load")]
+        //[HttpGet("club/{numero}/load")]
         [HttpGet("club/{numero}")]
         public async Task<IActionResult> GetJoueursDuClub([FromRoute] string numero)
         {
-            var club = await Context.Clubs.FindAsync(numero);
+            var club = await ClubService.LoadClub(numero);// Context.Clubs.FindAsync(numero);
             if (club == null)
                 return NotFound();
-
-            if (Request.Path.Value.Contains("load"))
+            var liste = await Service.LoadJoueurs(club);
+           /* if (Request.Path.Value.Contains("load"))
             {
-                var liste = await Service.loadListForClubFromSpid(numero, true, club);
+
                 foreach (var joueur in liste)
                 {
-                    await Service.loadDetailJoueur(joueur.Licence, true, club);
+                    await Service.LoadDetailJoueur(joueur.Licence, true, club);
                 }
 
-            }
+            }*/
 
 
-            var result = Context.JoueurSpid.Where(j => j.Club == club).Include("Extra");
+           // var result = Context.Joueurs.Where(j => j.Club == club).Include("Extra");
 
-            var result1 = await result.ToListAsync();
+            //var result1 = await result.ToListAsync();
 
-            return Ok(result1);
+            return Ok(liste);
         }
 
         // GET: api/Joueurs/5
@@ -197,7 +199,7 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var joueur = await Context.JoueurSpid.FindAsync(id);
+            var joueur = await Service.LoadJoueur(id);// Context.Joueurs.FindAsync(id);
 
             if (joueur == null)
             {
@@ -208,7 +210,7 @@ namespace ePing.Api.Controllers
         }
 
         [HttpPut("{licence}/extra")]
-        public async Task<IActionResult> PutExtra([FromRoute]string licence, [FromBody]JoueurDto extra)
+        public async Task<IActionResult> PutExtra([FromRoute]string licence, [FromBody]JoueurExtraDto extra)
         {
 
             if (!ModelState.IsValid)
@@ -230,7 +232,7 @@ namespace ePing.Api.Controllers
 
         // PUT: api/Joueurs/5
         [HttpPut("{licence}")]
-        public async Task<IActionResult> PutJoueur([FromRoute] string licence, [FromBody] JoueurSpid joueur)
+        public async Task<IActionResult> PutJoueur([FromRoute] string licence, [FromBody] Joueur joueur)
         {
             if (!ModelState.IsValid)
             {
@@ -265,14 +267,14 @@ namespace ePing.Api.Controllers
 
         // POST: api/Joueurs
         [HttpPost]
-        public async Task<IActionResult> PostJoueur([FromBody] JoueurSpid joueur)
+        public async Task<IActionResult> PostJoueur([FromBody] Joueur joueur)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            Context.JoueurSpid.Add(joueur);
+            Context.Joueurs.Add(joueur);
             await Context.SaveChangesAsync();
 
             return CreatedAtAction("GetJoueur", new { id = joueur.Licence }, joueur);
@@ -287,13 +289,13 @@ namespace ePing.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            var joueur = await Context.JoueurSpid.FindAsync(id);
+            var joueur = await Context.Joueurs.FindAsync(id);
             if (joueur == null)
             {
                 return NotFound();
             }
 
-            Context.JoueurSpid.Remove(joueur);
+            Context.Joueurs.Remove(joueur);
             await Context.SaveChangesAsync();
 
             return Ok(joueur);
@@ -301,7 +303,7 @@ namespace ePing.Api.Controllers
 
         private bool JoueurExists(string id)
         {
-            return Context.JoueurSpid.Any(e => e.Licence == id);
+            return Context.Joueurs.Any(e => e.Licence == id);
         }
     }
 }

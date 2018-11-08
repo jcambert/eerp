@@ -29,7 +29,7 @@ namespace ePing.Api
             return c.Phase == 1 ? new DateTime(int.Parse(annees[c.Phase]),7,31).ToString(fmt) : new DateTime(int.Parse(annees[c.Phase]),1,1).ToString(fmt);
         }
 
-        public static void AddClassementActuel(this List<Classement> histo, JoueurSpid joueur)
+        public static void AddClassementActuel(this List<Classement> histo, Joueur joueur)
         {
             if (histo == null || joueur == null) return;
             Classement cl = new Classement() { Phase = -1, Point = joueur.PointDebut };

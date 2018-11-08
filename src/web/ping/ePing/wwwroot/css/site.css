@@ -14,7 +14,7 @@
   }
 
 
-    .tour span:first-child {
+    .tour .pos{
         text-align: right;
         width: 34%;
         display: inline-block;
@@ -22,7 +22,7 @@
         white-space: nowrap;
     }
 
-    .tour span:last-child {
+    .tour .neg {
         text-align: left;
         width: 34%;
         display: inline-block;

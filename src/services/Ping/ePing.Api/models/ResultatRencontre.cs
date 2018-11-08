@@ -28,6 +28,8 @@ namespace ePing.Api.models
         public string DateReelle { get; set; }
         public int Poule { get;  set; }
         public int Division { get;  set; }
-        public Equipe Equipe { get;  set; }
+
+
+        public string EquipeLibelle { get;  set; }
     }
 }

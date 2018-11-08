@@ -15,8 +15,8 @@ namespace ePing.Api.models
         public int Poule { get; set; }
         public string LibellePoule { get; set; }
         public string Classement { get; set; }
-        [NotMapped]
-        public Equipe Equipe { get; set; }
+        //[NotMapped]
+        //public Equipe Equipe { get; set; }
 
         public string LibelleEquipe { get; set; }
 

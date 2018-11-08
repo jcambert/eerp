@@ -8,7 +8,7 @@ namespace ePing.Api.dbcontext
 {
     public class PingDbContext : DbContextWithTriggers
     {
-        private IObservable<IAfterEntry<JoueurSpid, PingDbContext>> joueurSpidObserveInserted;
+        private IObservable<IAfterEntry<Joueur, PingDbContext>> joueurSpidObserveInserted;
       //  private IObservable<IAfterEntry<Organisme, PingDbContext>> organismeObserveInserted;
 
         public PingDbContext()
@@ -23,11 +23,11 @@ namespace ePing.Api.dbcontext
         private void Initialize()
         {
            // Random rnd = new Random();
-            joueurSpidObserveInserted = DbObservable<PingDbContext>.FromInserted<JoueurSpid>();
+            joueurSpidObserveInserted = DbObservable<PingDbContext>.FromInserted<Joueur>();
             joueurSpidObserveInserted.Subscribe(entry =>
             {
                 var joueur = entry.Entity;
-                var extra = new Joueur() { Licence = joueur.Licence };
+                var extra = new JoueurExtra() { Licence = joueur.Licence };
                 joueur.Extra = extra;
             });
 
@@ -39,8 +39,8 @@ namespace ePing.Api.dbcontext
         }
 
         public DbSet<Club> Clubs { get; set; }
-        public DbSet<JoueurSpid> JoueurSpid { get; set; }
-        public DbSet<Joueur> JoueursExtra { get; set; }
+        public DbSet<Joueur> Joueurs { get; set; }
+        public DbSet<JoueurExtra> JoueursExtra { get; set; }
         public DbSet<Cache> Cache { get; set; }
         public DbSet<ClassementEquipe> ClassementsEquipes { get; set; }
         public DbSet<ResultatRencontre> ResultatsRencontres { get; set; }
@@ -49,10 +49,10 @@ namespace ePing.Api.dbcontext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<JoueurSpid>()
-            .HasOne<Joueur>(a => a.Extra)
-            .WithOne(b => b.JoueurSpid)
-            .HasForeignKey<Joueur>(e => e.LicenceOfJoueurSpid);
+            modelBuilder.Entity<Joueur>()
+            .HasOne<JoueurExtra>(a => a.Extra)
+            .WithOne(b => b.Joueur)
+            .HasForeignKey<JoueurExtra>(e => e.LicenceOfJoueurSpid);
 
 
 

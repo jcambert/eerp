@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ePing.Api.services
 {
-    
+
 
     public abstract class ServiceBase
     {
@@ -45,16 +45,16 @@ namespace ePing.Api.services
 
         public HttpClient CreateClient() => ClientFactory.CreateClient(Configuration["ping:name"]);
 
-        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add=null, Action<TModel> beforeSave = null, Action<TModel> beforeAdd = null) where TModel : Trackable
+        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel,Task> beforeAdd = null, bool autoSave = true) where TModel : Trackable
         {
             List<TModel> model;
-            Action<TModel> addOrUpdate = async (_model) =>
+            Func<TModel,Task> addOrUpdate = async (_model) =>
             {
                 var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
                 if (existed != null)
                     DbContext.Entry(existed).CurrentValues.SetValues(_model);
                 else
-                    
+
                     add(DbContext, _model);
             };
 
@@ -74,39 +74,60 @@ namespace ePing.Api.services
                     foreach (var item in model as IEnumerable<TModel>)
                     {
                         if (beforeAdd != null)
-                            beforeAdd(item);
-                        addOrUpdate(item);
+                            await beforeAdd(item);
+                        await addOrUpdate(item);
                         if (beforeSave != null)
                             beforeSave(item);
                     }
 
 
+                if (autoSave)
+                    try
+                    {
+                        await DbContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = ex.Message;
+                        throw ex;
+                    }
 
-                try
-                {
-                    await DbContext.SaveChangesAsync();
-                }
-                catch (Exception ex )
-                {
-                    var msg = ex.Message;
-                    throw ex;
-                }
 
-               
             }
+            else if (model is IEnumerable<TModel> && beforeAdd != null)
+                foreach (var item in model as IEnumerable<TModel>)
+                    await beforeAdd(item);
 
             return model;
         }
-        protected async Task<TModel> InternalLoadFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add, Action<TModel> beforeSave = null, Action<TModel> beforeAdd = null) where TModel : Trackable
+        protected async Task<TModel> InternalLoadFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel,Task> beforeAdd = null, bool autoSave = true) where TModel : Trackable
         {
             TModel model;
+            Func<TModel, Task> t = async (_model) =>
+             {
+                 var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
+                 if (existed != null)
+                     DbContext.Entry(existed).CurrentValues.SetValues(_model);
+                 else
+                 {
+                     if (add != null)
+                         add(DbContext, _model);
+                     else
+                         await DbContext.Set<TModel>().AddAsync(_model);
+                 }
+             };
             Action<TModel> addOrUpdate = async (_model) =>
             {
                 var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
                 if (existed != null)
                     DbContext.Entry(existed).CurrentValues.SetValues(_model);
                 else
-                    add(DbContext, _model);
+                {
+                    if (add != null)
+                        add(DbContext, _model);
+                    else
+                        await DbContext.Set<TModel>().AddAsync(_model);
+                }
             };
 
             var client = CreateClient();
@@ -115,33 +136,40 @@ namespace ePing.Api.services
 
             StreamReader reader = new StreamReader(res);
             string text = reader.ReadToEnd();
-            try
+
+            TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
+
+            if (dto == null) return default(TModel);
+            model = Mapper.Map<TModel>(filter(dto));
+            if (addToDb && model != null)
             {
-                TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
+                if (beforeAdd != null)
+                    await beforeAdd(model);
+                await t(model);// addOrUpdate(model);
 
-                if (dto == null) return default(TModel);
-                model = Mapper.Map<TModel>(filter(dto));
-                if (addToDb && model!=null)
-                {
-                    if (beforeAdd != null)
-                        beforeAdd(model);
-                    addOrUpdate(model);
+                if (beforeSave != null)
+                    beforeSave(model);
 
-                    if (beforeSave != null)
-                        beforeSave(model);
-                    await DbContext.SaveChangesAsync();
-                }
+                if (autoSave)
+                    try
+                    {
+                        await DbContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = ex.Message;
+                        throw ex;
+                    }
 
-                return model;
             }
-            catch(Exception ex)
-            {
-                var msg = ex.Message;
-                throw ex;
-            }
-            
+            else if (beforeAdd != null)
+                await beforeAdd(model);
 
-            
+            return model;
         }
+
+
+
+
     }
 }

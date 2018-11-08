@@ -117,7 +117,8 @@ data = {
     datasets: [],
     labels: [],
     snackbar: { visible: false, timeout: 3000, message: '', color: 'info' },
-    organismes: []
+    organismes: [],
+    club:null
 
 }
 

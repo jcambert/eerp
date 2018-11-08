@@ -63,10 +63,10 @@ namespace ePing.Api.services
             string[] types = new string[] { "D", "L", "Z"/*, "F"*/ };
             foreach (var @type in types)
             {
-                organismes.AddRange( await this.InternalLoadListFromSpid<ListeOrganismesHeader,List< OrganismeDto>, Organisme>($"/api/organisme/{@type}", true, liste => liste?.Liste?.Organismes, (ctx, model) => {   ctx.Organismes.Add(model); },null,model=> { model.Id = $"{@type}-{model.Identifiant}"; }));
+                organismes.AddRange( await this.InternalLoadListFromSpid<ListeOrganismesHeader,List< OrganismeDto>, Organisme>($"/api/organisme/{@type}", true, liste => liste?.Liste?.Organismes, (ctx, model) => {   ctx.Organismes.Add(model); },null,async (model)=> await Task.Run(()=>{ model.Id = $"{@type}-{model.Identifiant}"; })));
             }
 
-            organismes.Add(    await this.InternalLoadFromSpid<ListeOrganismeHeader, OrganismeDto, Organisme>($"/api/organisme/F", true, liste => liste?.Liste?.Organisme, (ctx, model) => { ctx.Organismes.Add(model); }, null, model => model.Id = $"F-{model.Identifiant}"));
+            organismes.Add(    await this.InternalLoadFromSpid<ListeOrganismeHeader, OrganismeDto, Organisme>($"/api/organisme/F", true, liste => liste?.Liste?.Organisme, (ctx, model) => { ctx.Organismes.Add(model); }, null, async(model) => { await Task.Run(()=> model.Id = $"F-{model.Identifiant}"); }));
             return organismes;
         }
     }

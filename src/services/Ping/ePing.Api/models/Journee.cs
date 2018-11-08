@@ -8,7 +8,7 @@ namespace ePing.Api.models
 {
     public static class JourneeExtensions
     {
-        public static void Add(this Journee journee,JoueurSpid joueur, Partie partie,PointService service)
+        public static void Add(this Journee journee,Joueur joueur, Partie partie,PointService service)
         {
             var pts=service.CalculPointsGagnePerdu(joueur.PointOfficiel, partie.Classement, partie.Victoire.ToVictoireDefaite(), 1).PointsJoueur1;
             journee.PointsGagnesPerdus += pts;

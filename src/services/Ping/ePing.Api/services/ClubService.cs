@@ -14,9 +14,9 @@ namespace ePing.Api.services
 
     public interface IClubService
     {
-        Task<Club> LoadClubFromSpid(string numero, bool addIfnotExist);
+        //Task<Club> LoadClubFromSpid(string numero, bool addIfnotExist);
         Task<List<Equipe>> LoadEquipes(Club club, string @type = null);
-        Task<Club> LoadClub(string numero);
+        Task<Club> LoadClub(string numero, bool autoSave = true);
     }
     public class ClubService : ServiceBase, IClubService
     {
@@ -27,9 +27,9 @@ namespace ePing.Api.services
             QueryService = queryService;
             OrganismeService = organismeService;
         }
-        public async Task<Club> LoadClubFromSpid(string numero, bool addToDb)
+        private async Task<Club> LoadClubFromSpid(string numero,bool autoSave=true)
         {
-            return await this.InternalLoadFromSpid<ListeClubHeader, ClubDto, Club>($"/api/club/{numero}/detail", true, liste => liste.Liste.Club, (ctx, model) => { ctx.Clubs.Add(model); });
+            return await this.InternalLoadFromSpid<ListeClubHeader, ClubDto, Club>($"/api/club/{numero}/detail", true, liste => liste.Liste.Club, (ctx, model) => { ctx.Clubs.Add(model); },null,null,autoSave);
         }
 
         public async Task<List<Equipe>> LoadEquipesFromSpid(List<Organisme> organismes, Club club, string @type = null)
@@ -47,7 +47,7 @@ namespace ePing.Api.services
             string url = $"api/club/{club.Numero}/equipes";
             if (type != null)
                 url += $"/{@type}";
-            var equipes = await this.InternalLoadListFromSpid<ListeEquipeHeader, List<EquipeDto>, Equipe>(url, true, liste => liste?.Liste?.Equipes,(ctx,e)=>ctx.Equipes.Add(e),null,e=> { updateEquipe(e); });
+            var equipes = await this.InternalLoadListFromSpid<ListeEquipeHeader, List<EquipeDto>, Equipe>(url, true, liste => liste?.Liste?.Equipes,(ctx,e)=>ctx.Equipes.Add(e),null,async (e)=>await Task.Run(()=> { updateEquipe(e); }));
 
            // equipes.ForEach(equipe => updateEquipe(equipe));
             return equipes;
@@ -64,11 +64,11 @@ namespace ePing.Api.services
             return equipes;
         }
 
-        public async Task<Club> LoadClub(string numero)
+        public async Task<Club> LoadClub(string numero,bool autoSave=true)
         {
             var club = await DbContext.Clubs.FindAsync(numero);
             if(club==null)
-                club = await LoadClubFromSpid(numero, true);
+                club = await LoadClubFromSpid(numero, autoSave);
             return club;
         }
     }

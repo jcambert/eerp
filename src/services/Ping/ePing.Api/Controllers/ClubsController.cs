@@ -40,28 +40,15 @@ namespace ePing.Api.Controllers
         }
 
         // GET: api/Clubs/5
-        [HttpGet("{numero}/load")]
+        //[HttpGet("{numero}/load")]
         [HttpGet("{numero}")]
         public async Task<IActionResult> GetClub([FromRoute] string numero)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-
-
 
             var club = await Service.LoadClub(numero);
-
-            if (club == null)
-            {
-
-                if (Request.Path.Value.Contains("/load"))
-                {
-                    club = await Service.LoadClubFromSpid(numero, true);
-                }
-                if (club == null) return NotFound();
-            }
+            if (club == null) return NotFound();
 
             return Ok(club);
         }

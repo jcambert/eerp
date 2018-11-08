@@ -64,7 +64,7 @@ var mv = new Vue({
             this.snackbar.visible = true;
         },*/
 
-        reloadJoueursDuClub() {
+       /* reloadJoueursDuClub() {
             this.showLoader("Chargement des joueurs");
 
             uri2 = this.api.ApiSettings.EndPoint + this.api.ApiSettings.ReloadJoueursDuClub.replace('{numero}', this.api.User.numeroClub);
@@ -81,7 +81,7 @@ var mv = new Vue({
                     this.hideLoader();
                     this.showSnackbar({ color: 'error', message: error2 });
                 });
-        },
+        },*/
         showJoueurDivider(joueur, index) {
             if (index > 0) {
                 if (this.orderJoueur == 'byPoints') return joueur.classement != this.filtered[index - 1].classement;
