@@ -5,6 +5,21 @@ function extendFunction(oldOne, newOne) {
         newOne();
     })();
 }
+function addParameterToURL(_url, _key, _value) {
+    var param = _key + '=' + escape(_value);
+
+    var sep = '&';
+    if (_url.indexOf('?') < 0) {
+        sep = '?';
+    } else {
+        var lastChar = _url.slice(-1);
+        if (lastChar == '&') sep = '';
+        if (lastChar == '?') sep = '';
+    }
+    _url += sep + param;
+
+    return _url;
+}
 
 Vue.filter("formatNumber", function (value) {
     return numeral(value).format("0.0"); // displaying other groupings/separators is possible, look at the docs
@@ -118,7 +133,7 @@ data = {
     labels: [],
     snackbar: { visible: false, timeout: 3000, message: '', color: 'info' },
     organismes: [],
-    club:null
+    club: null
 
 }
 
@@ -136,6 +151,10 @@ methods = {
         this.snackbar.visible = true;
     },
     goto(url) {
+        console.dir(window.viewingClub);
+        if (window.viewingClub.length > 0)
+            url = addParameterToURL(url, 'club', window.viewingClub);
+        console.dir(url);
         window.location.href = url;
     },
     createApiUri(name, queries) {
@@ -143,50 +162,51 @@ methods = {
         uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings[name];
         //console.dir(uri);
         _.forEach(queries, query => {
-            uri = uri.replace("{"+query.key+"}", query.value);
+            uri = uri.replace("{" + query.key + "}", query.value);
         });
-        return  uri;
+        return uri;
     },
     getSettings() {
-        
-            this.showLoader("Connexion à la base de données en cours");
-            return get('/api/dashboard/settings')
-                .then(
+
+        this.showLoader("Connexion à la base de données en cours");
+        return get('/api/dashboard/settings')
+            .then(
                 result => {
                     this.showLoader("Recherche du club");
-                        this.api = result.data; console.dir(result);
-                        //uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.Club.replace('{numero}', this.api.User.numeroClub);
-                        this.createApiUri("Club", [{ key: "numero", value: this.api.User.numeroClub }]);
-                        //console.dir(uri);
+                    this.api = result.data; console.dir(result);
+                    club = window.viewingClub.length > 0 ? window.viewingClub : this.api.User.numeroClub;
+                    
+                    this.createApiUri("Club", [{ key: "numero", value: club }]);
+                    console.dir(uri);
 
-                        return uri;
-                       
+                    return uri;
+
 
                 })
-                .then(get)
-                .then(response => {
-                    //this.showLoader("Recherche des joueurs du clubs");
-                    this.club = response.data;
-                    //uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.api.User.numeroClub);
-                    //return uri
-                })
-                /*.then(get)
-                .then(response => {
-                    this.joueurs = this.filtered = response.data;
-                    return this.api;
-                })*/
-                .catch(error => {
-                    console.error(error);
-                    this.hideLoader();
-                    this.showSnackbar({ color: 'error', message: error });
-                })
-           
-            
-        
+            .then(get)
+            .then(response => {
+                //this.showLoader("Recherche des joueurs du clubs");
+                this.club = response.data;
+                //uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.api.User.numeroClub);
+                //return uri
+            })
+            /*.then(get)
+            .then(response => {
+                this.joueurs = this.filtered = response.data;
+                return this.api;
+            })*/
+            .catch(error => {
+                console.error(error);
+                this.hideLoader();
+                this.showSnackbar({ color: 'error', message: error });
+            })
+
+
+
     },
 
     getOrganismes() {
-        
+
         return new Promise((resolve, reject) => {
             this.showLoader("Recherche des organismes");
             uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.Organismes;

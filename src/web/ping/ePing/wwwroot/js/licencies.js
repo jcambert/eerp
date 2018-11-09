@@ -101,7 +101,7 @@ var mv = new Vue({
             Vue.http.get(uri2).then(
                 r2 => {
                     this.currentJoueur = joueur;
-
+                    console.dir(r2.data);
                     _.forEach(r2.data, data => this.parties.push(data));
 
                     this.hideLoader();
@@ -417,7 +417,7 @@ var mv = new Vue({
         partieOrdered() {
 
             this.pointJoueur = 0;
-            this.partiesFiltered = _.orderBy(this.parties, ['date', 'idPartie'], ['asc', 'desc']);
+            this.partiesFiltered = _.orderBy(this.parties, ['date', 'idPartie'], ['desc', 'desc']);
             _.forEach(this.partiesFiltered, (value, key) => { console.dir(value); this.pointJoueur += value.pointsGagnesPerdus });
 
             return this.partiesFiltered;
@@ -429,7 +429,7 @@ var mv = new Vue({
             .then(response => {
                 this.showLoader("Recherche des joueurs du clubs");
                 //this.club = response.data;
-                uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.api.User.numeroClub);
+                uri = this.api.ApiSettings.EndPoint + this.api.ApiSettings.JoueursDuClub.replace('{numero}', this.club.numero);
                 return uri
             })
             .then(get)

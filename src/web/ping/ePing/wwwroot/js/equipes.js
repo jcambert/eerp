@@ -66,7 +66,7 @@
             .then(response => {
                 this.showLoader("Recherche des equipes du clubs");
                 this.equipes.splice(0,this.equipes.length)
-                uri = this.createApiUri("EquipesDuclub", [{ key: "numero", value: this.api.User.numeroClub }, { key: "type", value: "M" }]);//this.api.ApiSettings.EndPoint + this.api.ApiSettings.EquipesDuclub.replace('{numero}', this.api.User.numeroClub).replace('{type}', 'M');
+                uri = this.createApiUri("EquipesDuclub", [{ key: "numero", value: this.club.numero }, { key: "type", value: "M" }]);//this.api.ApiSettings.EndPoint + this.api.ApiSettings.EquipesDuclub.replace('{numero}', this.api.User.numeroClub).replace('{type}', 'M');
                 return uri;    
             })
             .then(get) 

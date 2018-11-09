@@ -9,9 +9,16 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ePing.Controllers
 {
+    public class ClubQueryParameters
+    {
+        
+        public string Club { get; set; } = string.Empty;
+    }
+
     [Authorize]
     public class HomeController : Controller
     {
@@ -22,35 +29,35 @@ namespace ePing.Controllers
             
         }
 
-        DashboardViewModel CreateVM()
+        DashboardViewModel CreateVM(string viewingClub="")
         {
             string auth = HttpContext.Session.GetValue<string>("auth");
             var user = JsonConvert.DeserializeObject<UserDto>(auth);
 
             var token = JsonConvert.DeserializeObject<BearerDto>(auth);
 
-
-            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt };
+            
+            DashboardViewModel vm = new DashboardViewModel() { User = user.User, Token = token.Jwt, ViewingClub=viewingClub };
             return vm;
         }
 
-        public IActionResult Index()
+        public IActionResult Index([FromQuery]ClubQueryParameters parameters)
         {
 
-            return View("Index", CreateVM());
+            return View("Index", CreateVM(parameters.Club));
         }
 
         
 
-        public IActionResult Licencies()
+        public IActionResult Licencies([FromQuery]ClubQueryParameters parameters)
         {
             
-            return View("Licencies", CreateVM());
+            return View("Licencies", CreateVM(parameters.Club));
         }
 
-        public IActionResult Equipes()
+        public IActionResult Equipes([FromQuery]ClubQueryParameters parameters)
         {
-            return View("Equipes", CreateVM());
+            return View("Equipes", CreateVM(parameters.Club));
         }
 
         public IActionResult Contact()

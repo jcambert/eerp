@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace ePing.Api.models
 {
+    [DebuggerDisplay("{DebuggerDsiplay}")]
     public class Club : Trackable
     {
 
@@ -33,5 +35,6 @@ namespace ePing.Api.models
 
         public List<Equipe> Equipes { get; set; } = new List<Equipe>();
 
+        private string DebuggerDisplay => $"Numero:{this.Numero} - Nom:{this.Nom} ";
     }
 }

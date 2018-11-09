@@ -50,11 +50,11 @@ namespace ePing.Api.dto
         [DataMember(Name = "prenom")]
         [JsonProperty("prenom")]
         public string Prenom { get; set; }
-        [DataMember(Name = "nclub")]
-        [JsonProperty("nclub")]
-        public string Club {get;set; }
         [DataMember(Name = "club")]
         [JsonProperty("club")]
+        public string Club {get;set; }
+        [DataMember(Name = "nclub")]
+        [JsonProperty("nclub")]
         public string NumeroClub { get; set; }
         [DataMember(Name = "sexe")]
         [JsonProperty("sexe")]

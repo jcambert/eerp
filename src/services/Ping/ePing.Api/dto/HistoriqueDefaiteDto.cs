@@ -7,7 +7,7 @@ namespace ePing.Api.dto
 {
     public class HistoriqueDefaiteDto
     {
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
 
         public int Defaite { get; set; } = 0;
     }

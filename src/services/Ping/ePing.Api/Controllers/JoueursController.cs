@@ -44,7 +44,7 @@ namespace ePing.Api.Controllers
             var parties = await Service.loadJoueurParties(joueur);
 
             var journees = new List<Journee>();
-            var toto = parties/*.GroupBy(x => x.Date)*/.OrderByDescending(d => DateTime.Parse(d.Date)).GroupBy(x => x.Date).ToList();
+            var toto = parties/*.OrderBy(d => d.Date)*/.GroupBy(x => x.Date).ToList();
             toto.ForEach(titi =>
             {
                 var journee = new Journee() { Date = titi.Key };
@@ -56,7 +56,7 @@ namespace ePing.Api.Controllers
                 journees.Add(journee);
             });
 
-            return Ok(journees);
+            return Ok(journees.OrderByDescending(j=>j.Date));
         }
         [HttpGet("{licence}/historique")]
         public async Task<IActionResult> GetHistoriquesDuJoueur([FromRoute] string licence)
@@ -97,7 +97,7 @@ namespace ePing.Api.Controllers
                 journees.Add(journee);
             });
 
-            var histo = Service.ConvertToHistoriquePoint(journees).OrderByDescending(h => DateTime.Parse(h.Date)).ToArray();
+            var histo = Service.ConvertToHistoriquePoint(journees).OrderByDescending(h => h.Date).ToArray();
             for (int i = 1; i < histo.Count(); i++)
             {
                 histo[i].PointsGagnesPerdus += histo[i - 1].PointsGagnesPerdus;
@@ -126,7 +126,7 @@ namespace ePing.Api.Controllers
                 journees.Add(journee);
             });
 
-            var histo = Service.ConvertToHistoriqueVictoire(journees).OrderBy(h => DateTime.Parse(h.Date)).ToArray();
+            var histo = Service.ConvertToHistoriqueVictoire(journees).OrderBy(h => h.Date).ToArray();
 
             for (int i = 1; i < histo.Count(); i++)
             {
@@ -154,7 +154,7 @@ namespace ePing.Api.Controllers
                 journees.Add(journee);
             });
 
-            var histo = Service.ConvertToHistoriqueDefaite(journees).OrderBy(h => DateTime.Parse(h.Date)).ToArray();
+            var histo = Service.ConvertToHistoriqueDefaite(journees).OrderBy(h => h.Date).ToArray();
 
             for (int i = 1; i < histo.Count(); i++)
             {

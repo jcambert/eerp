@@ -14,7 +14,23 @@ namespace ePing.Api
         {
             CreateMap<ClubDto, Club>().ReverseMap();
             CreateMap<JoueurDto, Joueur>().ReverseMap();
-            CreateMap<PartieDto, Partie>();
+            CreateMap<PartieDto, Partie>().ConstructUsing(p =>
+            {
+                DateTime d;
+                if (!DateTime.TryParse(p.Date, out d))
+                    d = DateTime.Now;
+                return new Partie()
+                {
+                    Classement = p.Classement,
+                    Date = d,
+                    Epreuve=p.Epreuve,
+                    Forfait=p.Forfait,
+                    IdPartie=p.IdPartie,
+                    Nom=p.Nom,
+                    Victoire=p.Victoire
+                    
+                };
+            });
             CreateMap<PartieHistoDto, Historique>();
             CreateMap<ClassementDto, Classement>();
             CreateMap<Journee, HistoriquePointDto>().ConvertUsing(journee =>
@@ -37,6 +53,8 @@ namespace ePing.Api
                 DateTime dt;
                 if (!DateTime.TryParse(x.DatePrevue, out dt))
                     dt = DateTime.Now;
+                int scoreA, scoreB;
+                if(!)
                 return new ResultatRencontre() {
                     DatePrevue=dt,
                     DateReelle=x.DateReelle,
@@ -44,8 +62,10 @@ namespace ePing.Api
                     EquipeB=x.EquipeB,
                     Libelle=x.Libelle,
                     LienRencontre=x.LienRencontre,
-                    ScoreA=x.ScoreA,
-                    ScoreB=x.ScoreB
+                    RealScoreA=x.ScoreA,
+                    RealScoreB=x.scoreB,
+                    ScoreA=x.ScoreA ?? 0,
+                    ScoreB=x.ScoreB ?? 0
                 };
             });
             CreateMap<ClassementEquipeDto, ClassementEquipe>().ConvertUsing(x=>

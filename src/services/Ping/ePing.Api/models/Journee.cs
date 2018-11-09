@@ -36,7 +36,7 @@ namespace ePing.Api.models
         {
 
         }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public string Epreuve { get; set; }
         public List<Partie> Parties { get;  } = new List<Partie>();
         public double PointsGagnesPerdus { get; set; } = 0;

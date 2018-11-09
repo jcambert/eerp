@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,7 +9,7 @@ namespace ePing.Api.models
     public class Partie:Trackable
     {
 
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
 
         public string Nom { get; set; }
 
@@ -20,6 +21,7 @@ namespace ePing.Api.models
 
         public string Forfait { get; set; }
 
+        [Key]
         public string IdPartie { get; set; }
 
         public double PointsGagnesPerdus { get; set; }

@@ -17,9 +17,9 @@ namespace ePing.Api.models
 
         public string EquipeB { get; set; }
 
-        public int? ScoreA { get; set; }
+        public int ScoreA { get; set; }
 
-        public int? ScoreB { get; set; }
+        public int ScoreB { get; set; }
 
         public string LienRencontre { get; set; }
 
@@ -31,5 +31,9 @@ namespace ePing.Api.models
 
 
         public string EquipeLibelle { get;  set; }
+
+        public string RealScoreA { get; set; }
+
+        public string RealScoreB { get; set; }
     }
 }

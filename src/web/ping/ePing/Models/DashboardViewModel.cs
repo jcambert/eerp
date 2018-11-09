@@ -10,5 +10,6 @@ namespace ePing.Models
         public UserViewModel User { get; internal set; }
         public string Token { get; internal set; }
         public ApiSettings ApiSettings { get; internal set; }
+        public string ViewingClub { get; internal set; }
     }
 }

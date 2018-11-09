@@ -38,10 +38,10 @@ namespace ePing.Api.dto
         public string EquipeB { get; set; }
         [DataMember(Name = "scorea")]
         [JsonProperty("scorea")]
-        public int? ScoreA { get; set; }
+        public string ScoreA { get; set; }
         [DataMember(Name = "scoreb")]
         [JsonProperty("scoreb")]
-        public int? ScoreB { get; set; }
+        public string ScoreB { get; set; }
         [DataMember(Name = "lien")]
         [JsonProperty("lien")]
         public string LienRencontre { get; set; }

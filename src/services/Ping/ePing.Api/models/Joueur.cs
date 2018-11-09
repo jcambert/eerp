@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ePing.Api.models
 {
+    [DebuggerDisplay("{DebuggerDisplay}")]
     public class Joueur:Trackable
     {
         private string _categorie;
@@ -61,7 +63,9 @@ namespace ePing.Api.models
 
         public double ProgressionAnnuelle => Point-(PointDebut==0?500: PointDebut);
         [IgnoreMap]
-        public JoueurExtra Extra { get; set; } 
+        public JoueurExtra Extra { get; set; }
+
+        private string DebuggerDisplay => $"Licence:{this.Licence} - Nom:{this.Nom} Prenom:{this.Prenom}";
 
     }
 }

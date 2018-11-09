@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ePing.Api.models
 {
+    [DebuggerDisplay("{DebuggerDsiplay}")]
     public class Equipe : Trackable
     {
         [Key]
@@ -72,5 +74,7 @@ namespace ePing.Api.models
         [NotMapped]
         public IEnumerable<Tour> Tours { get; set; } = new List<Tour>();
         public string Type { get; internal set; }
+
+        private string DebuggerDisplay => $"Libelle:{this.Libelle} - Division:{this.Division} ";
     }
 }
