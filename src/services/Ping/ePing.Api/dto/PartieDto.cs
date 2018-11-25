@@ -34,7 +34,7 @@ namespace ePing.Api.dto
         public string Nom { get; set; }
         [DataMember(Name = "classement")]
         [JsonProperty("classement")]
-        public double Classement { get; set; }
+        public string Classement { get; set; }
         [DataMember(Name = "epreuve")]
         [JsonProperty("epreuve")]
         public string Epreuve { get; set; }

@@ -55,7 +55,7 @@ namespace ePing.Api.models
 
         public int PointOfficiel { get; set; }
 
-        public int PropositionClassement { get; set; }
+        public string PropositionClassement { get; set; }
 
         public double PointDebut { get; set; }
 

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EntityFrameworkCore.Triggers;
-using Microsoft.EntityFrameworkCore;
+﻿using EntityFrameworkCore.Triggers;
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace ePing.Api.models
 {
     public abstract class Trackable
@@ -16,5 +13,12 @@ namespace ePing.Api.models
             Triggers<Trackable>.Inserting += e => e.Entity.Inserted = e.Entity.Updated = DateTime.UtcNow;
             Triggers<Trackable>.Updating += e => e.Entity.Updated = DateTime.UtcNow;
         }
+    }
+
+    public abstract class IdTrackable : Trackable
+    {
+        [key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
     }
 }

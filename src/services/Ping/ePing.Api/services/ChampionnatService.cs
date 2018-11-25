@@ -68,7 +68,7 @@ namespace ePing.Api.services
             var result = await LoadResultatsFromDb(equipe);
             equipe.Resultats = result;
 
-            var rs = equipe.Resultats.Where(r => (r.EquipeA == equipe.Nom || r.EquipeB == equipe.Nom) && (r.ScoreA != null && r.ScoreB != null && r.ScoreA > 0 && r.ScoreB > 0));
+            var rs = equipe.Resultats.Where(r => (r.EquipeA == equipe.Nom || r.EquipeB == equipe.Nom) && (r.ScoreA > 0 && r.ScoreB > 0));
             foreach (var resultat in rs)
             {
 

@@ -117,7 +117,7 @@
                             <v-card flat v-if="currentEquipe!=null">
                                 <v-list>
                                     <template v-for="(cl,index) in currentEquipe.classements">
-                                        <v-list-tile v-on:click="goto('')">
+                                        <v-list-tile v-on:click="viewClub(cl.numero)">
                                             <v-list-tile-action>
                                                 <v-btn fab dark small color="success" v-if="(index+1)<=2">{{cl.classement}}</v-btn>
                                                 <v-btn fab dark small color="error" v-else-if="(currentEquipe.classements.length- index)<=2">{{cl.classement}}</v-btn>

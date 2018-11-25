@@ -47,7 +47,7 @@ namespace ePing.Api.services
 
         protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true) where TModel : Trackable
         {
-            List<TModel> model;
+            List<TModel> model=null;
             Func<TModel, Task> addOrUpdate = async (_model) =>
              {
                  var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
@@ -58,43 +58,62 @@ namespace ePing.Api.services
                      add(DbContext, _model);
              };
 
-            var client = CreateClient();
+            try
+            {
+                var client = CreateClient();
 
-            var res = await client.GetStreamAsync(uri);
+                var res = await client.GetStreamAsync(uri);
 
-            StreamReader reader = new StreamReader(res);
-            string text = reader.ReadToEnd();
-            TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
+                StreamReader reader = new StreamReader(res);
+                string text = reader.ReadToEnd();
+                TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
 
-            if (dto == null) return default(List<TModel>);
-            model = Mapper.Map<List<TModel>>(filter(dto));
-
-            if (model is IEnumerable<TModel>)
-                foreach (var item in model as IEnumerable<TModel>)
-                {
-                    if (beforeAdd != null)
-                        await beforeAdd(item);
-                    if (addToDb)
-                    {
-                        await addOrUpdate(item);
-                        if (beforeSave != null)
-                            beforeSave(item);
-                    }
-                }
-
-
-            if (autoSave)
+                if (dto == null) return default(List<TModel>);
                 try
                 {
-                    await DbContext.SaveChangesAsync();
-                }
-                catch (Exception ex)
+                    model = Mapper.Map<List<TModel>>(filter(dto));
+                }catch(Exception ex1)
                 {
-                    var msg = ex.Message;
-                    throw ex;
+                    var msg = ex1.Message;
                 }
+                try
+                {
+                    var toto = (filter(dto) as List<dto.ResultatRencontreDto>)[12];
+                    var titi = Mapper.Map<ResultatRencontre>(toto);
+                }
+                catch  { }
+
+                if (model is IEnumerable<TModel>)
+                    foreach (var item in model as IEnumerable<TModel>)
+                    {
+                        if (beforeAdd != null)
+                            await beforeAdd(item);
+                        if (addToDb)
+                        {
+                            await addOrUpdate(item);
+                            if (beforeSave != null)
+                                beforeSave(item);
+                        }
+                    }
 
 
+                if (autoSave)
+                    try
+                    {
+                        await DbContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = ex.Message;
+                        throw ex;
+                    }
+
+            }
+            catch (Exception ex0)
+            {
+                var msg = ex0.Message;
+                //throw ex0;
+            }
 
 
             return model;

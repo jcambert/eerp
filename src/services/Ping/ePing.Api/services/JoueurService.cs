@@ -36,14 +36,8 @@ namespace ePing.Api.services
 
         private async Task<Joueur> LoadDetailJoueurFromSpid(Joueur joueur, bool autoSave = true)
         {
-            Func<Joueur, Task> beforeAdd = async (j) =>
-            {
-                if (j == null) return;
-                await Task.Run(() => { j.Extra = new JoueurExtra() { Licence = j.Licence }; });
-                //joueur.Club = club;
-
-            };
-            return await this.InternalLoadFromSpid<ListeJoueurHeader, JoueurDto, Joueur>($"api/joueur/{joueur.Licence}", true, liste => liste?.Liste?.Joueur, (ctx, j) => ctx.Joueurs.Add(j), null, beforeAdd, autoSave);
+           
+            return await this.InternalLoadFromSpid<ListeJoueurHeader, JoueurDto, Joueur>($"api/joueur/{joueur.Licence}", true, liste => liste?.Liste?.Joueur, (ctx, j) => ctx.Joueurs.Add(j), null, null, autoSave);
         }
 
         public async Task<List<Joueur>> loadJoueursFromSpid(Club club, bool autoSave = true)

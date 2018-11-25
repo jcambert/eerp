@@ -83,7 +83,7 @@ namespace ePing.Api.dto
         public double AncienPoint { get; set; }
         [DataMember(Name = "clast")]
         [JsonProperty("clast")]
-        public int Classement { get; set; }
+        public string Classement { get; set; }
         [DataMember(Name = "clnat")]
         [JsonProperty("clnat")]
         public int ClassementNational { get; set; }
@@ -101,7 +101,7 @@ namespace ePing.Api.dto
         public int PointOfficiel { get; set; }
         [DataMember(Name = "clpro")]
         [JsonProperty("clpro")]
-        public int PropositionClassement { get; set; }
+        public string PropositionClassement { get; set; }
         [DataMember(Name = "valinit")]
         [JsonProperty("valinit")]
         public double PointDebut { get; set; }

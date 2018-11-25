@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="NewFolder\" />
+    <Folder Include="Validators\regle\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

@@ -15,6 +15,8 @@ namespace ePing.Api.models
 
         public double Classement { get; set; }
 
+        public int RangNationnal { get; set; }
+
         public string Epreuve { get; set; }
 
         public string Victoire { get; set; }

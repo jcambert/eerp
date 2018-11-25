@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace ePing.Api.models
 {
-    [DebuggerDisplay("{DebuggerDsiplay}")]
+    [DebuggerDisplay("{DebuggerDisplay}")]
     public class Club : Trackable
     {
 

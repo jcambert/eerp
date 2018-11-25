@@ -151,10 +151,10 @@ methods = {
         this.snackbar.visible = true;
     },
     goto(url) {
-        console.dir(window.viewingClub);
+       alert(window.viewingClub);
         if (window.viewingClub.length > 0)
             url = addParameterToURL(url, 'club', window.viewingClub);
-        console.dir(url);
+        alert(url);
         window.location.href = url;
     },
     createApiUri(name, queries) {

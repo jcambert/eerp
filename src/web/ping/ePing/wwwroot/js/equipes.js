@@ -58,6 +58,11 @@
             if (resultat.scoreB > resultat.scoreA) return 'success';
             if (resultat.scoreB < resultat.scoreA) return 'error';
             return 'primary';
+        },
+        viewClub(numero) {
+            alert('set viewclub:' + numero);
+            window.viewingClub = numero;
+            this.goto('');
         }
     }),
     mounted: function () {
