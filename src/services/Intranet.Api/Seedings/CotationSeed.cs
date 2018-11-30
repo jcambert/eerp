@@ -34,8 +34,10 @@ namespace Intranet.Api.Seedings
         {
             var piec0 = new CotationPiece() { Reference = "Ref1234", Designation = "Des1234", DensiteMatiere = 8, Epaisseur = 1, Largeur = 100, Longueur = 100, Matiere = "Xc10<3", TypeMatiere = "Acier", PrixMatiere = 0.78, Pince = 0, SqueletteX = 10, SqueletteY = 10 };
             var cot0 = new Cotation() { Reference = "Ref1234", Indice = "0", Version = 0, CoefficientMatierePremiere = 1.35, CoefficientSousTraitance = 1.25, Delai = "1 Semaine", Difficulte = "Facile", Traitement = "Brut" };
+            var cot1 = new Cotation() { Reference = "5678", Indice = "1", Version = 2, CoefficientMatierePremiere = 1.35, CoefficientSousTraitance = 1.25, Delai = "1 Semaine", Difficulte = "Facile", Traitement = "Brut" };
             cot0.Pieces.Add(piec0);
             Set.Add(cot0);
+            Set.Add(cot1);
         }
     }
 }

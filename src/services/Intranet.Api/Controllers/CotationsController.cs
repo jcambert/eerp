@@ -7,120 +7,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Intranet.Api.dbcontext;
 using Intranet.Api.models;
+using Intranet.Api.services;
 
 namespace Intranet.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CotationsController : ControllerBase
+    public class CotationsController : ApiServiceBaseController<BaseService<Cotation>,Cotation>
     {
-        private readonly IntranetDbContext _context;
 
-        public CotationsController(IntranetDbContext context)
+
+        public CotationsController(BaseService<Cotation> service):base(service)
         {
-            _context = context;
         }
 
-        // GET: api/Cotations
-        [HttpGet]
-        public IEnumerable<Cotation> GetCotations()
+        // GET: api/Parametres
+        [HttpGet("{reference}/{indice}/{version?}")]
+        public IActionResult GetByReference([FromRoute] string reference,[FromRoute]string indice,[FromRoute]int version=0)
         {
-            return _context.Cotations.Include(c=>c.Pieces).ThenInclude(p=>p.Formats);
-        }
+            var result=Repository.Get(p => p.Reference == reference && p.Indice == indice && p.Version == version).FirstOrDefault();
 
-        // GET: api/Cotations/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCotation([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var cotation = await _context.Cotations.FindAsync(id);
-
-            if (cotation == null)
-            {
+            if (result == null)
                 return NotFound();
-            }
-
-            return Ok(cotation);
-        }
-
-        // PUT: api/Cotations/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCotation([FromRoute] int id, [FromBody] Cotation cotation)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != cotation.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(cotation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CotationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Cotations
-        [HttpPost]
-        public async Task<IActionResult> PostCotation([FromBody] Cotation cotation)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            _context.Cotations.Add(cotation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCotation", new { id = cotation.Id }, cotation);
-        }
-
-        // DELETE: api/Cotations/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCotation([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var cotation = await _context.Cotations.FindAsync(id);
-            if (cotation == null)
-            {
-                return NotFound();
-            }
-
-            _context.Cotations.Remove(cotation);
-            await _context.SaveChangesAsync();
-
-            return Ok(cotation);
-        }
-
-        private bool CotationExists(int id)
-        {
-            return _context.Cotations.Any(e => e.Id == id);
+            else
+                return Ok(result);
         }
     }
 }

@@ -13,23 +13,15 @@ namespace Intranet.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ParametresController : ControllerBase
+    public class ParametresController : ApiServiceBaseController<ParametreService,Parametre>
     {
-        public ParametreService Service { get; }
-        public IntranetDbContext Context => Service.Context;
-        public IRepository<IntranetDbContext, Parametre> Repository => Service.Repository;
 
-        public ParametresController(ParametreService parametreService)
+
+        public ParametresController(ParametreService service):base(service)
         {
-            Service = parametreService;
+
         }
 
-        // GET: api/Parametres
-        [HttpGet]
-        public IEnumerable<Parametre> GetParametres()
-        {
-            return Repository.Get();
-        }
 
         // GET: api/Parametres
         [HttpGet("flat")]
@@ -38,24 +30,7 @@ namespace Intranet.Api.Controllers
             var result = Service.Flatten();
             return Ok(result);
         }
-        // GET: api/Parametres/5
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetParametre([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var parametre = await Repository.GetByIdAsync(id);// (  Context.Parametres.FindAsync(id);
-
-            if (parametre == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(parametre);
-        }
+        
         // GET: api/Parametres/TypeMatiere
         [HttpGet("{type:alpha}")]
         public IActionResult GetParametreByType([FromRoute] string type)
@@ -92,80 +67,6 @@ namespace Intranet.Api.Controllers
 
             return Ok(parametre);
         }
-
-        // PUT: api/Parametres/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutParametre([FromRoute] int id, [FromBody] Parametre parametre)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != parametre.Id)
-            {
-                return BadRequest();
-            }
-
-            Repository.Update(parametre);
-
-            try
-            {
-                await Context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ParametreExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Parametres
-        [HttpPost]
-        public async Task<IActionResult> PostParametre([FromBody] Parametre parametre)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            Repository.Insert(parametre);
-
-            await Context.SaveChangesAsync();
-
-            return CreatedAtAction("GetParametre", new { id = parametre.Id }, parametre);
-        }
-
-        // DELETE: api/Parametres/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteParametre([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var parametre=await Repository.DeleteAsync(id);
-            
-            if (parametre == null)
-            {
-                return NotFound();
-            }
-            
-            await Context.SaveChangesAsync();
-
-            return Ok(parametre);
-        }
-
-        private bool ParametreExists(int id)
-        {
-            return Repository.Exists(id);
-        }
+        
     }
 }

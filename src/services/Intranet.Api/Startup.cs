@@ -35,6 +35,7 @@ namespace Intranet.Api
         {
             services.AddTransient<ISeeder, Seeder>();
             services.AddTransient<ParametreService>();
+            services.AddTransient(typeof(BaseService<>));
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             var c = Configuration.GetSection("api:settings");
             services.Configure<ApiSettings>(c);
