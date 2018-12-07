@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Intranets", "Intranets", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Intranet.Api", "src\services\Intranet.Api\Intranet.Api.csproj", "{848561FE-A141-4B0C-BC22-1EEF20B3AD49}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Intranet", "src\web\Intranet\Intranet.njsproj", "{FB8D6CF6-D4D2-4DC5-AE7D-87A91E32F972}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,10 +31,6 @@ Global
 		{848561FE-A141-4B0C-BC22-1EEF20B3AD49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{848561FE-A141-4B0C-BC22-1EEF20B3AD49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{848561FE-A141-4B0C-BC22-1EEF20B3AD49}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FB8D6CF6-D4D2-4DC5-AE7D-87A91E32F972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB8D6CF6-D4D2-4DC5-AE7D-87A91E32F972}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB8D6CF6-D4D2-4DC5-AE7D-87A91E32F972}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB8D6CF6-D4D2-4DC5-AE7D-87A91E32F972}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,7 +42,6 @@ Global
 		{C4FD38B9-A838-4A8B-9D56-A5FBC2621427} = {D729EC86-2660-43CC-AA86-ECE1EA026FDB}
 		{0324580D-A1F2-4175-ACC9-AE36E9DA016B} = {C6FF2DF1-1EB4-4B08-941F-7D3F37422056}
 		{848561FE-A141-4B0C-BC22-1EEF20B3AD49} = {0324580D-A1F2-4175-ACC9-AE36E9DA016B}
-		{FB8D6CF6-D4D2-4DC5-AE7D-87A91E32F972} = {19668AC6-8B2C-4CD6-915C-9E6815878045}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4B0174EE-72BC-42B0-9453-89B837B29E67}

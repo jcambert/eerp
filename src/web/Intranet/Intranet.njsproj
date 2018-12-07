@@ -39,6 +39,9 @@
     <Content Include="public\favicon.ico" />
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
+    <Content Include="src\components\AddCotationDialog.vue">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\Cotation.vue">
       <SubType>Code</SubType>
     </Content>
@@ -68,7 +71,8 @@
     <Folder Include="src\" />
     <Folder Include="src\assets\" />
     <Folder Include="src\components\" />
-    <Folder Include="src\vuex\" />
+    <Folder Include="src\store\" />
+    <Folder Include="src\store\modules\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\main.ts" />
@@ -76,21 +80,25 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\shims.d.ts" />
-    <TypeScriptCompile Include="src\vuex\FakeCotations.ts">
+    <TypeScriptCompile Include="src\store\FakeCotations.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\vuex\StandardMenu.ts">
+    <TypeScriptCompile Include="src\store\modules\CotationDialogModule.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\vuex\store.ts">
+    <TypeScriptCompile Include="src\store\StandardMenu.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\vuex\types.ts">
+    <TypeScriptCompile Include="src\store\index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\store\types.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include=".postcssrc.js" />
+    <Compile Include="vue.config.js" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

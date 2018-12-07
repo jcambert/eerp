@@ -1,13 +1,20 @@
 ﻿import Vue from 'vue';
 import Vuex, { StoreOptions, MutationTree, GetterTree, ActionTree } from 'vuex';
-//import { RootState } from './types';
+Vue.use(Vuex);
+/*
 import standardMenu from './StandardMenu';
 import fakeCotation from './FakeCotations';
-Vue.use(Vuex);
+import AddCotationDialog from '@/components/AddCotationDialog.vue';
+import CotationForm from '@/components/Cotation.vue' ;
+
+
+
  interface RootState {
     drawer: boolean;
      menuItems: Array<MenuItem>;
      cotations: Array<Cotation>;
+     addCotationDialog: boolean;
+     newCotation: Cotation;
 }
 
 interface MenuItem {
@@ -30,7 +37,9 @@ interface Cotation {
 let state : RootState= {
     drawer: true,
     menuItems: Array<MenuItem>(),
-    cotations: Array<Cotation>()
+    cotations: Array<Cotation>(),
+    addCotationDialog: false,
+    newCotation: {}
 }
 const getters: GetterTree<RootState,RootState> = {
     drawer(state): boolean {
@@ -41,6 +50,12 @@ const getters: GetterTree<RootState,RootState> = {
     },
     cotations(state):Array<Cotation> {
         return state.cotations;
+    },
+    addCotationDialog(state) {
+        return state.addCotationDialog;
+    },
+    newCotation(state) {
+        return state.newCotation;
     }
 }
 
@@ -59,7 +74,16 @@ const mutations: MutationTree<RootState> = {
     },
     SetCotations(state, cotations: Array<Cotation>) {
         state.cotations = cotations;
-    }
+    },
+    openCloseAddCotationDialog(state, value: boolean) {
+        state.addCotationDialog = value;
+        if (value)
+            state.newCotation = new Cotation();
+    },
+    addCotation(state, cotation: Cotation) {
+        state.cotations.push(cotation);
+    },
+    
 }
 
 const actions: ActionTree<RootState, RootState> = {
@@ -74,8 +98,19 @@ const actions: ActionTree<RootState, RootState> = {
     },
     fetchCotation({ commit }) {
         commit('SetCotations', fakeCotation);
+    },
+    openAddCotationDialog({ commit }) {
+        commit('openCloseAddCotationDialog', true);
+    },
+    closeAddCotationDialog({ commit }) {
+        commit('openCloseAddCotationDialog', false);
+    },
+    addNewCotation({ commit },cotation:Cotation) {
+        commit('addNewCotation', cotation);
     }
+
 }
+
 const store: StoreOptions<RootState> = {
     state: state,
     mutations: mutations,
@@ -84,4 +119,22 @@ const store: StoreOptions<RootState> = {
     
 }
 
-export default new Vuex.Store<RootState>(store);
+export default new Vuex.Store<RootState>(store);*/
+
+import CotationDialog,{ICotationDialogState } from './modules/CotationDialogModule';
+/*export interface IAppState {
+   cotationDialog: ICotationDialogState;
+}
+const store = new Vuex.Store<IAppState>({
+    modules: {
+        CotationDialogModule
+    }
+});*/
+
+const store = new Vuex.Store({
+    modules: {
+        dialog:CotationDialog
+    }
+})
+console.dir(store);
+export default store;

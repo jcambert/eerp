@@ -4,12 +4,14 @@ import Vuetify from 'vuetify'
 import Vuex from 'vuex'; 
 import { sync } from 'vuex-router-sync';
 
-import router from './router';
-import store from './vuex/store';
+import router from '@/router';
+import store from '@/store';
 
 import 'vuetify/dist/vuetify.min.css' 
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
+import CotationDialogModule from '@/store/modules/CotationDialogModule';
+console.dir(CotationDialogModule); 
 
 Vue.config.productionTip = true;
 

@@ -1,10 +1,14 @@
 ﻿<template>
     <v-layout justify-center>
+        <AddCotationDialog></AddCotationDialog>
         <v-flex xs12 sm12>
             <v-toolbar color="green darken-3" dark>
                 <v-toolbar-side-icon></v-toolbar-side-icon>
                 <v-toolbar-title>Cotations</v-toolbar-title>
                 <v-spacer></v-spacer>
+                <v-btn fab dark small color="cyan" v-on:click="openAddCotationDialog()">
+                    <v-icon >add</v-icon>
+                </v-btn>
                 <v-text-field flat
                               solo-inverted
                               prepend-icon="search"
@@ -33,23 +37,25 @@
     import { Action } from 'vuex-class';
     import Vuex, { mapGetters, mapActions } from 'vuex';
     import CotationCardView from './CotationCardView.vue';
+    import AddCotationDialog from './AddCotationDialog.vue';
     @Component({
-        components: { CotationCardView },
-        computed: mapGetters([ 'cotations']),
-        methods: mapActions(['fetchCotation'])
+        components: { CotationCardView, AddCotationDialog },
+        computed: mapGetters(['cotations','addCotationDialog']),
+        methods: mapActions(['fetchCotation', 'openAddCotationDialog'])
     })
-    export default class Cotation extends Vue {
-        cards: any[];
+    export default class CotationForm extends Vue {
+
         constructor() {
             super();
-            //this.cards = [];
-            //this.cards.push({ dp: '12345', reference: 'Pre-fab homes', designation: 'vxcvxcv', indice: '0',version:'0' });
-            //this.cards.push({ dp: '4566', reference: 'Pre-fab homes', designation: 'sfsdff', indice: '2' ,version:'1'});
+
             
         }
         @Action('fetchCotation', {}) fetchCotation: any;
         mounted() {
             this.fetchCotation();
         };
+
+        @Action('openAddCotationDialog', {}) openAddCotationDialog: any;
+
     }
 </script>

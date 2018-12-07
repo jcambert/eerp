@@ -47,8 +47,24 @@ namespace Intranet.Api
 
             }, ServiceLifetime.Transient);
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("all", policy =>
+                {
+                    policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    ;
+
+
+                });
+            });
+
             services.AddAutoMapper();
 
+            services.AddSignalR();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -79,7 +95,26 @@ namespace Intranet.Api
             {
                 app.UseHsts();
             }
+            /*app.Map("/intranet", map =>
+            {
+                map.UseCors("all");
+                
 
+            });*/
+            app.UseCors("all");
+            /*app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:8080")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+
+
+            });*/
+            app.UseSignalR(options =>
+            {
+                options.MapHub<IntranetHub>("/intranet");
+            });
             app.UseHttpsRedirection();
             app.UseMvc();
         }
