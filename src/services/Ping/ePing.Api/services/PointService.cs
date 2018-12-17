@@ -72,12 +72,12 @@ namespace ePing.Api.services
             switch (vd)
             {
                 case VictoireDefaite.Victoire:
-                    result = diffPoint > 0 ? vn : va;
-                    resultat = diffPoint > 0 ? "Victoire Normale" : "Victoire Anormale";
+                    result = diffPoint >= 0 ? vn : va;
+                    resultat = diffPoint >= 0 ? "Victoire Normale" : "Victoire Anormale";
                     break;
                 case VictoireDefaite.Defaite:
-                    result = diffPoint > 0 ? dn : da;
-                    resultat = diffPoint > 0 ? "Défaite Normale" : "Défaite Anormale";
+                    result = diffPoint <= 0 ? dn : da;
+                    resultat = diffPoint <= 0 ? "Défaite Normale" : "Défaite Anormale";
                     break;
                 default:
                     resultat = "??";
@@ -89,14 +89,15 @@ namespace ePing.Api.services
 
         public PointResultat CalculPointsGagnePerdu(double pointsj1, double pointsj2, VictoireDefaite vd, double coeficient = 1.0)
         {
-            double diffPoints = (pointsj1 - pointsj2) * (vd == VictoireDefaite.Defaite ? -1 : 1);
-
+            double diffPoints = Math.Abs(pointsj1 - pointsj2);// * (vd == VictoireDefaite.Defaite ? -1 : 1);
+            int vdcoef = (vd == VictoireDefaite.Defaite ? -1 : 1);
+            //if (vdcoef < 0 && (pointsj2 - pointsj1) > 0) vdcoef = -1;
 
 
 
             string res1, res2;
-            var tab1 = GetDico(diffPoints, vd, out res1);
-            var tab2 = GetDico(diffPoints, vd == VictoireDefaite.Victoire ? VictoireDefaite.Defaite : VictoireDefaite.Victoire, out res2);
+            var tab1 = GetDico(pointsj1 - pointsj2, vd, out res1);
+            var tab2 = GetDico(pointsj2 - pointsj1, vd == VictoireDefaite.Victoire ? VictoireDefaite.Defaite : VictoireDefaite.Victoire, out res2);
             var key1 = tab1.Keys.Where(k => k <= Math.Abs(diffPoints)).LastOrDefault();
             var key2 = tab2.Keys.Where(k => k <= Math.Abs(diffPoints)).LastOrDefault();
             return new PointResultat() { PointsJoueur1 = tab1[key1] * coeficient, ResultatJoueur1 = res1, PointsJoueur2 = tab2[key2] * coeficient, ResultatJoueur2 = res2 };

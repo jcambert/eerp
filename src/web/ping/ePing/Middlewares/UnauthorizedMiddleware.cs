@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ePing
@@ -23,7 +24,7 @@ namespace ePing
             httpContext.Response.Headers.Add("X-Content-Type-Options", "nosniff");
             await _next.Invoke(httpContext);
 
-            if (httpContext.Response.StatusCode == 401)
+            if (httpContext.Response.StatusCode != 200 && httpContext.Request.Method=="GET")
             {
 
                  httpContext.Response.Redirect("/Login");// await WriteAsync("You are not authorized to access this page");

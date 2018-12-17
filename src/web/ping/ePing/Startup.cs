@@ -71,7 +71,14 @@ namespace ePing
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-            
+            services.AddCors(options =>
+            {
+                options.AddPolicy("all",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,18 +87,18 @@ namespace ePing
            
             if (env.IsDevelopment())
             {
-                app.UseStatusCodePagesWithRedirects("/Login");
-                app.UseUnauthorizedMiddleware();
-                app.UseDeveloperExceptionPage();
+                //app.UseStatusCodePagesWithRedirects("/Login");
+               // app.UseUnauthorizedMiddleware();
+               // app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseStatusCodePagesWithRedirects("/Login");
-                app.UseExceptionHandler("/Home/Error");
+             //   app.UseStatusCodePagesWithRedirects("/Login");
+              //  app.UseExceptionHandler("/Home/Error");
             }
-           
-           
-            
+
+
+            app.UseCors("all");
             
             app.UseStaticFiles();
 
@@ -120,6 +127,7 @@ namespace ePing
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
+              
                 .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
                 .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
                                                                             retryAttempt)));
@@ -127,18 +135,6 @@ namespace ePing
 
         private void ConfigureAuthService(IServiceCollection services)
         {
-            /*services
-                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = "/Login";
-                    options.LogoutPath = "/Logout";
-                    options.AccessDeniedPath = "/Login";
-                    options.Events = new CookieAuthenticationEvents()
-                    {
-                        
-                    };
-                });*/
             
             services.AddAuthentication("Bearer")
             .AddIdentityServerAuthentication(options =>
@@ -149,18 +145,6 @@ namespace ePing
                 options.ApiName = "pingapi";
                 options.SaveToken = true;
 
-                
-                /*options.JwtBearerEvents = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents()
-                {
-                    OnTokenValidated= bearer =>
-                    {
-                        bearer.
-                    }
-                };*/
-               /* options.TokenRetriever = request =>
-                 {
-                     
-                 };*/
                 
             });
 
