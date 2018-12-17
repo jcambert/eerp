@@ -72,7 +72,7 @@ namespace Auth.Api.Controllers
             var token = await _authRequest.Login(Request.BaseUrl(), licenceOrName??"",prenom);
             if (token.IsError)
                 return Unauthorized();
-
+           
             int licence;
             PingUser user;
             if (int.TryParse(licenceOrName, out licence))

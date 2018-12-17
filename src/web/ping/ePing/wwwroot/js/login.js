@@ -37,16 +37,16 @@ var mv=new Vue({
                 this.requested = true;
                 url = this.tokenendpoint.format(this.licence, this.prenom)
 
-                url = "/login/?licenceOrName={0}&prenom={1}".format(this.licence, this.prenom);
-                
-                Vue.http.post(url).then(
+               // url = "/login/?licenceOrName={0}&prenom={1}".format(this.licence, this.prenom);
+                url="login"
+                Vue.http.post(url, {licenceOrName:this.licence,prenom:this.prenom}).then(
                     function (response) { 
                         console.dir(response);
                         window.location.href = "/Home";
                     },
                     function (error) {
                         console.dir(error);
-                        this.requested = false;
+                        //this.requested = false;
                     });
                     
             }

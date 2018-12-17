@@ -44,7 +44,7 @@ namespace Auth.Api.Services
             await Discover(baseUrl);
 
             var client = new HttpClient();
-
+            
             var resp = await client.RequestPasswordTokenAsync(new PasswordTokenRequest()
             {
                 Address = disco.TokenEndpoint,
@@ -58,6 +58,15 @@ namespace Auth.Api.Services
             });
             return resp;
 
+        }
+
+        public async Task Logout(string baseUrl)
+        {
+            await Discover(baseUrl);
+
+            var client = new HttpClient();
+
+            await client.RevokeTokenAsync()
         }
     }
 }
