@@ -34,10 +34,11 @@ namespace ePing.Api.services
             ClubService = clubService;
         }
 
-        private async Task<Joueur> LoadDetailJoueurFromSpid(Joueur joueur, bool autoSave = true)
+        private async Task<Joueur> LoadDetailJoueurFromSpid(string licence, bool addToDb=true, bool autoSave = true)
         {
-           
-            return await this.InternalLoadFromSpid<ListeJoueurHeader, JoueurDto, Joueur>($"api/joueur/{joueur.Licence}", true, liste => liste?.Liste?.Joueur, (ctx, j) => ctx.Joueurs.Add(j), null, null, autoSave);
+            Joueur result =await this.InternalLoadFromSpid<ListeJoueurHeader, JoueurDto, Joueur>($"api/joueur/{licence}", addToDb, liste => liste?.Liste?.Joueur, (ctx, j) => ctx.Joueurs.Add(j), null, null, autoSave);
+
+            return result;
         }
 
         public async Task<List<Joueur>> loadJoueursFromSpid(Club club, bool autoSave = true)
@@ -80,9 +81,10 @@ namespace ePing.Api.services
             var joueurs = DbContext.Joueurs.Where(j => j.NumeroClub == club.Numero).ToList();
             if (joueurs == null || joueurs.Count == 0)
             {
-                joueurs = await loadJoueursFromSpid(club,false);
                 List<Task> tasks = new List<Task>();
-                joueurs.ForEach(joueur => tasks.Add(LoadDetailJoueurFromSpid(joueur,false)));
+                joueurs = await loadJoueursFromSpid(club,false);
+                
+                joueurs.ForEach(joueur => tasks.Add(LoadDetailJoueurFromSpid(joueur.Licence,true,false)));
                 await Task.WhenAll(tasks);
 
                 await DbContext.SaveChangesAsync();
@@ -101,13 +103,33 @@ namespace ePing.Api.services
         private async Task<Joueur> LoadJoueurFromSpid(string licence)
         {
             var uri = $"/api/joueur/{licence}/spid";
-            Func<Joueur, Task> beforeAdd = async (j) =>
+            /*Func<JoueurSpid, Task> beforeAdd = async (j) =>
                {
                    j.Extra = new JoueurExtra() { Licence = j.Licence };
                   //j.Club = await ClubService.LoadClub(j.NumeroClub, false);
                   await LoadDetailJoueurFromSpid(j, false);
-               };
-            return await this.InternalLoadFromSpid<ListeJoueurHeader, JoueurDto, Joueur>(uri, true, liste => liste?.Liste?.Joueur, (ctx, j) => { ctx.Joueurs.Add(j); }, null, beforeAdd);
+               };*/
+            JoueurSpid joueurspid= await this.InternalLoadFromSpid<ListeJoueurSpidHeader, JoueurSpidDto, JoueurSpid>(uri, false, liste => liste?.Liste?.Joueur, null, null, null);
+            Joueur joueur =await LoadDetailJoueurFromSpid(joueurspid.Licence,false, false);
+            joueur.Extra = new JoueurExtra() { Licence = joueur.Licence };
+            joueur.Sexe = joueurspid.Sexe;
+            joueur.Type = joueurspid.Type;
+            joueur.Certificat = joueurspid.Certificat;
+            joueur.Validation = joueurspid.Validation;
+            joueur.Echelon = joueurspid.Echelon;
+            joueur.Place = joueurspid.Place;
+            joueur.Mutation = joueurspid.Mutation;
+            joueur.Arbitre = joueurspid.Arbitre;
+            joueur.JugeArbitre = joueurspid.JugeArbitre;
+            joueur.Tech = joueurspid.Tech;
+            await this.DbContext.Set<Joueur>().AddAsync(joueur);
+            await DbContext.SaveChangesAsync();
+            return joueur;
+        }
+
+        private async Task AddDetailJoueurFromspid()
+        {
+
         }
     }
 }

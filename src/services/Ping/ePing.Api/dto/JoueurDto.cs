@@ -9,6 +9,13 @@ namespace ePing.Api.dto
 {
 
     [DataContract]
+    public class ListeJoueurSpidHeader
+    {
+        [DataMember(Name = "liste")]
+        [JsonProperty("liste")]
+        public JoueurSpidDtoHeader Liste { get; set; }
+    }
+    [DataContract]
     public class ListeJoueurHeader
     {
         [DataMember(Name = "liste")]
@@ -16,6 +23,15 @@ namespace ePing.Api.dto
         public JoueurDtoHeader Liste { get; set; }
     }
 
+    //FROM api/joueur/{licence}/spid
+    public class JoueurSpidDtoHeader
+    {
+        [DataMember(Name = "licence")]
+        [JsonProperty("licence")]
+        public JoueurSpidDto Joueur { get; set; }
+
+    }
+    //FROM api/joueur/{licence}
     public class JoueurDtoHeader
     {
         [DataMember(Name = "joueur")]
@@ -106,6 +122,77 @@ namespace ePing.Api.dto
         [JsonProperty("valinit")]
         public double PointDebut { get; set; }
 
+
+    }
+    
+    public class JoueurSpidDto
+    {
+        [DataMember(Name = "idlicence")]
+        [JsonProperty("idlicence")]
+        public string IdLicence { get; set; }
+        [DataMember(Name = "nom")]
+        [JsonProperty("nom")]
+        public string Nom{ get; set; }
+        [DataMember(Name = "prenom")]
+        [JsonProperty("prenom")]
+        public string Prenom { get; set; }
+        [DataMember(Name = "licence")]
+        [JsonProperty("licence")]
+        public string Licence { get; set; }
+        [DataMember(Name = "numclub")]
+        [JsonProperty("numclub")]
+        public string NumClub { get; set; }
+        [DataMember(Name = "nomclub")]
+        [JsonProperty("nomclub")]
+        public string NomClub { get; set; }
+        [DataMember(Name = "sexe")]
+        [JsonProperty("sexe")]
+        public string Sexe { get; set; }
+        [DataMember(Name = "type")]
+        [JsonProperty("type")]
+        public string Type { get; set; }
+        [DataMember(Name = "certif")]
+        [JsonProperty("certif")]
+        public string Certificat { get; set; }
+        [DataMember(Name = "validation")]
+        [JsonProperty("validation")]
+        public string Validation { get; set; }
+        [DataMember(Name = "echelon")]
+        [JsonProperty("echelon")]
+        public string Echelon { get; set; }
+        [DataMember(Name = "place")]
+        [JsonProperty("place")]
+        public string Place { get; set; }
+        [DataMember(Name = "point")]
+        [JsonProperty("point")]
+        public string Points { get; set; }
+        [DataMember(Name = "cat")]
+        [JsonProperty("cat")]
+        public string Categorie { get; set; }
+        [DataMember(Name = "pointm")]
+        [JsonProperty("pointm")]
+        public string PointsMensuel { get; set; }
+        [DataMember(Name = "apointm")]
+        [JsonProperty("apointm")]
+        public string APointsMensuel { get; set; }
+        [DataMember(Name = "initm")]
+        [JsonProperty("initm")]
+        public string PointsInitial { get; set; }
+        [DataMember(Name = "mutation")]
+        [JsonProperty("mutation")]
+        public string Mutation { get; set; }
+        [DataMember(Name = "natio")]
+        [JsonProperty("natio")]
+        public string Nationalite { get; set; }
+        [DataMember(Name = "arb")]
+        [JsonProperty("arb")]
+        public string Arbitre { get; set; }
+        [DataMember(Name = "ja")]
+        [JsonProperty("ja")]
+        public string JugeArbitre { get; set; }
+        [DataMember(Name = "tech")]
+        [JsonProperty("tech")]
+        public string Tech { get; set; }
 
     }
 }

@@ -64,24 +64,49 @@ namespace Auth.Api.Controllers
         [HttpPost]
         [AllowAnonymous]
         // [ValidateAntiForgeryToken]
-        public async Task<ActionResult<LoginResult>> Index([FromQuery] string licenceOrName,[FromQuery] string prenom =null)
-        {
-            licenceOrName =  licenceOrName?.ToUpper();
-            prenom = prenom.TitleCase();
+        /* public async Task<ActionResult<LoginResult>> Index([FromQuery] string licenceOrName,[FromQuery] string prenom =null)
+         {
+             licenceOrName =  licenceOrName?.ToUpper();
+             prenom = prenom.TitleCase();
 
-            var token = await _authRequest.Login(Request.BaseUrl(), licenceOrName??"",prenom);
+             var token = await _authRequest.Login(Request.BaseUrl(), licenceOrName??"",prenom);
+             if (token.IsError)
+                 return Unauthorized();
+
+             int licence;
+             PingUser user;
+             if (int.TryParse(licenceOrName, out licence))
+                 user = await _repo.FindByLicenceAsync(licenceOrName);
+             else
+                 user = await _repo.FindByNameAsync(licenceOrName, prenom);
+             return new LoginResult() { Jwt = token.AccessToken, User = user ?? default(PingUser) };
+
+
+         }*/
+        public async Task<ActionResult<LoginResult>> Index([FromForm] LoginModel model)
+        {
+            model.licenceOrName = model.licenceOrName?.ToUpper();
+            model.prenom = model.prenom.TitleCase();
+
+            var token = await _authRequest.Login(Request.BaseUrl(), model.licenceOrName ?? "", model.prenom);
             if (token.IsError)
                 return Unauthorized();
-           
+
             int licence;
             PingUser user;
-            if (int.TryParse(licenceOrName, out licence))
-                user = await _repo.FindByLicenceAsync(licenceOrName);
+            if (int.TryParse(model.licenceOrName, out licence))
+                user = await _repo.FindByLicenceAsync(model.licenceOrName);
             else
-                user = await _repo.FindByNameAsync(licenceOrName, prenom);
+                user = await _repo.FindByNameAsync(model.licenceOrName, model.prenom);
             return new LoginResult() { Jwt = token.AccessToken, User = user ?? default(PingUser) };
-                
+
 
         }
+    }
+
+    public class LoginModel
+    {
+        public string licenceOrName { get; set; }
+        public string prenom { get; set; }
     }
 }

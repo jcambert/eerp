@@ -41,10 +41,13 @@ namespace ePing.Controllers
             {
                 var endpoint = _configuration["ping:auth:login_endpoint"];
                 endpoint = String.Format(endpoint, user.licenceOrName, user.prenom ?? "");
-
-
-                HttpClient client = _factory.CreateClient("login");
-                var response = await client.PostAsync(endpoint, new FormUrlEncodedContent(new Dictionary<string, string>()));
+                endpoint = "/Login";
+                FormUrlEncodedContent dataForm = new FormUrlEncodedContent(new[] {
+                    new KeyValuePair<string,string>("licenceOrName",user.licenceOrName),
+                    new KeyValuePair<string, string>("prenom",user.prenom)
+                });
+                HttpClient client = _factory.CreateClient("auth");
+                var response = await client.PostAsync(endpoint, dataForm);
                 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {

@@ -11,6 +11,7 @@ namespace ePing.Api.models
     [DebuggerDisplay("{DebuggerDisplay}")]
     public class Joueur:Trackable
     {
+     
         private string _categorie;
 
         [Key]
@@ -64,6 +65,67 @@ namespace ePing.Api.models
         public double ProgressionAnnuelle => Point-(PointDebut==0?500: PointDebut);
         [IgnoreMap]
         public JoueurExtra Extra { get; set; }
+        public string Type { get;  set; }
+        public string Certificat { get;  set; }
+        public string Validation { get;  set; }
+        public string Mutation { get;  set; }
+        public string Arbitre { get;  set; }
+        public string JugeArbitre { get;  set; }
+        public string Tech { get;  set; }
+
+        private string DebuggerDisplay => $"Licence:{this.Licence} - Nom:{this.Nom} Prenom:{this.Prenom}";
+
+    }
+
+    [DebuggerDisplay("{DebuggerDisplay}")]
+    public class JoueurSpid : Trackable
+    {
+
+
+        [Key]
+        public string IdLicence { get; set; }
+
+        public string Nom { get; set; }
+
+        public string Prenom { get; set; }
+
+        public string Licence { get; set; }
+
+        public string NumClub { get; set; }
+
+        public string NomClub { get; set; }
+
+        public string Sexe { get; set; }
+
+        public string Type { get; set; }
+
+        public string Certificat { get; set; }
+
+        public string Validation { get; set; }
+
+        public string Echelon { get; set; }
+
+        public string Place { get; set; }
+
+        public string Points { get; set; }
+
+        public string Categorie { get; set; }
+
+        public string PointsMensuel { get; set; }
+ 
+        public string APointsMensuel { get; set; }
+
+        public string PointsInitial { get; set; }
+
+        public string Mutation { get; set; }
+
+        public string Nationalite { get; set; }
+
+        public string Arbitre { get; set; }
+
+        public string JugeArbitre { get; set; }
+
+        public string Tech { get; set; }
 
         private string DebuggerDisplay => $"Licence:{this.Licence} - Nom:{this.Nom} Prenom:{this.Prenom}";
 

@@ -7,6 +7,8 @@
 
         public string Club { get; set; }
 
+        public string Joueur { get; set; }
+
         public string JoueursDuClub { get; set; }
 
         //public string ReloadJoueursDuClub { get; set; }

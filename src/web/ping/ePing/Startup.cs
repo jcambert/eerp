@@ -62,7 +62,7 @@ namespace ePing
 
             
 
-            services.AddHttpClient("login", options =>
+            services.AddHttpClient("auth", options =>
             {
                 options.BaseAddress = new Uri(Configuration.GetValue<string>("ping:auth:IdentityUrl"));
             })

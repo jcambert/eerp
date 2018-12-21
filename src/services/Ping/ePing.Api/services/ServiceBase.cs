@@ -147,6 +147,8 @@ namespace ePing.Api.services
 
             if (dto == null) return default(TModel);
             model = Mapper.Map<TModel>(filter(dto));
+                if (model == null)
+                    throw new Exception("Something where wrong in mapping Dto. Check Api Mapping to Dto");
             if (addToDb && model != null)
             {
                 if (beforeAdd != null)
@@ -162,7 +164,7 @@ namespace ePing.Api.services
                     
 
             }
-            else if (beforeAdd != null)
+            else if (beforeAdd != null && model !=null)
                 await beforeAdd(model);
             }
             catch (Exception ex)

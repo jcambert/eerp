@@ -112,7 +112,7 @@ namespace Auth.Api
             {
                 options.AddPolicy("all", policy =>
                 {
-                    policy.AllowAnyHeader().WithHeaders("access-control-allow-origin");
+                    policy.AllowAnyHeader();//.WithHeaders("access-control-allow-origin");
                     policy.AllowAnyOrigin();
                     policy.AllowAnyMethod();
                    

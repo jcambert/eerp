@@ -3,6 +3,7 @@ using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Auth.Api.Services
@@ -60,13 +61,22 @@ namespace Auth.Api.Services
 
         }
 
-        public async Task Logout(string baseUrl)
+        public async Task<TokenRevocationResponse> Logout( string baseUrl,string token)
         {
             await Discover(baseUrl);
 
             var client = new HttpClient();
 
-            await client.RevokeTokenAsync()
+            var request = new TokenRevocationRequest()
+            {
+                Address = disco.RevocationEndpoint,
+                ClientId = "client",
+                ClientSecret = "secret",
+                Token = token,
+            };
+
+            var resp= await client.RevokeTokenAsync(request, CancellationToken.None);
+            return resp;
         }
     }
 }

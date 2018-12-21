@@ -36,6 +36,13 @@ namespace ePing.Api.Controllers
             return Context.Joueurs;
         }
 
+      /*  [HttpGet("{licence}")]
+        public async Task<IActionResult> GetJoueur([FromRoute] string licence)
+        {
+            var joueur = await Service.LoadJoueur(licence);
+            return Ok(joueur);
+        }*/
+
         // GET: api/Joueurs
         [HttpGet("{licence}/parties")]
         public async Task<IActionResult> GetPartiesDuJoueur([FromRoute] string licence)

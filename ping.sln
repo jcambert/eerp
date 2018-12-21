@@ -29,6 +29,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ping", "ping", "{71E808D6-A8CF-4EB1-8EA3-A3B5303EE469}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{B7E97E73-C1E2-49AA-904A-2B6801038AD3}"
+	ProjectSection(SolutionItems) = preProject
+		src\services\Identity\identitymodel.pdf = src\services\Identity\identitymodel.pdf
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Api", "src\services\Identity\Auth.Api\Auth.Api.csproj", "{DF1539E0-41A6-4947-A6D9-13880916285F}"
 EndProject
@@ -36,9 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PingPointsTest", "PingPoint
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility", "utility", "{BC381C4D-96E3-4F97-A9EC-151E6C4AA033}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation", "src\utility\Validation\Validation.csproj", "{329B8FB7-A747-4020-A84A-67EA30BD9E17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Validation", "src\utility\Validation\Validation.csproj", "{329B8FB7-A747-4020-A84A-67EA30BD9E17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationTest", "src\utility\ValidationTest\ValidationTest.csproj", "{C2C81670-C533-432C-8981-365FA16F5CCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidationTest", "src\utility\ValidationTest\ValidationTest.csproj", "{C2C81670-C533-432C-8981-365FA16F5CCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
