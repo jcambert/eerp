@@ -104,7 +104,8 @@ namespace ePing
 
             app.UseCookiePolicy();
             app.UseSession();
-            
+
+            app.UseAliveMiddleware();
             app.UseBearerMiddleware();
             app.UseAuthentication();
 
