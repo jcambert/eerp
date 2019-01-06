@@ -31,9 +31,24 @@ namespace ePing.Api.models
         public string Latitude { get; set; }
         public string DateValidation { get; set; }
 
+        
         public List<Joueur> Joueurs { get; set; } = new List<Joueur>();
 
         public List<Equipe> Equipes { get; set; } = new List<Equipe>();
+
+        private string DebuggerDisplay => $"Numero:{this.Numero} - Nom:{this.Nom} ";
+    }
+
+    [DebuggerDisplay("{DebuggerDisplay}")]
+    public class ClubSearch : Trackable
+    {
+        public string IdClub { get; set; }
+
+        public string Numero { get; set; }
+
+        public string Nom { get; set; }
+
+        public string Validation { get; set; }
 
         private string DebuggerDisplay => $"Numero:{this.Numero} - Nom:{this.Nom} ";
     }

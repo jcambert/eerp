@@ -63,6 +63,7 @@ namespace Ping.Api.services
             apis[Configuration.ClubEquipe] = "spid:api:clubequipe";
             apis[Configuration.ClassementDivision] = "spid:api:divisionclassement";
             apis[Configuration.ListeJoueur] = "spid:api:listejoueur";
+            apis[Configuration.ListeJoueurClassement] = "spid:api:listejoueurclt";
             apis[Configuration.Joueur] = "spid:api:joueur";
             apis[Configuration.JoueurSpid] = "spid:api:joueurspid";
             apis[Configuration.JoueurPartieSpid] = "spid:api:joueurpartiespid";
@@ -104,9 +105,6 @@ namespace Ping.Api.services
             doc.Load(result);
             var root = doc.DocumentElement;
             var node_ = root.SelectSingleNode("/liste");
-            /*var node = doc.GetElementsByTagName("liste");
-            doc.LoadXml(node_.InnerXml);
-            node_ = doc.DocumentElement;*/
             var json = JsonConvert.SerializeXmlNode(node_);
             return json;
         }

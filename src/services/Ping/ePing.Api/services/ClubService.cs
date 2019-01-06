@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace ePing.Api.services
 {
@@ -17,6 +18,7 @@ namespace ePing.Api.services
         //Task<Club> LoadClubFromSpid(string numero, bool addIfnotExist);
         Task<List<Equipe>> LoadEquipes(Club club, string @type = null);
         Task<Club> LoadClub(string numero, bool autoSave = true);
+        Task<List<ClubSearch>> SearchClub(string numero);
     }
     public class ClubService : ServiceBase, IClubService
     {
@@ -27,9 +29,24 @@ namespace ePing.Api.services
             QueryService = queryService;
             OrganismeService = organismeService;
         }
+
+
         private async Task<Club> LoadClubFromSpid(string numero,bool autoSave=true)
         {
             return await this.InternalLoadFromSpid<ListeClubHeader, ClubDto, Club>($"/api/club/{numero}/detail", true, liste => liste.Liste.Club, (ctx, model) => { ctx.Clubs.Add(model); },null,null,autoSave);
+        }
+
+        private async Task<List<ClubSearch>> SearchClubFromSpid(string numero)
+        {
+            Func<string, ListeClubsSearchHeader> onUniqueResultat = (text) =>
+            {
+                var liste = JsonConvert.DeserializeObject<ListeClubSearchHeader>(text);
+                var result0 = new ListeClubsSearchHeader();
+                result0.Liste = new ClubsSearchDtoHeader();
+                result0.Liste.Clubs.Add(liste.Liste.Club);
+                return result0;
+            };
+            return await this.InternalLoadListFromSpid<ListeClubsSearchHeader, List<ClubSearchDto>, ClubSearch>($"/api/club/{numero}", false, liste => liste?.Liste?.Clubs,null,null,null,false,onUniqueResultat);
         }
 
         public async Task<List<Equipe>> LoadEquipesFromSpid(List<Organisme> organismes, Club club, string @type = null)
@@ -70,6 +87,11 @@ namespace ePing.Api.services
             if(club==null)
                 club = await LoadClubFromSpid(numero, autoSave);
             return club;
+        }
+
+        public async Task<List<ClubSearch>> SearchClub(string numero)
+        {
+            return await SearchClubFromSpid(numero);
         }
     }
 }

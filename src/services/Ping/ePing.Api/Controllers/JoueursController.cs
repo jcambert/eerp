@@ -171,14 +171,14 @@ namespace ePing.Api.Controllers
         }
 
 
-        //[HttpGet("club/{numero}/load")]
+        [HttpGet("club/{numero}/load")]
         [HttpGet("club/{numero}")]
         public async Task<IActionResult> GetJoueursDuClub([FromRoute] string numero)
         {
             var club = await ClubService.LoadClub(numero);// Context.Clubs.FindAsync(numero);
             if (club == null)
                 return NotFound();
-            var liste = await Service.LoadJoueurs(club);
+            var liste = await Service.LoadJoueursForClub(club, Request.Path.Value.Contains("load"));
            /* if (Request.Path.Value.Contains("load"))
             {
 
@@ -311,6 +311,32 @@ namespace ePing.Api.Controllers
         private bool JoueurExists(string id)
         {
             return Context.Joueurs.Any(e => e.Licence == id);
+        }
+
+        [HttpGet("liste/club/{club?}")]
+        [HttpGet("liste/nom/{nom?}/{prenom?}")]
+        [HttpGet("liste/licence/{licence?}")]
+        public async Task<IActionResult> GetList(string club = null, string nom = null, string prenom = null, string licence = null)
+        {
+            List<JoueurSearch> result=null;
+            if (Request.Path.StartsWithSegments("/api/joueurs/liste/club"))
+                result = await Service.ListeJoueursByClub(club);
+            else if (Request.Path.StartsWithSegments("/api/joueurs/liste/nom"))
+                result = await Service.ListeJoueursByNom(nom, prenom);
+            else if (Request.Path.StartsWithSegments("/api/joueurs/liste/licence"))
+                result = await Service.ListeJoueursByLicence(licence);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+           /* NameValueCollection @params = new NameValueCollection();
+            if (club != null) @params["club"] = club;
+            if (nom != null) @params["nom"] = nom;
+            if (prenom != null) @params["prenom"] = prenom;
+            if (licence != null) @params["licence"] = licence;
+
+            var response = await SpidRequest.Execute(Configuration.ApiName, Configuration.ListeJoueur, @params);
+
+            return response;*/
         }
     }
 }

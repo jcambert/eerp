@@ -29,6 +29,7 @@ namespace Ping.Api.services
         string ClubEquipe { get; }
         string ClassementDivision { get; }
         string ListeJoueur { get; }
+        string ListeJoueurClassement { get; }
         string Joueur { get; }
         string JoueurSpid { get; }
         string JoueurPartieSpid { get; }
@@ -81,6 +82,8 @@ namespace Ping.Api.services
         public string ClassementDivision => "ClassementDivision";
 
         public string ListeJoueur => "ListeJoueur";
+
+        public string ListeJoueurClassement => "ListeJoueurClassement";
 
         public string Joueur => "Joueur";
 

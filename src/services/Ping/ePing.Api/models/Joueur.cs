@@ -34,7 +34,7 @@ namespace ePing.Api.models
         public double Point { get; set; }
 
         //public int Classe =>(Point/100);
-
+        public Club ClubRelation { get; set; }
 
         public string Nationalite { get; set; }
 
@@ -129,5 +129,31 @@ namespace ePing.Api.models
 
         private string DebuggerDisplay => $"Licence:{this.Licence} - Nom:{this.Nom} Prenom:{this.Prenom}";
 
+    }
+
+    [DebuggerDisplay("{DebuggerDisplay}")]
+    public class JoueurSearch:Trackable
+    {
+
+        [Key]
+        public string Licence { get; set; }
+
+        public string Nom { get; set; }
+
+        public string Prenom { get; set; }
+
+        public string Club { get; set; }
+
+        public string NomClub { get; set; }
+
+        public string Sexe { get; set; }
+
+        public string Echelon { get; set; }
+ 
+        public string Place { get; set; }
+
+        public string Point { get; set; }
+
+        private string DebuggerDisplay => $"Licence:{this.Licence} - Nom:{this.Nom} Prenom:{this.Prenom}";
     }
 }

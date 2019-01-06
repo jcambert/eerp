@@ -49,10 +49,17 @@ namespace ePing.Api.dbcontext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Club>().HasMany<Joueur>().WithOne(j => j.ClubRelation).OnDelete(DeleteBehavior.Cascade);
+
+
             modelBuilder.Entity<Joueur>()
             .HasOne<JoueurExtra>(a => a.Extra)
             .WithOne(b => b.Joueur)
-            .HasForeignKey<JoueurExtra>(e => e.LicenceOfJoueurSpid);
+            
+            .HasForeignKey<JoueurExtra>(e => e.LicenceOfJoueurSpid)
+            .OnDelete(DeleteBehavior.Cascade)
+            ;
 
 
 

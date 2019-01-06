@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace ePing.Api.dto
@@ -74,5 +75,57 @@ namespace ePing.Api.dto
         [JsonProperty("datevalidation")]
         public string DateValidation { get; set; }
 
+    }
+
+
+
+    [DataContract()]
+    public class ListeClubsSearchHeader
+    {
+        [JsonProperty("liste")]
+        [DataMember(Name = "liste")]
+        public ClubsSearchDtoHeader Liste { get; set; } = new ClubsSearchDtoHeader();
+
+    }
+
+    [DataContract()]
+    public class ListeClubSearchHeader
+    {
+        [JsonProperty("liste")]
+        [DataMember(Name = "liste")]
+        public ClubSearchDtoHeader Liste { get; set; }
+
+    }
+
+    public class ClubsSearchDtoHeader
+    {
+        [JsonProperty("club")]
+        [DataMember(Name = "club")]
+        public List<ClubSearchDto> Clubs { get; set; } = new List<ClubSearchDto>();
+
+    }
+
+    public class ClubSearchDtoHeader
+    {
+        [JsonProperty("club")]
+        [DataMember(Name = "club")]
+        public ClubSearchDto Club { get; set; }
+
+    }
+
+    public class ClubSearchDto
+    {
+        [DataMember(Name = "idclub")]
+        [JsonProperty("idclub")]
+        public string IdClub { get; set; }
+        [DataMember(Name = "numero")]
+        [JsonProperty("numero")]
+        public string Numero { get; set; }
+        [DataMember(Name = "nom")]
+        [JsonProperty("nom")]
+        public string Nom { get; set; }
+        [DataMember(Name = "validation")]
+        [JsonProperty("validation")]
+        public string Validation { get; set; }
     }
 }

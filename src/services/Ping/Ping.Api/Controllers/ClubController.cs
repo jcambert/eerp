@@ -57,10 +57,11 @@ namespace Ping.Api.Controllers
                 var result = await SpidRequest.Execute(Configuration.ApiName, Configuration.Club, new NameValueCollection() {
                     {"ville", nomornumero}
                 });
-                
-                return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubFFTT, new NameValueCollection() {
-                    {"nom", nomornumero }
-                });
+
+                /* return await SpidRequest.Execute(Configuration.ApiName, Configuration.ClubFFTT, new NameValueCollection() {
+                     {"nom", nomornumero }
+                 });*/
+                return result;
             }
         }
         /*

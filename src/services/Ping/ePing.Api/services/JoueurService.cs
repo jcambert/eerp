@@ -3,6 +3,7 @@ using ePing.Api.dbcontext;
 using ePing.Api.dto;
 using ePing.Api.models;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +22,11 @@ namespace ePing.Api.services
         List<HistoriquePointDto> ConvertToHistoriquePoint(List<Journee> journees);
         List<HistoriqueVictoireDto> ConvertToHistoriqueVictoire(List<Journee> journees);
         List<HistoriqueDefaiteDto> ConvertToHistoriqueDefaite(List<Journee> journees);
-        Task<List<Joueur>> LoadJoueurs(Club club);
+        Task<List<Joueur>> LoadJoueursForClub(Club club, bool reload = false);
         Task<Joueur> LoadJoueur(string licence);
+        Task<List<JoueurSearch  >> ListeJoueursByClub(string club);
+        Task<List<JoueurSearch>> ListeJoueursByNom(string nom, string prenom);
+        Task<List<JoueurSearch>> ListeJoueursByLicence(string licence);
     }
 
     public class JoueurService : ServiceBase, IJoueurService
@@ -41,9 +45,9 @@ namespace ePing.Api.services
             return result;
         }
 
-        public async Task<List<Joueur>> loadJoueursFromSpid(Club club, bool autoSave = true)
+        public async Task<List<Joueur>> loadJoueursFromSpid(Club club, bool addToDb = true, bool autoSave = true)
         {
-            return await this.InternalLoadListFromSpid<ListeJoueursHeader, List<JoueurDto>, Joueur>($"api/joueur/liste/club/{club.Numero}", true, liste => liste?.Liste?.Joueurs, (ctx,j)=>ctx.Joueurs.Add(j),null,null,autoSave);
+            return await this.InternalLoadListFromSpid<ListeJoueursHeader, List<JoueurDto>, Joueur>($"api/joueur/liste/club/{club.Numero}", addToDb, liste => liste?.Liste?.Joueurs, (ctx,j)=>ctx.Joueurs.Add(j),null,null,autoSave);
         }
 
         public async Task<List<Partie>> loadJoueurParties(Joueur joueur)
@@ -61,6 +65,19 @@ namespace ePing.Api.services
             return await this.InternalLoadListFromSpid<ListeClassementHeader, List<ClassementDto>, Classement>($"api/joueur/{joueur.Licence}/histoclass", false, liste => liste?.Liste?.Classements);
         }
 
+        public async Task<List<JoueurSearch>> loadJoueursByNom(string nom,string prenom)
+        {
+            Func<string, ListeJoueursSearchHeader> onUniqueResultat = (text) =>
+            {
+                var liste=JsonConvert.DeserializeObject<ListeJoueurSearchHeader>(text);
+                var result0 = new ListeJoueursSearchHeader();
+                result0.Liste.Joueurs.Add(liste.Liste.Joueur);
+                return result0;
+            };
+            List<JoueurSearch> result = await this.InternalLoadListFromSpid<ListeJoueursSearchHeader, List<JoueurSearchDto>, JoueurSearch>($"api/joueur/liste/nom/{nom}/{prenom}", false, liste => liste?.Liste?.Joueurs, null, null, null,false,onUniqueResultat);
+            return result;
+        }
+
         public List<HistoriquePointDto> ConvertToHistoriquePoint(List<Journee> journees)
         {
             return Mapper.Map<List<HistoriquePointDto>>(journees);
@@ -76,18 +93,34 @@ namespace ePing.Api.services
             return Mapper.Map<List<HistoriqueDefaiteDto>>(journees);
         }
 
-        public async Task<List<Joueur>> LoadJoueurs(Club club)
+        public async Task<List<Joueur>> LoadJoueursForClub(Club club,bool reload=false)
         {
-            var joueurs = DbContext.Joueurs.Where(j => j.NumeroClub == club.Numero).ToList();
-            if (joueurs == null || joueurs.Count == 0)
+            List<Joueur> joueurs = null;
+            try
             {
-                List<Task> tasks = new List<Task>();
-                joueurs = await loadJoueursFromSpid(club,false);
-                
-                joueurs.ForEach(joueur => tasks.Add(LoadDetailJoueurFromSpid(joueur.Licence,true,false)));
-                await Task.WhenAll(tasks);
 
-                await DbContext.SaveChangesAsync();
+
+                if (!reload)
+                    joueurs = DbContext.Joueurs.Where(j => j.NumeroClub == club.Numero).ToList();
+                else
+                {
+                    DbContext.Joueurs.RemoveRange(DbContext.Joueurs.Where(j => j.NumeroClub == club.Numero).ToList());
+                    await DbContext.SaveChangesAsync();
+                }
+                if (joueurs == null || joueurs.Count == 0)
+                {
+                    List<Task> tasks = new List<Task>();
+                    joueurs = await loadJoueursFromSpid(club, false, false);
+
+                    //joueurs.ForEach(joueur => tasks.Add(LoadDetailJoueurFromSpid(joueur.Licence,true,false)));
+                    joueurs.ForEach(joueur => tasks.Add(LoadJoueurFromSpid(joueur.Licence, false)));
+                    await Task.WhenAll(tasks);
+
+                    await DbContext.SaveChangesAsync();
+                }
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
             return joueurs.OrderBy(j=>j.Nom).ThenBy(j=>j.Prenom).ToList();
         }
@@ -100,17 +133,13 @@ namespace ePing.Api.services
             return joueur;
         }
 
-        private async Task<Joueur> LoadJoueurFromSpid(string licence)
+        private async Task<Joueur> LoadJoueurFromSpid(string licence,bool autoSave=true)
         {
             var uri = $"/api/joueur/{licence}/spid";
-            /*Func<JoueurSpid, Task> beforeAdd = async (j) =>
-               {
-                   j.Extra = new JoueurExtra() { Licence = j.Licence };
-                  //j.Club = await ClubService.LoadClub(j.NumeroClub, false);
-                  await LoadDetailJoueurFromSpid(j, false);
-               };*/
+            
             JoueurSpid joueurspid= await this.InternalLoadFromSpid<ListeJoueurSpidHeader, JoueurSpidDto, JoueurSpid>(uri, false, liste => liste?.Liste?.Joueur, null, null, null);
             Joueur joueur =await LoadDetailJoueurFromSpid(joueurspid.Licence,false, false);
+            if (joueur == null) return null;
             joueur.Extra = new JoueurExtra() { Licence = joueur.Licence };
             joueur.Sexe = joueurspid.Sexe;
             joueur.Type = joueurspid.Type;
@@ -123,13 +152,29 @@ namespace ePing.Api.services
             joueur.JugeArbitre = joueurspid.JugeArbitre;
             joueur.Tech = joueurspid.Tech;
             await this.DbContext.Set<Joueur>().AddAsync(joueur);
-            await DbContext.SaveChangesAsync();
+            if(autoSave)
+                await DbContext.SaveChangesAsync();
             return joueur;
         }
 
         private async Task AddDetailJoueurFromspid()
         {
 
+        }
+
+        public Task<List<JoueurSearch>> ListeJoueursByClub(string club)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<JoueurSearch>> ListeJoueursByNom(string nom, string prenom)
+        {
+            return await loadJoueursByNom(nom, prenom);
+        }
+
+        public Task<List<JoueurSearch>> ListeJoueursByLicence(string licence)
+        {
+            throw new NotImplementedException();
         }
     }
 }

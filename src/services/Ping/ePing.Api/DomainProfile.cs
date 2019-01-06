@@ -18,6 +18,8 @@ namespace ePing.Api
                 return 0;
             });
             CreateMap<ClubDto, Club>().ReverseMap();
+            CreateMap<ClubSearchDto, ClubSearch>().ReverseMap();
+            CreateMap<JoueurSearchDto, JoueurSearch>().ReverseMap();
             CreateMap<JoueurSpidDto, JoueurSpid>().ReverseMap();
             CreateMap<JoueurDto, Joueur>().ConstructUsing(j=> {
                 int nationnal, classement;

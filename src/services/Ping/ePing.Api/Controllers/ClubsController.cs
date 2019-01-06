@@ -54,6 +54,14 @@ namespace ePing.Api.Controllers
         }
 
 
+        [HttpGet("liste/{numero}")]
+        public async Task<IActionResult> GetList([FromRoute] string numero)
+        {
+            var result = await Service.SearchClub(numero);
+
+            return Ok(result);
+        }
+
         [HttpGet("{numero}/equipes/")]
         [HttpGet("{numero}/equipes/resultats")]
         public async Task<IActionResult> GetEquipesDuclub([FromRoute]string numero)

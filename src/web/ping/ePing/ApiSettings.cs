@@ -34,5 +34,9 @@
         public string ResultatEquipe { get; set; }
 
         public string ClassementEquipe { get; set; }
+
+        public string ListeJoueursByNom { get; set; }
+
+        public string ListeClubsByNom { get; set; }
     }
 }

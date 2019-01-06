@@ -195,4 +195,65 @@ namespace ePing.Api.dto
         public string Tech { get; set; }
 
     }
+
+    [DataContract]
+    public class ListeJoueursSearchHeader
+    {
+        [DataMember(Name = "liste")]
+        [JsonProperty("liste")]
+        public JoueursSearchDtoHeader Liste { get; set; } = new JoueursSearchDtoHeader();
+    }
+
+    [DataContract]
+    public class ListeJoueurSearchHeader
+    {
+        [DataMember(Name = "liste")]
+        [JsonProperty("liste")]
+        public JoueurSearchDtoHeader Liste { get; set; }
+    }
+
+    public class JoueursSearchDtoHeader
+    {
+        [DataMember(Name = "joueur")]
+        [JsonProperty("joueur")]
+        public List<JoueurSearchDto> Joueurs { get; set; } = new List<JoueurSearchDto>();
+
+    }
+    public class JoueurSearchDtoHeader
+    {
+        [DataMember(Name = "joueur")]
+        [JsonProperty("joueur")]
+        public JoueurSearchDto Joueur { get; set; }
+
+    }
+    public class JoueurSearchDto
+    {
+        [DataMember(Name = "licence")]
+        [JsonProperty("licence")]
+        public string  Licence { get; set; }
+        [DataMember(Name = "nom")]
+        [JsonProperty("nom")]
+        public string Nom { get; set; }
+        [DataMember(Name = "prenom")]
+        [JsonProperty("prenom")]
+        public string Prenom { get; set; }
+        [DataMember(Name = "club")]
+        [JsonProperty("club")]
+        public string Club { get; set; }
+        [DataMember(Name = "nclub")]
+        [JsonProperty("nclub")]
+        public string NomClub { get; set; }
+        [DataMember(Name = "sexe")]
+        [JsonProperty("sexe")]
+        public string Sexe { get; set; }
+        [DataMember(Name = "echelon")]
+        [JsonProperty("echelon")]
+        public string Echelon { get; set; }
+        [DataMember(Name = "place")]
+        [JsonProperty("place")]
+        public string Place { get; set; }
+        [DataMember(Name = "point")]
+        [JsonProperty("point")]
+        public string Point { get; set; }
+    }
 }

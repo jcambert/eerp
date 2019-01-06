@@ -45,7 +45,7 @@ namespace ePing.Api.services
 
         public HttpClient CreateClient() => ClientFactory.CreateClient(Configuration["ping:name"]);
 
-        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true) where TModel : Trackable
+        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true,Func<string,TListDto>onUniqueResultat=null) where TModel : Trackable
         {
             List<TModel> model=null;
             Func<TModel, Task> addOrUpdate = async (_model) =>
@@ -66,7 +66,19 @@ namespace ePing.Api.services
 
                 StreamReader reader = new StreamReader(res);
                 string text = reader.ReadToEnd();
-                TListDto dto = JsonConvert.DeserializeObject<TListDto>(text);
+
+                TListDto dto;//= JsonConvert.DeserializeObject<TListDto>(text);
+                try
+                {
+                    dto = JsonConvert.DeserializeObject<TListDto>(text);
+                }
+                catch 
+                {
+                    if (onUniqueResultat != null)
+                        dto = onUniqueResultat(text);
+                    else
+                        dto = default(TListDto);
+                }
 
                 if (dto == null) return default(List<TModel>);
                 try
@@ -76,14 +88,15 @@ namespace ePing.Api.services
                 {
                     var msg = ex1.Message;
                 }
-                try
+
+                /*try
                 {
                     var toto = (filter(dto) as List<dto.ResultatRencontreDto>)[12];
                     var titi = Mapper.Map<ResultatRencontre>(toto);
                 }
-                catch  { }
+                catch  { }*/
 
-                if (model is IEnumerable<TModel>)
+                if (model is IEnumerable<TModel> && (beforeAdd!=null || addToDb))
                     foreach (var item in model as IEnumerable<TModel>)
                     {
                         if (beforeAdd != null)
@@ -97,7 +110,7 @@ namespace ePing.Api.services
                     }
 
 
-                if (autoSave)
+                if (autoSave && addToDb)
                     try
                     {
                         await DbContext.SaveChangesAsync();
@@ -147,8 +160,8 @@ namespace ePing.Api.services
 
             if (dto == null) return default(TModel);
             model = Mapper.Map<TModel>(filter(dto));
-                if (model == null)
-                    throw new Exception("Something where wrong in mapping Dto. Check Api Mapping to Dto");
+               // if (model == null)
+                //    throw new Exception("Something where wrong in mapping Dto. Check Api Mapping to Dto");
             if (addToDb && model != null)
             {
                 if (beforeAdd != null)
