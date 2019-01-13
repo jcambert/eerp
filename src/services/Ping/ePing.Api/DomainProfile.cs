@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ePing.Api.dto;
 using ePing.Api.models;
+using ePing.Api.services;
 using System;
 using System.Text.RegularExpressions;
 
@@ -69,7 +70,28 @@ namespace ePing.Api
 
                 };
             });
-            CreateMap<PartieHistoDto, Historique>();
+            CreateMap<PartieHistoDto, Historique>().ConstructUsing(histo =>
+            {
+                return new Historique()
+                {
+                    ClassementAdversaire = histo.ClassementAdversaire,
+                    CodeChampionnat = histo.CodeChampionnat,
+                    CoefficientEpreuve = histo.CoefficientEpreuve,
+                    Date = histo.Date,
+                    IdPartie = histo.IdPartie,
+                    Inserted = histo.Inserted,
+                    Journee = histo.Journee,
+                    Licence = histo.Licence,
+                    LicenceAdversaire = histo.LicenceAdversaire,
+                    NomPrenomAdversaire = histo.NomPrenomAdversaire,
+                    Phase = PingService.GetPhase(histo.Date),
+                    PointsGagnesPerdus=double.Parse( histo.PointsGagnesPerdus),
+                    SexeAdversaire=histo.SexeAdversaire,
+                    Victoire=histo.Victoire
+                    
+
+                };
+            });
             CreateMap<ClassementDto, Classement>();
             CreateMap<Journee, HistoriquePointDto>().ConvertUsing(journee =>
             {

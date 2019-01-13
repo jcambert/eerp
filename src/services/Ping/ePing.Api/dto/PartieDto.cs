@@ -87,5 +87,8 @@ namespace ePing.Api.dto
         [DataMember(Name = "idpartie")]
         [JsonProperty("idpartie")]
         public string IdPartie { get; set; }
+        [DataMember(Name = "inserted")]
+        [JsonProperty("inserted")]
+        public DateTime Inserted { get; set; }
     }
 }

@@ -59,14 +59,16 @@ namespace Ping.Api.Controllers
         [HttpGet("{licence}/parties")]
         public async Task<ActionResult<string>> GetByPartieSpid(string licence)
         {
+            var resp = "";
             if(Request.Path.Value.Contains("/historique"))
-                return await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieMySql, new NameValueCollection() {
+                resp= await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieMySql, new NameValueCollection() {
                 {"licence", licence}
             });
             else
-            return await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieSpid, new NameValueCollection() {
+            resp= await SpidRequest.Execute(Configuration.ApiName, Configuration.JoueurPartieSpid, new NameValueCollection() {
                 {"numlic", licence}
             });
+            return resp;
         }
 
         [HttpGet("{license}/histoclass")]

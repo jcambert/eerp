@@ -73,6 +73,8 @@ namespace ePing.Api.models
         public string JugeArbitre { get;  set; }
         public string Tech { get;  set; }
 
+        //public JourneeHistoriques Historiques { get; set; }
+
         private string DebuggerDisplay => $"Licence:{this.Licence} - Nom:{this.Nom} Prenom:{this.Prenom}";
 
     }

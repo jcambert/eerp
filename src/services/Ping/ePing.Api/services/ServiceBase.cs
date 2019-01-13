@@ -17,16 +17,16 @@ namespace ePing.Api.services
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
-        private readonly PingDbContext _dbcontext;
+        //private readonly PingDbContext _dbcontext;
         private readonly IMapper _mapper;
         private readonly EfService _efService;
         private readonly CacheService _cache;
 
-        public ServiceBase(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext, EfService efService)
+        public ServiceBase(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper,/* PingDbContext dbcontext,*/ EfService efService)
         {
             _clientFactory = clientFactory;
             _configuration = configuration;
-            _dbcontext = dbcontext;
+            //_dbcontext = dbcontext;
             _mapper = mapper;
             _efService = efService;
         }
@@ -35,7 +35,7 @@ namespace ePing.Api.services
 
         public IConfiguration Configuration => _configuration;
 
-        public PingDbContext DbContext => _dbcontext;
+        //public PingDbContext DbContext => _dbcontext;
 
         public IMapper Mapper => _mapper;
 
@@ -45,10 +45,10 @@ namespace ePing.Api.services
 
         public HttpClient CreateClient() => ClientFactory.CreateClient(Configuration["ping:name"]);
 
-        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true,Func<string,TListDto>onUniqueResultat=null) where TModel : Trackable
+        protected async Task<List<TModel>> InternalLoadListFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<OldPingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true,Func<string,TListDto>onUniqueResultat=null) where TModel : Trackable
         {
             List<TModel> model=null;
-            Func<TModel, Task> addOrUpdate = async (_model) =>
+            /*Func<TModel, Task> addOrUpdate = async (_model) =>
              {
                  var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
                  if (existed != null)
@@ -56,7 +56,7 @@ namespace ePing.Api.services
                  else
 
                      add(DbContext, _model);
-             };
+             };*/
 
             try
             {
@@ -103,14 +103,14 @@ namespace ePing.Api.services
                             await beforeAdd(item);
                         if (addToDb)
                         {
-                            await addOrUpdate(item);
+                           // await addOrUpdate(item);
                             if (beforeSave != null)
                                 beforeSave(item);
                         }
                     }
 
 
-                if (autoSave && addToDb)
+                /*if (autoSave && addToDb)
                     try
                     {
                         await DbContext.SaveChangesAsync();
@@ -119,7 +119,7 @@ namespace ePing.Api.services
                     {
                         var msg = ex.Message;
                         throw ex;
-                    }
+                    }*/
 
             }
             catch (Exception ex0)
@@ -131,10 +131,10 @@ namespace ePing.Api.services
 
             return model;
         }
-        protected async Task<TModel> InternalLoadFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<PingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true) where TModel : Trackable
+        protected async Task<TModel> InternalLoadFromSpid<TListDto, TModelDto, TModel>(string uri, bool addToDb, Func<TListDto, TModelDto> filter, Action<OldPingDbContext, TModel> add = null, Action<TModel> beforeSave = null, Func<TModel, Task> beforeAdd = null, bool autoSave = true) where TModel : Trackable
         {
             TModel model;
-            Func<TModel, Task> addOrUpdate = async (_model) =>
+            /*Func<TModel, Task> addOrUpdate = async (_model) =>
              {
                  var existed = await DbContext.Set<TModel>().FindAsync(EfService.GetKeyValues(_model));
                  if (existed != null)
@@ -146,7 +146,7 @@ namespace ePing.Api.services
                      else
                          await DbContext.Set<TModel>().AddAsync(_model);
                  }
-             };
+             };*/
             try
             {
                 var client = CreateClient();
@@ -166,14 +166,12 @@ namespace ePing.Api.services
             {
                 if (beforeAdd != null)
                     await beforeAdd(model);
-                await addOrUpdate(model);
+               // await addOrUpdate(model);
 
                 if (beforeSave != null)
                     beforeSave(model);
 
-                if (autoSave)
-                    
-                        await DbContext.SaveChangesAsync();
+                //if (autoSave)await DbContext.SaveChangesAsync();
                     
 
             }

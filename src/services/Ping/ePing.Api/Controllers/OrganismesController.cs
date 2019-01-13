@@ -17,7 +17,7 @@ namespace ePing.Api.Controllers
     {
         
 
-        public OrganismesController(PingDbContext context,IOrganismeService service):base(context)
+        public OrganismesController(/*PingDbContext context,*/IOrganismeService service):base(/*context*/)
         {
             this.Service = service;
         }
@@ -35,7 +35,8 @@ namespace ePing.Api.Controllers
         {
             await Service.Load();// LoadFromSpid(Request.Path.Value.Contains("force"));
 
-            return Context.Organismes;
+            // return Context.Organismes;
+            return null;
         }
 
         // GET: api/Organismes/5
@@ -48,21 +49,22 @@ namespace ePing.Api.Controllers
             }
 
             await Service.Load();// LoadFromSpid();
-            var organisme = await Context.Organismes.FindAsync(id);
-
+            /*var organisme = await Context.Organismes.FindAsync(id);
+            
             if (organisme == null)
             {
                 return NotFound();
             }
 
-            return Ok(organisme);
+            return Ok(organisme);*/
+            return Ok();
         }
 
         // PUT: api/Organismes/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutOrganisme([FromRoute] string id, [FromBody] Organisme organisme)
         {
-            if (!ModelState.IsValid)
+            /*if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -90,48 +92,52 @@ namespace ePing.Api.Controllers
                 }
             }
 
-            return NoContent();
+            return NoContent();*/
+            return Ok();
         }
 
         // POST: api/Organismes
         [HttpPost]
         public async Task<IActionResult> PostOrganisme([FromBody] Organisme organisme)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            /*  if (!ModelState.IsValid)
+              {
+                  return BadRequest(ModelState);
+              }
 
-            Context.Organismes.Add(organisme);
-            await Context.SaveChangesAsync();
+              Context.Organismes.Add(organisme);
+              await Context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrganisme", new { id = organisme.Id }, organisme);
+              return CreatedAtAction("GetOrganisme", new { id = organisme.Id }, organisme);*/
+            return Ok();
         }
 
         // DELETE: api/Organismes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganisme([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            /* if (!ModelState.IsValid)
+             {
+                 return BadRequest(ModelState);
+             }
 
-            var organisme = await Context.Organismes.FindAsync(id);
-            if (organisme == null)
-            {
-                return NotFound();
-            }
+             var organisme = await Context.Organismes.FindAsync(id);
+             if (organisme == null)
+             {
+                 return NotFound();
+             }
 
-            Context.Organismes.Remove(organisme);
-            await Context.SaveChangesAsync();
+             Context.Organismes.Remove(organisme);
+             await Context.SaveChangesAsync();
 
-            return Ok(organisme);
+             return Ok(organisme);*/
+            return Ok();
         }
 
         private bool OrganismeExists(string id)
         {
-            return Context.Organismes.Any(e => e.Id == id);
+            return false;
+           // return Context.Organismes.Any(e => e.Id == id);
         }
     }
 }

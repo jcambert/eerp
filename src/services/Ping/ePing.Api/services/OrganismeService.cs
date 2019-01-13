@@ -4,6 +4,7 @@ using ePing.Api.dto;
 using ePing.Api.models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,19 +19,28 @@ namespace ePing.Api.services
     }
     public class OrganismeService : ServiceBase, IOrganismeService
     {
-        public OrganismeService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext, EfService efService,QueryService queryService) : base(clientFactory, configuration, mapper, dbcontext, efService)
+        private ElasticService _elastic;
+        
+        public ElasticClient Elastic
+        {
+            get { return _elastic.Elastic; }
+        }
+
+        public OrganismeService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, /*PingDbContext dbcontext,*/ EfService efService,QueryService queryService, ElasticService elastic) : base(clientFactory, configuration, mapper,/* dbcontext,*/ efService)
         {
             QueryService = queryService;
+            _elastic = elastic;
         }
 
         public QueryService QueryService { get; }
 
         public async Task<List<Organisme>> Load()
         {
-            var result = DbContext.Organismes.ToList();
+            /*var result = DbContext.Organismes.ToList();
             if (result == null || result.Count == 0)
                 result = await LoadFromSpid();
-            return result;
+            return result;*/
+            return await LoadFromSpid();
         }
 
         /*public async Task<List<Organisme>> LoadFromSpid(bool force = false)

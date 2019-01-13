@@ -27,6 +27,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{623DEA39-3E44-45E8-BD1A-A02B89D7634D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ping", "ping", "{71E808D6-A8CF-4EB1-8EA3-A3B5303EE469}"
+	ProjectSection(SolutionItems) = preProject
+		src\services\Ping\api-smartping-720.pdf = src\services\Ping\api-smartping-720.pdf
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{B7E97E73-C1E2-49AA-904A-2B6801038AD3}"
 	ProjectSection(SolutionItems) = preProject

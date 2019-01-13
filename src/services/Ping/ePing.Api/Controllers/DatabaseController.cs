@@ -13,20 +13,20 @@ namespace ePing.Api.Controllers
     [ApiController]
     public class DatabaseController : ControllerBase
     {
-        public DatabaseController(PingDbContext context, IClubService service)
+        public DatabaseController(/*PingDbContext context,*/ IClubService service)
         {
-            Context = context;
+           // Context = context;
             Service = service;
         }
 
-        public PingDbContext Context { get; }
+       // public PingDbContext Context { get; }
         public IClubService Service { get; }
 
         [HttpPost]
         public async Task<IActionResult> reset()
         {
-            Context.Clubs.RemoveRange(Context.Clubs);
-            await Context.SaveChangesAsync();
+           /* Context.Clubs.RemoveRange(Context.Clubs);
+            await Context.SaveChangesAsync();*/
             return Ok();
         }
 

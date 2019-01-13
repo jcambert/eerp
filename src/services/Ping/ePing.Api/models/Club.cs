@@ -32,7 +32,7 @@ namespace ePing.Api.models
         public string DateValidation { get; set; }
 
         
-        public List<Joueur> Joueurs { get; set; } = new List<Joueur>();
+        public List<string> Joueurs { get; set; } = new List<string>();//NUMERO DES LICENCES DES JOUEURS
 
         public List<Equipe> Equipes { get; set; } = new List<Equipe>();
 

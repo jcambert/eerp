@@ -17,7 +17,7 @@ namespace ePing.Api.Controllers
 
 
 
-        public ClubsController(PingDbContext context, IClubService service, IOrganismeService organismeService, IChampionnatService championnatService, QueryService queryService/*, CacheService cache*/) : base(context)
+        public ClubsController(/*PingDbContext context,*/ IClubService service, IOrganismeService organismeService, IChampionnatService championnatService, QueryService queryService/*, CacheService cache*/) : base(/*context*/)
         {
 
             Service = service;
@@ -36,7 +36,8 @@ namespace ePing.Api.Controllers
         [HttpGet]
         public IEnumerable<Club> GetClubs()
         {
-            return Context.Clubs;
+            //return Context.Clubs;
+            return null;
         }
 
         // GET: api/Clubs/5
@@ -73,37 +74,36 @@ namespace ePing.Api.Controllers
             var equipes = await Service.LoadEquipes(club, "M");
             if (full)
             {
-               /* Func<Equipe, Task> getClassementsAsync = (equipe) =>
-               {
-                   return ChampionnatService.LoadClassements(equipe);
-                 
-               };
-                Func<Equipe, Task> getResultatsAsync = (equipe) =>
-                {
-                    return ChampionnatService.LoadResultats(equipe);
-                };*/
-                //var tasks = new List<Task>();
+
                 foreach (var equipe in equipes)
                 {
-                    //var pere = QueryService.Parse(equipe.LienDivision).Where(q => q.Key == "organisme_pere").FirstOrDefault();
 
-                    //equipe.Organisme = organismes.Where(o => o.Identifiant == pere.Value).FirstOrDefault();
                     await ChampionnatService.LoadClassements(equipe);
                     await ChampionnatService.LoadResultats(equipe);
-                    //tasks.Add(getClassementsAsync(equipe));
-                    //tasks.Add(getResultatsAsync(equipe));
                 }
-               // await Task.WhenAll(tasks);
             }
             
         
             return Ok(equipes);
         }
 
+        [HttpGet("{numero}/joueurs")]
+        public async Task<IActionResult> GetJoueursDuClub([FromRoute] string numero)
+        {
+            var club = await Service.LoadClub(numero);// Context.Clubs.FindAsync(numero);
+            if (club == null)
+                return NotFound();
+            var liste = await Service.LoadJoueurs(club);
+
+
+            return Ok(liste);
+            return Ok();
+        }
+
         // PUT: api/Clubs/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutClub([FromRoute] string id, [FromBody] Club club)
-        {
+        {/*
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -131,7 +131,7 @@ namespace ePing.Api.Controllers
                     throw;
                 }
             }
-
+            */
             return NoContent();
         }
 
@@ -139,7 +139,7 @@ namespace ePing.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> PostClub([FromBody] Club club)
         {
-            if (!ModelState.IsValid)
+            /*if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -147,33 +147,36 @@ namespace ePing.Api.Controllers
             Context.Clubs.Add(club);
             await Context.SaveChangesAsync();
 
-            return CreatedAtAction("GetClub", new { id = club.idClub }, club);
+            return CreatedAtAction("GetClub", new { id = club.idClub }, club);*/
+            return Ok();
         }
 
         // DELETE: api/Clubs/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClub([FromRoute] string id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            /* if (!ModelState.IsValid)
+             {
+                 return BadRequest(ModelState);
+             }
 
-            var club = await Context.Clubs.FindAsync(id);
-            if (club == null)
-            {
-                return NotFound();
-            }
+             var club = await Context.Clubs.FindAsync(id);
+             if (club == null)
+             {
+                 return NotFound();
+             }
 
-            Context.Clubs.Remove(club);
-            await Context.SaveChangesAsync();
+             Context.Clubs.Remove(club);
+             await Context.SaveChangesAsync();
 
-            return Ok(club);
+             return Ok(club);*/
+            return Ok();
         }
 
         private bool ClubExists(string id)
         {
-            return Context.Clubs.Any(e => e.idClub == id);
+            return false;
+            //return Context.Clubs.Any(e => e.idClub == id);
         }
 
 

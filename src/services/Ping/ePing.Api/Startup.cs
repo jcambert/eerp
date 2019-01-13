@@ -30,7 +30,7 @@ namespace ePing.Api
         {
             services.AddSingleton<QueryService>();
             services.AddSingleton<EfService>();
-
+            services.AddSingleton<ElasticService>();
             services.AddTransient<IClubService, ClubService>();
             services.AddTransient<IJoueurService, JoueurService>();
             services.AddTransient<IOrganismeService, OrganismeService>();
@@ -39,7 +39,8 @@ namespace ePing.Api
 
 
             services.Configure<PointsSettings>(Configuration.GetSection("ping:points"));
-
+            services.Configure<ElasticSettings>(Configuration.GetSection("elastic"));
+            
             services
                 .AddHttpClient(Configuration["ping:name"], c =>
                 {
@@ -54,12 +55,12 @@ namespace ePing.Api
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
             //  var connection = new SqliteConnection("DataSource=:memory:");
-            var connection = new SqliteConnection("Data Source=ping.db");
+            /*var connection = new SqliteConnection("Data Source=ping.db");
             services.AddEntityFrameworkSqlite().AddDbContext<PingDbContext>(options =>
             {
                 options.UseSqlite(connection);
                 
-            }, ServiceLifetime.Transient);
+            }, ServiceLifetime.Transient);*/
 
             services.AddAutoMapper();
 
@@ -90,7 +91,7 @@ namespace ePing.Api
             {
                 app.UseDeveloperExceptionPage();
 
-                using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+               /* using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
                 {
                     var context = serviceScope.ServiceProvider.GetRequiredService<PingDbContext>();
                     if (env.IsDevelopment())
@@ -99,7 +100,7 @@ namespace ePing.Api
                         context.Database.EnsureCreated();
 
                     }
-                }
+                }*/
             }
 
 

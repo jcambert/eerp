@@ -6,16 +6,16 @@ using System;
 
 namespace ePing.Api.dbcontext
 {
-    public class PingDbContext : DbContextWithTriggers
+    public class OldPingDbContext : DbContextWithTriggers
     {
-        private IObservable<IAfterEntry<Joueur, PingDbContext>> joueurSpidObserveInserted;
+        private IObservable<IAfterEntry<Joueur, OldPingDbContext>> joueurSpidObserveInserted;
       //  private IObservable<IAfterEntry<Organisme, PingDbContext>> organismeObserveInserted;
 
-        public PingDbContext()
+        public OldPingDbContext()
         {
             Initialize();
         }
-        public PingDbContext(DbContextOptions options) : base(options)
+        public OldPingDbContext(DbContextOptions options) : base(options)
         {
             Initialize();
         }
@@ -23,7 +23,7 @@ namespace ePing.Api.dbcontext
         private void Initialize()
         {
            // Random rnd = new Random();
-            joueurSpidObserveInserted = DbObservable<PingDbContext>.FromInserted<Joueur>();
+            joueurSpidObserveInserted = DbObservable<OldPingDbContext>.FromInserted<Joueur>();
             joueurSpidObserveInserted.Subscribe(entry =>
             {
                 var joueur = entry.Entity;
@@ -45,6 +45,8 @@ namespace ePing.Api.dbcontext
         public DbSet<ClassementEquipe> ClassementsEquipes { get; set; }
         public DbSet<ResultatRencontre> ResultatsRencontres { get; set; }
         public DbSet<Equipe> Equipes { get; set; }
+        //public DbSet<JourneeHistoriques> JourneeHistoriques { get; set; }
+        //public DbSet<Historique> Historiques { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

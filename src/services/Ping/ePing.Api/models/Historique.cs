@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ePing.Api.models
+﻿namespace ePing.Api.models
 {
-    public class Historique:Trackable
+  
+    public class Historique : Trackable
     {
+
+
         public string Licence { get; set; }
 
         public string LicenceAdversaire { get; set; }
@@ -19,6 +17,12 @@ namespace ePing.Api.models
 
         public string Date { get; set; }
 
+        public int Phase
+        {
+            get;
+            set;
+        }
+
         public string SexeAdversaire { get; set; }
 
         public string NomPrenomAdversaire { get; set; }
@@ -29,6 +33,9 @@ namespace ePing.Api.models
 
         public string ClassementAdversaire { get; set; }
 
+        //[key]
         public string IdPartie { get; set; }
+
+
     }
 }

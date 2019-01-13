@@ -68,8 +68,21 @@ namespace ePing.Api.models
 
         }
 
-    public class JourneeHistoriques
+    public class JourneeHistoriques:IdTrackable
     {
+        /*private string licence;
+        private DateTime now;*/
+
+        public JourneeHistoriques()
+        {
+
+        }
+        public JourneeHistoriques(string licence,int phase, DateTime now)
+        {
+            //this.Licence = licence;
+            this.Inserted = now;
+        }
+
         public List<Historique> Historiques { get; set; } = new List<Historique>();
 
         public int NombreDeMatch => Historiques.Count();
@@ -89,5 +102,10 @@ namespace ePing.Api.models
         public double MoyennePointParVictoire => Math.Round(PointsVictoire /( NombreDeVictoire==0?1 : NombreDeVictoire), 1);
 
         public double MoyennePointParDefaite => Math.Round(pointsDefaite/ (NombreDeDefaite==0?1: NombreDeDefaite), 1);
+
+       
+        //public string Licence { get; set; }
+        //public int Phase { get; private set; }
+        //public DateTime inserted { get; set; }
     }
 }

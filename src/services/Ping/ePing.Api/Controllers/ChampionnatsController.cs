@@ -13,7 +13,7 @@ namespace ePing.Api.Controllers
     [ApiController]
     public class ChampionnatsController : PingControllerBase
     {
-        public ChampionnatsController(PingDbContext context,IChampionnatService service) : base(context)
+        public ChampionnatsController(/*PingDbContext context,*/IChampionnatService service) : base(/*context*/)
         {
             Service = service;
             

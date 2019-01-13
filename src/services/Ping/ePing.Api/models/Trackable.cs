@@ -5,8 +5,8 @@ namespace ePing.Api.models
 {
     public abstract class Trackable
     {
-        public DateTime Inserted { get; protected set; }
-        public DateTime Updated { get; protected set; }
+        public DateTime Inserted { get;  set; }
+        public DateTime Updated { get; set; }
 
         static Trackable()
         {

@@ -23,7 +23,7 @@ namespace ePing.Api.services
     }
     public class ChampionnatService : ServiceBase, IChampionnatService
     {
-        public ChampionnatService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext, EfService efService) : base(clientFactory, configuration, mapper, dbcontext, efService)
+        public ChampionnatService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, /*PingDbContext dbcontext,*/ EfService efService) : base(clientFactory, configuration, mapper,/* dbcontext,*/ efService)
         {
         }
 
@@ -35,10 +35,11 @@ namespace ePing.Api.services
 
         public async Task<List<ClassementEquipe>> LoadClassementsFromDb(Equipe equipe)
         {
-            var cls = DbContext.ClassementsEquipes.Where(e => e.Division == equipe.IdDivision&& e.Poule == equipe.IdPoule).ToList();
-            if (cls == null || cls.Count == 0)
-                cls = await LoadClassementsFromSpid(equipe);
-            return cls;
+            /* var cls = DbContext.ClassementsEquipes.Where(e => e.Division == equipe.IdDivision&& e.Poule == equipe.IdPoule).ToList();
+             if (cls == null || cls.Count == 0)
+                 cls = await LoadClassementsFromSpid(equipe);
+             return cls;*/
+            return null;
         }
 
         public async Task<List<ClassementEquipe>> LoadClassements(Equipe equipe)
@@ -57,10 +58,11 @@ namespace ePing.Api.services
 
         private async Task<List<ResultatRencontre>> LoadResultatsFromDb(Equipe equipe)
         {
-            var rs = DbContext.ResultatsRencontres.Where(r => r.Division == equipe.IdDivision && r.Poule == equipe.IdPoule).ToList();
+            /*var rs = DbContext.ResultatsRencontres.Where(r => r.Division == equipe.IdDivision && r.Poule == equipe.IdPoule).ToList();
             if (rs == null || rs.Count == 0)
                 rs = await LoadResultatsFromSpid(equipe);
-            return rs;
+            return rs;*/
+            return null;
         }
 
         public async Task<List<ResultatRencontre>> LoadResultats(Equipe equipe)

@@ -3,6 +3,7 @@ using ePing.Api.dbcontext;
 using ePing.Api.dto;
 using ePing.Api.models;
 using Microsoft.Extensions.Configuration;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace ePing.Api.services
         //Task<List<Joueur>> loadListForClubFromSpid(string numero, bool addToDb, Club club);
         // Task<Joueur> LoadDetailJoueur(Joueur joueur);
         Task<List<Partie>> loadJoueurParties(Joueur joueur);
-        Task<List<Historique>> loadJoueurHistoriques(Joueur joueur);
+        Task<JourneeHistoriques> loadJoueurHistoriques(Joueur joueur);
         Task<List<Classement>> loadHistoriqueClassement(Joueur joueur);
         List<HistoriquePointDto> ConvertToHistoriquePoint(List<Journee> journees);
         List<HistoriqueVictoireDto> ConvertToHistoriqueVictoire(List<Journee> journees);
@@ -31,11 +32,18 @@ namespace ePing.Api.services
 
     public class JoueurService : ServiceBase, IJoueurService
     {
-        public IClubService ClubService { get; }
+        private ElasticService _elastic;
+       // public IClubService ClubService { get; }
 
-        public JoueurService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, PingDbContext dbcontext, EfService efService, IClubService clubService) : base(clientFactory, configuration, mapper, dbcontext, efService)
+        public ElasticClient Elastic
         {
-            ClubService = clubService;
+            get { return _elastic.Elastic; }
+        }
+
+        public JoueurService(IHttpClientFactory clientFactory, IConfiguration configuration, IMapper mapper, /*PingDbContext dbcontext,*/ EfService efService,/* IClubService clubService,*/ ElasticService elastic) : base(clientFactory, configuration, mapper,/* dbcontext, */efService)
+        {
+           // ClubService = clubService;
+            _elastic = elastic;
         }
 
         private async Task<Joueur> LoadDetailJoueurFromSpid(string licence, bool addToDb=true, bool autoSave = true)
@@ -55,9 +63,22 @@ namespace ePing.Api.services
             return await this.InternalLoadListFromSpid<ListePartiesHeader, List<PartieDto>, Partie>($"api/joueur/{joueur.Licence}/parties", false, liste => liste?.Liste?.Parties);
         }
 
-        public async Task<List<Historique>> loadJoueurHistoriques(Joueur joueur)
+        public async Task<JourneeHistoriques> loadJoueurHistoriques(Joueur joueur)
         {
-            return await this.InternalLoadListFromSpid<ListePartiesHeader, List<PartieHistoDto>, Historique>($"api/joueur/{joueur.Licence}/parties/historique", false, liste => liste?.Liste?.Historiques);
+            JourneeHistoriques result = null;
+
+
+            //if (joueur.Historiques == null)
+           // {
+                var parties = await this.InternalLoadListFromSpid<ListePartiesHeader, List<PartieHistoDto>, Historique>($"api/joueur/{joueur.Licence}/parties/historique", false, liste => liste?.Liste?.Historiques);
+                
+                var journees = new JourneeHistoriques(joueur.Licence, PingService.CurrentPhase, DateTime.Now);
+                journees.AddRange(parties);
+                result = journees;
+
+                await Elastic.UpdateAsync<Joueur,JourneeHistoriques>(new DocumentPath<Joueur>(joueur.Licence), u => u.Doc(result));
+           // }
+            return result;
         }
 
         public async Task<List<Classement>> loadHistoriqueClassement(Joueur joueur)
@@ -96,7 +117,7 @@ namespace ePing.Api.services
         public async Task<List<Joueur>> LoadJoueursForClub(Club club,bool reload=false)
         {
             List<Joueur> joueurs = null;
-            try
+           /* try
             {
 
 
@@ -121,15 +142,30 @@ namespace ePing.Api.services
             }catch(Exception e)
             {
                 Console.WriteLine(e.Message);
-            }
+            }*/
             return joueurs.OrderBy(j=>j.Nom).ThenBy(j=>j.Prenom).ToList();
         }
 
         public async Task<Joueur> LoadJoueur(string licence)
         {
-            var joueur = await DbContext.Joueurs.FindAsync(licence);
-            if (joueur == null)
-                joueur = await LoadJoueurFromSpid(licence);
+            Joueur joueur = null;
+            var resp = await Elastic.GetAsync(new DocumentPath<Joueur>(licence));
+
+            // resp = await Elastic.SearchAsync<Joueur>(s => s.Query(q => q.Match(m => m.Field(f => f.Licence).Query(licence))));
+            if (resp.IsValid && resp.Found)
+                //joueur = resp.Hits.First().Source;
+                joueur = resp.Source;
+            else
+            {
+               /* joueur = await DbContext.Joueurs.FindAsync(licence);
+                if (joueur == null)*/
+                    joueur = await LoadJoueurFromSpid(licence);
+                if (resp.ApiCall.HttpStatusCode==404 && joueur!=null)
+                {
+                    var iresp = await Elastic.IndexDocumentAsync<Joueur>(joueur);
+
+                }
+            }
             return joueur;
         }
 
@@ -151,9 +187,9 @@ namespace ePing.Api.services
             joueur.Arbitre = joueurspid.Arbitre;
             joueur.JugeArbitre = joueurspid.JugeArbitre;
             joueur.Tech = joueurspid.Tech;
-            await this.DbContext.Set<Joueur>().AddAsync(joueur);
+            /*await this.DbContext.Set<Joueur>().AddAsync(joueur);
             if(autoSave)
-                await DbContext.SaveChangesAsync();
+                await DbContext.SaveChangesAsync();*/
             return joueur;
         }
 

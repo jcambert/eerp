@@ -17,7 +17,7 @@ namespace ePing.Api.Controllers
     {
 
 
-        public JoueursController(PingDbContext context, IJoueurService service, PointService pointsService, IClubService clubService) : base(context)
+        public JoueursController(/*PingDbContext context,*/ IJoueurService service, PointService pointsService, IClubService clubService) : base(/*context*/)
         {
             Service = service;
             PointsService = pointsService;
@@ -33,7 +33,8 @@ namespace ePing.Api.Controllers
         [HttpGet]
         public IEnumerable<Joueur> GetJoueurs()
         {
-            return Context.Joueurs;
+            // return Context.Joueurs;
+            return null;
         }
 
       /*  [HttpGet("{licence}")]
@@ -68,11 +69,12 @@ namespace ePing.Api.Controllers
         [HttpGet("{licence}/historique")]
         public async Task<IActionResult> GetHistoriquesDuJoueur([FromRoute] string licence)
         {
+
+            
             var joueur = await Service.LoadJoueur(licence);
-            var parties = await Service.loadJoueurHistoriques(joueur);
-            var journee = new JourneeHistoriques();
-            journee.AddRange(parties);
-            return Ok(journee);
+            var journees = await Service.loadJoueurHistoriques(joueur);
+
+            return Ok(journees);
         }
 
         [HttpGet("{licence}/histoclass")]
@@ -219,7 +221,7 @@ namespace ePing.Api.Controllers
         [HttpPut("{licence}/extra")]
         public async Task<IActionResult> PutExtra([FromRoute]string licence, [FromBody]JoueurExtraDto extra)
         {
-
+            /*
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -234,49 +236,51 @@ namespace ePing.Api.Controllers
 
             await Context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent();*/
+            return Ok();
         }
 
         // PUT: api/Joueurs/5
         [HttpPut("{licence}")]
         public async Task<IActionResult> PutJoueur([FromRoute] string licence, [FromBody] Joueur joueur)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (licence != joueur.Licence)
-            {
-                return BadRequest();
-            }
-
-            Context.Entry(joueur).State = EntityState.Modified;
-
-            try
-            {
-                await Context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!JoueurExists(licence))
+            /*    if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    return BadRequest(ModelState);
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                if (licence != joueur.Licence)
+                {
+                    return BadRequest();
+                }
+
+                Context.Entry(joueur).State = EntityState.Modified;
+
+                try
+                {
+                    await Context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!JoueurExists(licence))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return NoContent();*/
+            return Ok();
         }
 
         // POST: api/Joueurs
         [HttpPost]
         public async Task<IActionResult> PostJoueur([FromBody] Joueur joueur)
         {
-            if (!ModelState.IsValid)
+            /*if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -284,14 +288,15 @@ namespace ePing.Api.Controllers
             Context.Joueurs.Add(joueur);
             await Context.SaveChangesAsync();
 
-            return CreatedAtAction("GetJoueur", new { id = joueur.Licence }, joueur);
+            return CreatedAtAction("GetJoueur", new { id = joueur.Licence }, joueur);*/
+            return Ok();
         }
 
         // DELETE: api/Joueurs/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteJoueur([FromRoute] string id)
         {
-            if (!ModelState.IsValid)
+            /*if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -305,12 +310,14 @@ namespace ePing.Api.Controllers
             Context.Joueurs.Remove(joueur);
             await Context.SaveChangesAsync();
 
-            return Ok(joueur);
+            return Ok(joueur);*/
+            return Ok();
         }
 
         private bool JoueurExists(string id)
         {
-            return Context.Joueurs.Any(e => e.Licence == id);
+            return false;
+            //return Context.Joueurs.Any(e => e.Licence == id);
         }
 
         [HttpGet("liste/club/{club?}")]
